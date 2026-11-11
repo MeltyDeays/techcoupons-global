@@ -151,19 +151,19 @@ export function MarketCatalogPage({ storeFilter = null }) {
       />
 
       {/* Compact, Breathable Hero Section */}
-      <section className="mb-4 sm:mb-6 rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 shadow-sm">
-        <h1 className="mb-1.5 text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-[#1F1B18] leading-snug">
+      <section className="mb-4 sm:mb-6 w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 shadow-sm">
+        <h1 className="mb-1.5 text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-[#1F1B18] leading-snug break-words">
           {customHeading}
         </h1>
-        <p className="max-w-3xl text-xs sm:text-sm text-[#574B40] leading-relaxed">
+        <p className="max-w-3xl text-xs sm:text-sm text-[#574B40] leading-relaxed break-words">
           {dict.heroSubtitle}
         </p>
 
         {!hasTemuInCountry && (
           <div className="mt-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-[#D4A359]/60 bg-[#F6F2EA] p-3 text-xs text-[#574B40]">
-            <div className="flex items-start sm:items-center gap-2">
+            <div className="flex items-start sm:items-center gap-2 min-w-0">
               <Info className="h-4 w-4 text-[#B85332] shrink-0 mt-0.5 sm:mt-0" />
-              <span>{ui.miamiNotice(displayCountry, localeConfig.currencyCode)}</span>
+              <span className="break-words">{ui.miamiNotice(displayCountry, localeConfig.currencyCode)}</span>
             </div>
             <Link
               to={ui.usLockerTarget || '/en-us/temu'}
@@ -175,7 +175,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
         )}
 
         {/* Integrated Clean Search Bar */}
-        <div className="mt-4 relative">
+        <div className="mt-4 relative w-full">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A6B5E]" />
           <input
             type="search"
@@ -188,11 +188,11 @@ export function MarketCatalogPage({ storeFilter = null }) {
       </section>
 
       {/* Modern Visual Category Selector (Preserves active store: All, Temu, or AliExpress) */}
-      <section aria-label="Categories" className="mb-5 sm:mb-6">
+      <section aria-label="Categories" className="mb-5 sm:mb-6 w-full max-w-full min-w-0">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
           <Link
             to={getCategoryPath(null)}
-            className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
+            className={`flex min-w-0 items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
               !categoryFilter
                 ? 'border-[#B85332] bg-[#B85332] text-[#FCF9F4] shadow-sm'
                 : 'border-[#DED4C6] bg-[#FCF9F4] text-[#574B40] hover:border-[#B85332] hover:text-[#1F1B18]'
@@ -210,7 +210,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
               <Link
                 key={catSlug}
                 to={getCategoryPath(catSlug)}
-                className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
+                className={`flex min-w-0 items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
                   isActive
                     ? 'border-[#B85332] bg-[#B85332] text-[#FCF9F4] shadow-sm'
                     : 'border-[#DED4C6] bg-[#FCF9F4] text-[#574B40] hover:border-[#B85332] hover:text-[#1F1B18]'
@@ -225,7 +225,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
       </section>
 
       {/* Coupon Grid */}
-      <section aria-label="Verified Checkout Coupons">
+      <section aria-label="Verified Checkout Coupons" className="w-full max-w-full min-w-0">
         {filteredCoupons.length === 0 ? (
           <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 sm:p-8 text-center">
             <p className="text-base sm:text-lg font-extrabold text-[#1F1B18] mb-2">
@@ -247,7 +247,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
             </div>
           </div>
         ) : (
-          <div className="grid gap-4 sm:gap-5 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 w-full">
             {filteredCoupons.map((coupon) => (
               <CouponCard key={coupon.id} coupon={coupon} localeConfig={localeConfig} />
             ))}
@@ -310,34 +310,34 @@ export function DynamicsPage() {
         coupons={[]}
       />
 
-      <section className="mb-6 rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
-        <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-lg bg-[#8F5B1D]/15 border border-[#8F5B1D]/30 px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-[#7A4D16]">
-          <Gamepad2 className="h-3.5 w-3.5" />
-          <span>{dyn.badge}</span>
+      <section className="mb-6 w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
+        <div className="mb-2.5 inline-flex max-w-full items-center gap-1.5 rounded-lg bg-[#8F5B1D]/15 border border-[#8F5B1D]/30 px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-[#7A4D16]">
+          <Gamepad2 className="h-3.5 w-3.5 shrink-0" />
+          <span className="break-words">{dyn.badge}</span>
         </div>
 
-        <h1 className="mb-2 text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1F1B18]">
+        <h1 className="mb-2 text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1F1B18] break-words">
           {dyn.title(displayCountry)}
         </h1>
 
-        <p className="text-xs sm:text-sm md:text-base text-[#574B40] leading-relaxed">
+        <p className="text-xs sm:text-sm md:text-base text-[#574B40] leading-relaxed break-words">
           {dyn.subtitle}
         </p>
       </section>
 
-      <div className="grid gap-4 sm:gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 w-full">
         {dyn.items.map((item) => {
           const isCopied = copiedId === item.id;
           const isAli = item.storeKey === 'aliexpress';
           return (
             <article
               key={item.id}
-              className="flex flex-col justify-between rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 shadow-sm"
+              className="flex w-full max-w-full min-w-0 overflow-hidden flex-col justify-between rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 shadow-sm"
             >
-              <div>
-                <div className="mb-2.5 flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="mb-2.5 flex flex-wrap items-center justify-between gap-1.5">
                   <span
-                    className={`rounded-lg px-2.5 py-1 text-[10px] sm:text-[11px] font-extrabold border ${
+                    className={`rounded-lg px-2.5 py-1 text-[10px] sm:text-[11px] font-extrabold border break-words ${
                       isAli
                         ? 'bg-[#7A3B24]/15 border-[#7A3B24]/30 text-[#7A3B24]'
                         : 'bg-[#8F5B1D]/15 border-[#8F5B1D]/30 text-[#7A4D16]'
@@ -345,26 +345,26 @@ export function DynamicsPage() {
                   >
                     {item.badge}
                   </span>
-                  <span className="font-mono text-[11px] font-bold text-[#6E6055] uppercase">
+                  <span className="font-mono text-[11px] font-bold text-[#6E6055] uppercase shrink-0">
                     {item.store}
                   </span>
                 </div>
 
-                <h2 className="mb-2 text-base sm:text-lg font-extrabold text-[#1F1B18]">
+                <h2 className="mb-2 text-base sm:text-lg font-extrabold text-[#1F1B18] break-words">
                   {item.title}
                 </h2>
 
-                <p className="mb-4 rounded-xl border border-[#E5DAC9] bg-[#F3ECE2] p-3 text-xs leading-relaxed text-[#574B40]">
+                <p className="mb-4 rounded-xl border border-[#E5DAC9] bg-[#F3ECE2] p-3 text-xs leading-relaxed text-[#574B40] break-words">
                   {item.howItWorks}
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-1.5 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] px-3 py-2">
-                  <span className="text-[10px] font-extrabold uppercase text-[#6E6055]">
+              <div className="space-y-2 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] px-3 py-2.5 min-w-0">
+                  <span className="text-[10px] font-extrabold uppercase text-[#6E6055] shrink-0">
                     {dyn.typeInSearch}
                   </span>
-                  <code className="font-mono text-xs sm:text-sm md:text-base font-extrabold text-[#8F5B1D] select-all break-all">
+                  <code className="font-mono text-xs sm:text-sm md:text-base font-extrabold text-[#8F5B1D] select-all break-words sm:text-right">
                     {item.code}
                   </code>
                 </div>
@@ -378,13 +378,13 @@ export function DynamicsPage() {
                 >
                   {isCopied ? (
                     <>
-                      <Check className="h-4 w-4" />
-                      <span>{dyn.copiedBtn}</span>
+                      <Check className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{dyn.copiedBtn}</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="h-4 w-4" />
-                      <span>{dyn.copyBtn(item.store)}</span>
+                      <Copy className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{dyn.copyBtn(item.store)}</span>
                     </>
                   )}
                 </button>
@@ -495,69 +495,69 @@ export function GuidesPage() {
         coupons={[]}
       />
 
-      <section className="mb-6 rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
-        <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-lg bg-[#3D6352]/15 border border-[#3D6352]/30 px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-[#3D6352]">
-          <BadgeDollarSign className="h-3.5 w-3.5" />
-          <span>{g.badge}</span>
+      <section className="mb-6 w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
+        <div className="mb-2.5 inline-flex max-w-full items-center gap-1.5 rounded-lg bg-[#3D6352]/15 border border-[#3D6352]/30 px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-[#3D6352]">
+          <BadgeDollarSign className="h-3.5 w-3.5 shrink-0" />
+          <span className="break-words">{g.badge}</span>
         </div>
 
-        <h1 className="mb-2 text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1F1B18]">
+        <h1 className="mb-2 text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1F1B18] break-words">
           {g.title(displayCountry)}
         </h1>
 
-        <p className="text-xs sm:text-sm md:text-base text-[#574B40] leading-relaxed">
+        <p className="text-xs sm:text-sm md:text-base text-[#574B40] leading-relaxed break-words">
           {g.subtitle(ex20, ex15, ex5)}
         </p>
       </section>
 
-      <div className="space-y-5">
+      <div className="space-y-5 w-full max-w-full min-w-0">
         {/* Guide 1: Price Adjustment */}
-        <article className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
-          <div className="mb-3.5 flex items-center gap-3">
+        <article className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
+          <div className="mb-3.5 flex items-center gap-3 min-w-0">
             <span className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[#3D6352] text-[#FCF9F4] shrink-0">
               <BadgeDollarSign className="h-5 w-5" />
             </span>
-            <div>
-              <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#1F1B18]">
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#1F1B18] break-words">
                 {g.g1Title}
               </h2>
-              <p className="text-xs font-semibold text-[#3D6352]">{g.g1Sub}</p>
+              <p className="text-xs font-semibold text-[#3D6352] break-words">{g.g1Sub}</p>
             </div>
           </div>
 
-          <p className="mb-4 text-xs sm:text-sm leading-relaxed text-[#574B40]">
+          <p className="mb-4 text-xs sm:text-sm leading-relaxed text-[#574B40] break-words">
             {g.g1Desc(localeConfig.currencyCode)}
           </p>
 
-          <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
             {steps.map((s, idx) => (
-              <div key={idx} className="rounded-xl border border-[#E5DAC9] bg-[#F6F2EA] p-3.5 sm:p-4">
+              <div key={idx} className="min-w-0 rounded-xl border border-[#E5DAC9] bg-[#F6F2EA] p-3.5 sm:p-4">
                 <span className="font-mono text-xs font-extrabold text-[#B85332]">{s.step}</span>
-                <h3 className="mt-1 font-extrabold text-sm text-[#1F1B18]">{s.title}</h3>
-                <p className="mt-1 text-xs text-[#574B40] leading-relaxed">{s.desc}</p>
+                <h3 className="mt-1 font-extrabold text-sm text-[#1F1B18] break-words">{s.title}</h3>
+                <p className="mt-1 text-xs text-[#574B40] leading-relaxed break-words">{s.desc}</p>
               </div>
             ))}
           </div>
         </article>
 
         {/* Guide 2: How to Stack 3 Discounts on AliExpress */}
-        <article className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
-          <div className="mb-3.5 flex items-center gap-3">
+        <article className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
+          <div className="mb-3.5 flex items-center gap-3 min-w-0">
             <span className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[#B85332] text-[#FCF9F4] shrink-0">
               <Layers className="h-5 w-5" />
             </span>
-            <div>
-              <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#1F1B18]">
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#1F1B18] break-words">
                 {g.g2Title}
               </h2>
-              <p className="text-xs font-semibold text-[#B85332]">
+              <p className="text-xs font-semibold text-[#B85332] break-words">
                 {g.g2Sub(displayCountry)}
               </p>
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm leading-relaxed text-[#574B40]">{g.g2Desc}</p>
-          <ul className="mt-3 space-y-2 text-xs sm:text-sm text-[#1F1B18] list-disc list-inside">
+          <p className="text-xs sm:text-sm leading-relaxed text-[#574B40] break-words">{g.g2Desc}</p>
+          <ul className="mt-3 space-y-2 text-xs sm:text-sm text-[#1F1B18] list-disc list-inside break-words">
             {g.g2Bullets.map((b, i) => (
               <li key={i}>{b}</li>
             ))}
@@ -565,20 +565,20 @@ export function GuidesPage() {
         </article>
 
         {/* Guide 3: Direct Shipping vs Miami Locker */}
-        <article className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
-          <div className="mb-3.5 flex items-center gap-3">
+        <article className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
+          <div className="mb-3.5 flex items-center gap-3 min-w-0">
             <span className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[#7A3B24] text-[#FCF9F4] shrink-0">
               <Truck className="h-5 w-5" />
             </span>
-            <div>
-              <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#1F1B18]">
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#1F1B18] break-words">
                 {g.g3Title}
               </h2>
-              <p className="text-xs font-semibold text-[#7A3B24]">{g.g3Sub}</p>
+              <p className="text-xs font-semibold text-[#7A3B24] break-words">{g.g3Sub}</p>
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm leading-relaxed text-[#574B40]">
+          <p className="text-xs sm:text-sm leading-relaxed text-[#574B40] break-words">
             {g.g3Desc(displayCountry)}
           </p>
         </article>

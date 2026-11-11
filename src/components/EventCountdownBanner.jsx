@@ -35,35 +35,35 @@ export default function EventCountdownBanner({
   const pad = (n) => String(n).padStart(2, '0');
 
   return (
-    <div className="mb-4 sm:mb-6 rounded-2xl border-2 border-[#B85332]/40 bg-gradient-to-r from-[#FCF9F4] via-[#F6EFE4] to-[#FCF9F4] p-4 sm:p-5 shadow-sm">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div className="mb-4 sm:mb-6 w-full max-w-full min-w-0 overflow-hidden rounded-2xl border-2 border-[#B85332]/40 bg-gradient-to-r from-[#FCF9F4] via-[#F6EFE4] to-[#FCF9F4] p-3.5 sm:p-5 shadow-sm">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 sm:gap-4 min-w-0">
         {/* Left: Event Badge + Title + Description */}
         <div className="space-y-1.5 min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#B85332] px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-[#FCF9F4] shadow-sm">
               <Flame className="h-3.5 w-3.5 shrink-0" />
               <span>{eventInfo.codeTag} • {isLive ? txt.liveBadge : txt.upcomingBadge}</span>
             </span>
 
-            <span className="inline-flex items-center gap-1 rounded-lg border border-[#D8C8B4] bg-[#FCF9F4] px-2.5 py-1 text-[10px] font-bold text-[#574B40]">
+            <span className="inline-flex max-w-full items-center gap-1 rounded-lg border border-[#D8C8B4] bg-[#FCF9F4] px-2.5 py-1 text-[10px] font-bold text-[#574B40]">
               <Calendar className="h-3 w-3 text-[#B85332] shrink-0" />
-              <span className="truncate">{txt.calendarNote}</span>
+              <span className="whitespace-normal leading-snug break-words">{txt.calendarNote}</span>
             </span>
           </div>
 
-          <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#1F1B18] leading-snug">
+          <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#1F1B18] leading-snug break-words">
             {txt.title}
           </h2>
-          <p className="text-xs sm:text-sm text-[#574B40] leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#574B40] leading-relaxed break-words">
             {txt.desc}
           </p>
         </div>
 
         {/* Right: Live Automatic Countdown + 11.11 Filter Button */}
-        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end justify-between gap-2.5 shrink-0">
-          <div className="flex items-center justify-between sm:justify-start gap-2 rounded-xl border border-[#D8C8B4] bg-[#FCF9F4] px-3 py-2 shadow-sm">
-            <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-[#6E6055] uppercase">
-              <Clock className="h-3.5 w-3.5 text-[#B85332]" />
+        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end justify-between gap-2.5 shrink-0 min-w-0">
+          <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2 rounded-xl border border-[#D8C8B4] bg-[#FCF9F4] px-3 py-2 shadow-sm">
+            <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-extrabold text-[#6E6055] uppercase">
+              <Clock className="h-3.5 w-3.5 text-[#B85332] shrink-0" />
               <span>{isLive ? txt.endsIn : txt.startsIn}</span>
             </span>
 
@@ -90,14 +90,14 @@ export default function EventCountdownBanner({
             <button
               type="button"
               onClick={onToggleEvent1111}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-extrabold transition shadow-sm ${
+              className={`inline-flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-extrabold transition shadow-sm ${
                 onlyEvent1111
                   ? 'bg-[#1F1B18] text-[#FCF9F4]'
                   : 'bg-[#B85332] text-[#FCF9F4] hover:bg-[#9E4224]'
               }`}
             >
               <Sparkles className="h-3.5 w-3.5 shrink-0" />
-              <span>{onlyEvent1111 ? txt.showing1111Btn : txt.filter1111Btn}</span>
+              <span className="truncate">{onlyEvent1111 ? txt.showing1111Btn : txt.filter1111Btn}</span>
             </button>
           )}
         </div>

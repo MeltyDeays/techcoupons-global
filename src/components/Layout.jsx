@@ -110,7 +110,7 @@ export default function Layout({
   const contactUrl = getLocalizedPath(localeConfig, 'contact');
 
   return (
-    <div dir={localeConfig.rtl ? 'rtl' : 'ltr'} className="min-h-screen flex flex-col bg-[#F6F2EA] text-[#1F1B18] font-sans">
+    <div dir={localeConfig.rtl ? 'rtl' : 'ltr'} className="min-h-screen w-full max-w-[100vw] overflow-x-hidden flex flex-col bg-[#F6F2EA] text-[#1F1B18] font-sans">
       {/* Ultra-Clean Minimalist Header */}
       <header className="sticky top-0 z-40 border-b border-[#DED4C6] bg-[#FCF9F4]/95 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-3 sm:px-4">
@@ -271,12 +271,12 @@ export default function Layout({
             </div>
           </div>
 
-          {/* Row 2 on Mobile/Tablet: Single Clean Horizontal Tab Strip */}
-          <nav className="flex lg:hidden items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-[#ECE5D8] py-2 text-xs font-bold">
+          {/* Row 2 on Mobile/Tablet: Wrapped Pill Navigation so zero tabs are ever clipped */}
+          <nav className="flex flex-wrap lg:hidden items-center gap-1.5 border-t border-[#ECE5D8] py-2 text-[11px] sm:text-xs font-bold">
             <Link
               to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'all', activeCategory) : `/${localeConfig.code}`}
               onClick={handleScrollTopClick}
-              className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
+              className={`rounded-full px-2.5 sm:px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                 activeSection === 'coupons' && !activeStore
                   ? 'bg-[#1F1B18] text-[#FCF9F4]'
                   : 'bg-[#F0E9DF] text-[#574B40]'
@@ -289,7 +289,7 @@ export default function Layout({
               <Link
                 to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'temu', activeCategory) : `/${localeConfig.code}/temu`}
                 onClick={handleScrollTopClick}
-                className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
+                className={`rounded-full px-2.5 sm:px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                   activeSection === 'coupons' && activeStore === 'temu'
                     ? 'bg-[#B85332] text-[#FCF9F4]'
                     : 'bg-[#F0E9DF] text-[#8C3D22]'
@@ -302,7 +302,7 @@ export default function Layout({
             <Link
               to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'aliexpress', activeCategory) : `/${localeConfig.code}/aliexpress`}
               onClick={handleScrollTopClick}
-              className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
+              className={`rounded-full px-2.5 sm:px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                 activeSection === 'coupons' && activeStore === 'aliexpress'
                   ? 'bg-[#7A3B24] text-[#FCF9F4]'
                   : 'bg-[#F0E9DF] text-[#6E3520]'
@@ -314,26 +314,26 @@ export default function Layout({
             <Link
               to={dynamicsUrl}
               onClick={handleScrollTopClick}
-              className={`shrink-0 rounded-full px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap focus:outline-none ${
+              className={`rounded-full px-2.5 sm:px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap focus:outline-none ${
                 activeSection === 'dynamics'
                   ? 'bg-[#8F5B1D] text-[#FCF9F4]'
                   : 'bg-[#F0E9DF] text-[#7A4D16]'
               }`}
             >
-              <Gamepad2 className="h-3.5 w-3.5" />
+              <Gamepad2 className="h-3.5 w-3.5 shrink-0" />
               <span>{ui.navDynamics}</span>
             </Link>
 
             <Link
               to={guidesUrl}
               onClick={handleScrollTopClick}
-              className={`shrink-0 rounded-full px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap focus:outline-none ${
+              className={`rounded-full px-2.5 sm:px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap focus:outline-none ${
                 activeSection === 'guides'
                   ? 'bg-[#3D6352] text-[#FCF9F4]'
                   : 'bg-[#F0E9DF] text-[#3D6352]'
               }`}
             >
-              <BookOpen className="h-3.5 w-3.5" />
+              <BookOpen className="h-3.5 w-3.5 shrink-0" />
               <span>{ui.navGuides}</span>
             </Link>
           </nav>
@@ -341,10 +341,10 @@ export default function Layout({
       </header>
 
       {/* Main Content + Sidebar */}
-      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col lg:flex-row gap-6 lg:gap-8 px-3 sm:px-4 py-4 sm:py-7">
-        <main className="flex-1 min-w-0">{children}</main>
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col lg:flex-row gap-5 sm:gap-6 lg:gap-8 px-3 sm:px-4 py-4 sm:py-7 overflow-hidden">
+        <main className="w-full max-w-full flex-1 min-w-0 overflow-hidden">{children}</main>
 
-        <aside className="w-full lg:w-80 shrink-0 space-y-5">
+        <aside className="w-full max-w-full lg:w-80 shrink-0 min-w-0 space-y-5">
           {AFFILIATE_CONFIG.sidebarBanners.active ? (
             <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-5 shadow-sm">
               <div className="mb-3 flex items-center justify-between">

@@ -95,10 +95,10 @@ export default function CouponCard({ coupon, localeConfig }) {
 
   return (
     <>
-      <article className="group relative flex flex-col justify-between rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-5 shadow-[0_4px_20px_-6px_rgba(31,27,24,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#B85332]/60 hover:shadow-[0_12px_26px_-8px_rgba(184,83,50,0.14)] font-sans">
-        <div>
+      <article className="group relative flex w-full max-w-full min-w-0 overflow-hidden flex-col justify-between rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-5 shadow-[0_4px_20px_-6px_rgba(31,27,24,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#B85332]/60 hover:shadow-[0_12px_26px_-8px_rgba(184,83,50,0.14)] font-sans">
+        <div className="min-w-0">
           {/* Top bar: Localized Store Badge + Clean Category Pill */}
-          <div className="mb-2.5 flex items-center justify-between gap-2">
+          <div className="mb-2.5 flex flex-wrap items-center justify-between gap-1.5">
             <span
               className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider border ${
                 isTemu
@@ -109,7 +109,7 @@ export default function CouponCard({ coupon, localeConfig }) {
               {isTemu ? ui.storeBadgeTemu : ui.storeBadgeAli}
             </span>
 
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#F0E9DF] border border-[#D8C8B4] px-2.5 py-1 text-[10px] sm:text-[11px] font-bold text-[#574B40] max-w-[60%] truncate">
+            <span className="inline-flex min-w-0 max-w-full sm:max-w-[60%] items-center gap-1.5 rounded-lg bg-[#F0E9DF] border border-[#D8C8B4] px-2.5 py-1 text-[10px] sm:text-[11px] font-bold text-[#574B40] truncate">
               <CategoryIcon className="h-3.5 w-3.5 text-[#B85332] shrink-0" />
               <span className="truncate">{shortCatLabel}</span>
             </span>
@@ -119,17 +119,17 @@ export default function CouponCard({ coupon, localeConfig }) {
           <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
             <span className="inline-flex items-center gap-1 rounded-md bg-[#3D6352]/12 px-2 py-0.5 text-[10px] font-bold text-[#3D6352] border border-[#3D6352]/25">
               <ShoppingCart className="h-3 w-3 shrink-0" />
-              <span>{ui.checkoutBadge}</span>
+              <span className="break-words">{ui.checkoutBadge}</span>
             </span>
             {coupon.eligibilityText && (
-              <span className="inline-flex items-center rounded-md bg-[#B85332]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#9E4224] border border-[#B85332]/25">
+              <span className="inline-flex items-center rounded-md bg-[#B85332]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#9E4224] border border-[#B85332]/25 break-words">
                 {coupon.eligibilityText}
               </span>
             )}
           </div>
 
           {/* High-Readability Title */}
-          <h3 className="mb-2 text-base sm:text-lg font-extrabold leading-snug text-[#1F1B18] group-hover:text-[#B85332] transition-colors">
+          <h3 className="mb-2 text-base sm:text-lg font-extrabold leading-snug text-[#1F1B18] group-hover:text-[#B85332] transition-colors break-words">
             {coupon.title}
           </h3>
 
@@ -137,10 +137,10 @@ export default function CouponCard({ coupon, localeConfig }) {
           {(coupon.appliesToText || coupon.regionalNote) && (
             <div className="mb-3.5 space-y-1.5 rounded-xl bg-[#F3ECE2] px-3 py-2 border border-[#E5DAC9]">
               {coupon.appliesToText && (
-                <p className="text-xs leading-relaxed text-[#574B40]">{coupon.appliesToText}</p>
+                <p className="text-xs leading-relaxed text-[#574B40] break-words">{coupon.appliesToText}</p>
               )}
               {coupon.regionalNote && (
-                <p className="text-[11px] font-semibold leading-snug text-[#3D6352]">
+                <p className="text-[11px] font-semibold leading-snug text-[#3D6352] break-words">
                   • {coupon.regionalNote}
                 </p>
               )}
@@ -150,7 +150,7 @@ export default function CouponCard({ coupon, localeConfig }) {
           {/* Benefit Summary Box */}
           <div className="mb-4 rounded-xl bg-[#F0E9DF] p-3 border border-[#DED4C6]">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#DED4C6] pb-2 mb-2">
-              <div>
+              <div className="min-w-0">
                 <span className="text-[10px] uppercase tracking-wider font-bold text-[#6E6055] block">
                   {ui.directDiscount}
                 </span>
@@ -185,18 +185,18 @@ export default function CouponCard({ coupon, localeConfig }) {
         </div>
 
         {/* Code Box & Action Button */}
-        <div className="mt-1 flex flex-col gap-2">
+        <div className="mt-1 flex flex-col gap-2 min-w-0">
           <div
             onClick={handleRevealAndCopy}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && handleRevealAndCopy()}
-            className="flex cursor-pointer items-center justify-between gap-2 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] hover:border-[#B85332] px-3 py-2 transition"
+            className="flex flex-wrap cursor-pointer items-center justify-between gap-1.5 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] hover:border-[#B85332] px-3 py-2 transition min-w-0"
           >
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6E6055] shrink-0">
               {ui.promoCodeLabel}
             </span>
-            <code className="font-mono text-sm sm:text-base font-extrabold tracking-wider text-[#B85332] select-all truncate">
+            <code className="font-mono text-sm sm:text-base font-extrabold tracking-wider text-[#B85332] select-all break-all">
               {revealed ? coupon.code : maskedCode}
             </code>
           </div>
