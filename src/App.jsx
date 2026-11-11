@@ -22,6 +22,7 @@ import Layout from './components/Layout.jsx';
 import SEOHead from './components/SEOHead.jsx';
 import CouponCard from './components/CouponCard.jsx';
 import NativeSEOGuide from './components/NativeSEOGuide.jsx';
+import EventCountdownBanner from './components/EventCountdownBanner.jsx';
 import {
   Search,
   Info,
@@ -72,6 +73,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
   const { locale, slug } = useParams();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [onlyEvent1111, setOnlyEvent1111] = useState(false);
 
   if (!LOCALE_MAP[(locale || '').toLowerCase()]) {
     return <Navigate to={`/${DEFAULT_LOCALE}`} replace />;
@@ -99,7 +101,11 @@ export function MarketCatalogPage({ storeFilter = null }) {
   const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
   const hasTemuInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
 
-  const coupons = getCouponsForLocale(localeConfig.code, { storeFilter, categoryFilter });
+  const coupons = getCouponsForLocale(localeConfig.code, {
+    storeFilter,
+    categoryFilter,
+    onlyEvent1111
+  });
 
   const filteredCoupons = coupons.filter((c) => {
     if (!searchQuery.trim()) return true;
@@ -135,6 +141,13 @@ export function MarketCatalogPage({ storeFilter = null }) {
         pageTitle={`${customHeading} | CuponesTech`}
         pageDescription={dict.heroSubtitle}
         coupons={coupons}
+      />
+
+      {/* Automatic Event Calendar & 11.11 Live Countdown Banner */}
+      <EventCountdownBanner
+        localeConfig={localeConfig}
+        onlyEvent1111={onlyEvent1111}
+        onToggleEvent1111={() => setOnlyEvent1111((prev) => !prev)}
       />
 
       {/* Compact, Breathable Hero Section */}

@@ -4,30 +4,79 @@ import { AFFILIATE_CONFIG } from '../config/affiliateConfig.js';
 /**
  * REGIONAL ALIEXPRESS TIERED PROMO CODES (Official Global Portals / Choice Active Series)
  */
+const EU_LOCALES = [
+  'es-es', 'fr-fr', 'de-de', 'de-at', 'it-it', 'nl-nl', 'pl-pl',
+  'pt-pt', 'sv-se', 'da-dk', 'fi-fi', 'el-gr', 'cs-cz', 'ro-ro',
+  'hu-hu', 'fr-be', 'en-ie'
+];
+
 const ALIEXPRESS_REGIONAL_TIERS = {
+  tier6_18_new: {
+    default: { primary: 'IFPSF035', backup: 'IFPGQEE8' }
+  },
   tier3_18: {
-    default: { primary: 'IFPCOGGC', backup: 'IFPGTV1F' },
-    'es-mx': { primary: 'ALIMX03', backup: 'IFPCOGGC' },
-    'pt-br': { primary: 'IFPCOGGC', backup: 'IFPGTV1F' },
-    'es-es': { primary: 'IFPCOGGC', backup: 'IFPGTV1F' }
+    default: { primary: 'IFPPYMNC', backup: 'IFPOJMMH' },
+    'en-us': { primary: 'IFPHRPPX', backup: 'JJZ03F' },
+    'es-us': { primary: 'IFPHRPPX', backup: 'JJZ03F' },
+    'es-mx': { primary: 'ALIMX03', backup: 'IFPPYMNC' },
+    'pt-br': { primary: 'AFFNOV01', backup: 'IFPPYMNC' },
+    EU: { primary: 'OEUD1103', backup: 'IFPPYMNC' }
   },
   tier8_45: {
-    default: { primary: 'IFPCDXGG', backup: 'IFPOSPHJ' }
+    default: { primary: 'IFPH7JTG', backup: 'IFP7C7F4' },
+    'en-us': { primary: 'IFPXPT4R', backup: 'JJZ08F' },
+    'es-us': { primary: 'IFPXPT4R', backup: 'JJZ08F' },
+    'pt-br': { primary: 'AFFNOV02', backup: 'IFPH7JTG' },
+    EU: { primary: 'OEUD1108', backup: 'IFPH7JTG' }
   },
   tier13_79: {
-    default: { primary: 'IFPIMB3X', backup: 'IFPZ5GQG' }
+    default: { primary: 'IFP8JJII', backup: 'IFPBJKOH' },
+    'en-us': { primary: 'IFPOGSEK', backup: 'JJZ20F' },
+    'es-us': { primary: 'IFPOGSEK', backup: 'JJZ20F' },
+    'pt-br': { primary: 'AFFNOV03', backup: 'IFP8JJII' },
+    EU: { primary: 'OEUD1114', backup: 'IFP8JJII' }
   },
   tier24_139: {
-    default: { primary: 'IFPDSIWP', backup: 'IFPHB8CL' }
+    default: { primary: 'IFPSOMRB', backup: 'IFPEDRVK' },
+    'en-us': { primary: 'IFPWBCF9', backup: 'JJZ30F' },
+    'es-us': { primary: 'IFPWBCF9', backup: 'JJZ30F' },
+    EU: { primary: 'OEUD1127', backup: 'IFPSOMRB' }
   },
   tier40_229: {
-    default: { primary: 'IFPZWROH', backup: 'IFPM9JQA' }
+    default: { primary: 'IFPTUSUJ', backup: 'IFPT8YXM' },
+    'en-us': { primary: 'IFP4WYWO', backup: 'JJZ40F' },
+    'es-us': { primary: 'IFP4WYWO', backup: 'JJZ40F' },
+    EU: { primary: 'OEUD1143', backup: 'IFPTUSUJ' }
+  },
+  tier60_349: {
+    default: { primary: 'IFPD1RWY', backup: 'IFPMOWED' },
+    'en-us': { primary: 'IFPJA46F', backup: 'JJZ60F' },
+    'es-us': { primary: 'IFPJA46F', backup: 'JJZ60F' },
+    EU: { primary: 'OEUD1160', backup: 'IFPD1RWY' }
+  },
+  tier80_469: {
+    default: { primary: 'IFPAYSD8', backup: 'IFPWIL3R' },
+    'en-us': { primary: 'IFPAFP51', backup: 'JJZ80F' },
+    'es-us': { primary: 'IFPAFP51', backup: 'JJZ80F' },
+    EU: { primary: 'OEUD1179', backup: 'IFPAYSD8' }
+  },
+  tier100_500: {
+    default: { primary: 'IFPCOBPV', backup: 'IFP2WO3T' },
+    'en-us': { primary: 'IFP4LOLI', backup: 'JJZ100F' },
+    'es-us': { primary: 'IFP4LOLI', backup: 'JJZ100F' }
+  },
+  tier120_600: {
+    default: { primary: 'IFP9Z8BS', backup: 'IFPHQ1HD' },
+    'en-us': { primary: 'IFPWCFMD', backup: 'JJZ130F' },
+    'es-us': { primary: 'IFPWCFMD', backup: 'JJZ130F' }
   }
 };
 
 function getAliCodeForLocale(tierKey, localeCode) {
   const tier = ALIEXPRESS_REGIONAL_TIERS[tierKey] || ALIEXPRESS_REGIONAL_TIERS.tier8_45;
-  return tier[localeCode] || tier.default;
+  if (tier[localeCode]) return tier[localeCode];
+  if (EU_LOCALES.includes(localeCode) && tier.EU) return tier.EU;
+  return tier.default;
 }
 
 /**
@@ -1099,50 +1148,184 @@ const CHECKOUT_COUPONS = [
       es: '¿Para qué sirve?: Descuenta en conjuntos para recién nacido, zapatos infantiles, estuches de colores, agendas, organizadores de escritorio y mochilas.',
       en: 'What it covers: Discounts newborn outfits, kids shoes, art pencil cases, planners, desk organizers, and school bags.'
     }
+  },
+
+  // =========================================================================
+  // 12. ESPECIALES 11.11 FESTIVAL GLOBAL Y ESCALERA MULTI-PAÍS (isEvent1111: true)
+  // =========================================================================
+  {
+    id: 'ali-1111-newuser-bonus',
+    store: 'aliexpress',
+    category: 'moda-ropa',
+    tierKey: 'tier6_18_new',
+    isEvent1111: true,
+    discountPct: 33,
+    discountUsd: 6,
+    minSpendUsd: 18,
+    userEligibility: {},
+    title: {},
+    appliesTo: {}
+  },
+  {
+    id: 'ali-1111-tier40',
+    store: 'aliexpress',
+    category: 'tech-gadgets',
+    tierKey: 'tier40_229',
+    isEvent1111: true,
+    discountPct: 18,
+    discountUsd: 40,
+    minSpendUsd: 229,
+    userEligibility: {},
+    title: {},
+    appliesTo: {}
+  },
+  {
+    id: 'ali-1111-tier60',
+    store: 'aliexpress',
+    category: 'tech-gadgets',
+    tierKey: 'tier60_349',
+    isEvent1111: true,
+    discountPct: 18,
+    discountUsd: 60,
+    minSpendUsd: 349,
+    userEligibility: {},
+    title: {},
+    appliesTo: {}
+  },
+  {
+    id: 'ali-1111-tier80',
+    store: 'aliexpress',
+    category: 'perifericos-gaming',
+    tierKey: 'tier80_469',
+    isEvent1111: true,
+    discountPct: 18,
+    discountUsd: 80,
+    minSpendUsd: 469,
+    userEligibility: {},
+    title: {},
+    appliesTo: {}
+  },
+  {
+    id: 'ali-1111-tier100',
+    store: 'aliexpress',
+    category: 'smart-home',
+    tierKey: 'tier100_500',
+    isEvent1111: true,
+    discountPct: 20,
+    discountUsd: 100,
+    minSpendUsd: 500,
+    userEligibility: {},
+    title: {},
+    appliesTo: {}
+  },
+  {
+    id: 'ali-1111-tier120',
+    store: 'aliexpress',
+    category: 'herramientas-autos',
+    tierKey: 'tier120_600',
+    isEvent1111: true,
+    discountPct: 20,
+    discountUsd: 120,
+    minSpendUsd: 600,
+    userEligibility: {},
+    title: {},
+    appliesTo: {}
+  },
+  {
+    id: 'temu-1111-global-bundle',
+    store: 'temu',
+    category: 'moda-ropa',
+    code: 'fav43910',
+    backupCode: 'aci382910',
+    isEvent1111: true,
+    discountPct: 30,
+    discountUsd: 100,
+    minSpendUsd: 39,
+    userEligibility: {},
+    title: {},
+    appliesTo: {}
   }
 ];
 
 export const SEARCH_DYNAMIC_CODES = [];
 
-export function getCouponsForLocale(localeCode, { storeFilter = null, categoryFilter = null } = {}) {
+function getDynamicAdminCoupons() {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem('ecosistema_b_custom_coupons_v1');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((item) => ({
+      id: item.id || `custom-${item.code}`,
+      store: item.store || 'aliexpress',
+      category: item.category || 'tech-gadgets',
+      code: item.code,
+      backupCode: item.backupCode || null,
+      isEvent1111: true,
+      discountPct: Number(item.discountPct) || 20,
+      discountUsd: Number(item.discountUsd || item.basePriceUsd) || 15,
+      minSpendUsd: Number(item.minSpendUsd) || 45,
+      userEligibility: {},
+      title: {
+        es: item.productName?.es || item.title || '',
+        en: item.productName?.en || item.title || ''
+      },
+      appliesTo: {}
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export function getCouponsForLocale(
+  localeCode,
+  { storeFilter = null, categoryFilter = null, onlyEvent1111 = false } = {}
+) {
   const localeConfig = getLocaleConfig(localeCode);
   const { lang, dict } = localeConfig;
   const availableStores = localeConfig.stores || ['temu', 'aliexpress'];
   const tpl = COUPON_LANG_TEMPLATES[lang] || COUPON_LANG_TEMPLATES.en;
 
-  return CHECKOUT_COUPONS.filter((c) => {
+  const allCoupons = [... getDynamicAdminCoupons(), ...CHECKOUT_COUPONS];
+
+  return allCoupons.filter((c) => {
     if (!availableStores.includes(c.store)) return false;
     if (storeFilter && c.store !== storeFilter) return false;
     if (categoryFilter && c.category !== categoryFilter) return false;
+    if (onlyEvent1111 && !c.isEvent1111) return false;
     return true;
   }).map((c) => {
     const categoryLabel = dict.categories[c.category] || c.category;
+    const localMinSpend = formatLocalPrice(c.minSpendUsd, localeConfig);
+    const localDiscountAmount = formatLocalPrice(c.discountUsd, localeConfig);
 
-    let localizedTitle = c.title[lang];
+    let localizedTitle = c.title?.[lang];
     if (!localizedTitle) {
-      localizedTitle = c.store === 'aliexpress'
+      const baseTitle = c.store === 'aliexpress'
         ? tpl.aliTitle(categoryLabel)
         : tpl.temuTitle(c.discountPct, categoryLabel);
+      localizedTitle = c.isEvent1111
+        ? `[11.11 • -${localDiscountAmount}] ${baseTitle}`
+        : baseTitle;
     }
 
-    let appliesToText = c.appliesTo[lang];
+    let appliesToText = c.appliesTo?.[lang];
     if (!appliesToText) {
       const catCoverDesc = tpl.catCovers[c.category] || COUPON_LANG_TEMPLATES.en.catCovers[c.category];
       appliesToText = `${tpl.coversPrefix} ${catCoverDesc}`;
     }
 
-    let eligibilityText = c.userEligibility[lang];
+    let eligibilityText = c.userEligibility?.[lang];
     if (!eligibilityText) {
-      eligibilityText = c.store === 'aliexpress' ? tpl.allUsers : tpl.newUsers;
+      const baseElig = c.store === 'aliexpress' && c.tierKey !== 'tier6_18_new' ? tpl.allUsers : tpl.newUsers;
+      eligibilityText = c.isEvent1111 ? `11.11 • ${baseElig}` : baseElig;
     }
-
-    const localMinSpend = formatLocalPrice(c.minSpendUsd, localeConfig);
-    const localDiscountAmount = formatLocalPrice(c.discountUsd, localeConfig);
 
     let primaryCode = c.code;
     let backupCode = c.backupCode || null;
 
-    if (c.store === 'aliexpress') {
+    if (c.store === 'aliexpress' && c.tierKey) {
       const aliCodes = getAliCodeForLocale(c.tierKey, localeConfig.code);
       primaryCode = aliCodes.primary;
       backupCode = aliCodes.backup;
