@@ -5,7 +5,8 @@ import { AFFILIATE_CONFIG } from '../config/affiliateConfig.js';
 import {
   getSectionText,
   getLocalizedPath,
-  translatePathToLocale
+  translatePathToLocale,
+  getLocalizedCountryName
 } from '../data/multilingualSections.js';
 import {
   ShieldAlert,
@@ -48,6 +49,7 @@ export default function Layout({
   const dropdownRef = useRef(null);
   const { dict } = localeConfig;
   const ui = getSectionText(localeConfig.lang);
+  const activeCountryDisplay = getLocalizedCountryName(localeConfig, localeConfig.lang);
   const hasTemuInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
 
   // Auto-scroll to top on every route change so footer/sidebar links never leave the user stuck at the bottom
@@ -85,7 +87,9 @@ export default function Layout({
   const filteredLocales = LOCALES.filter((loc) => {
     if (!countrySearch.trim()) return true;
     const q = countrySearch.toLowerCase();
+    const localizedName = getLocalizedCountryName(loc, localeConfig.lang).toLowerCase();
     return (
+      localizedName.includes(q) ||
       loc.countryName.toLowerCase().includes(q) ||
       loc.languageName.toLowerCase().includes(q) ||
       loc.code.toLowerCase().includes(q) ||
@@ -201,7 +205,7 @@ export default function Layout({
                 className="flex items-center gap-1.5 rounded-xl border border-[#D8C8B4] bg-[#F6F2EA] px-2.5 py-1.5 text-xs font-bold text-[#1F1B18] hover:border-[#B85332] transition focus:outline-none"
               >
                 <FlagImg iso={localeConfig.iso} className="h-3.5 w-5" />
-                <span className="max-w-[85px] sm:max-w-[130px] truncate">{localeConfig.countryName}</span>
+                <span className="max-w-[95px] sm:max-w-[165px] truncate">{activeCountryDisplay}</span>
                 <span className="rounded bg-[#E6DDD0] px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#574B40]">
                   {localeConfig.currencyCode}
                 </span>
@@ -217,7 +221,7 @@ export default function Layout({
                         type="search"
                         value={countrySearch}
                         onChange={(e) => setCountrySearch(e.target.value)}
-                        placeholder={`${localeConfig.countryName}, ${localeConfig.currencyCode}...`}
+                        placeholder={`${activeCountryDisplay}, ${localeConfig.currencyCode}...`}
                         className="w-full rounded-xl border border-[#D8C8B4] bg-[#F6F2EA] pl-8 pr-3 py-2 text-xs text-[#1F1B18] placeholder-[#8C7D70] focus:border-[#B85332] focus:outline-none"
                       />
                     </div>
@@ -227,6 +231,7 @@ export default function Layout({
                     {filteredLocales.map((loc) => {
                       const isSelected = loc.code === localeConfig.code;
                       const onlyAli = !loc.stores?.includes('temu');
+                      const displayLocName = getLocalizedCountryName(loc, localeConfig.lang);
                       return (
                         <button
                           key={loc.code}
@@ -241,7 +246,7 @@ export default function Layout({
                           <div className="flex items-center gap-2.5 min-w-0">
                             <FlagImg iso={loc.iso} className="h-4 w-6" />
                             <div className="truncate">
-                              <span className="block truncate font-semibold">{loc.countryName}</span>
+                              <span className="block truncate font-semibold">{displayLocName}</span>
                               <span className="text-[10px] text-[#7A6B5E]">{loc.languageName}</span>
                             </div>
                           </div>
@@ -418,7 +423,7 @@ export default function Layout({
           {/* Global Regions Directory */}
           <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-5 shadow-sm">
             <h3 className="mb-3 text-xs font-extrabold uppercase tracking-wider text-[#574B40]">
-              {localeConfig.countryName} • {LOCALES.length} Regions
+              {activeCountryDisplay} • {LOCALES.length} Regions
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-1.5 text-xs max-h-72 overflow-y-auto pr-1">
               {LOCALES.map((loc) => (
@@ -433,7 +438,7 @@ export default function Layout({
                   }`}
                 >
                   <FlagImg iso={loc.iso} className="h-3.5 w-5" />
-                  <span className="truncate">{loc.countryName}</span>
+                  <span className="truncate">{getLocalizedCountryName(loc, localeConfig.lang)}</span>
                 </Link>
               ))}
             </div>
@@ -476,7 +481,7 @@ export default function Layout({
                 <div className="flex items-center gap-2 rounded-xl bg-[#F3ECE2] px-3 py-2 border border-[#E5DAC9] mb-3">
                   <FlagImg iso={localeConfig.iso} className="h-4 w-6" />
                   <span className="font-bold text-[#1F1B18] truncate">
-                    {localeConfig.countryName} ({localeConfig.currencyCode})
+                    {activeCountryDisplay} ({localeConfig.currencyCode})
                   </span>
                 </div>
               </div>

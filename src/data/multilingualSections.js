@@ -1,5 +1,136 @@
-// Native translations for all 14 languages across 66 countries:
-// UI Micro-labels, 11 Diverse Shopping Categories, App Dynamics & Mini-Games, and 30-Day Price Adjustment Guides.
+// Complete 14-Language Native Dictionary:
+// UI Micro-labels, Localized US Locker / Freight Forwarder terms, 11 Categories,
+// App Dynamics & Mini-Games, and 30-Day Price Adjustment & US Locker Guides.
+
+const BASE_DYNAMICS_EN = [
+  {
+    id: 'dyn-credit777',
+    store: 'Temu App',
+    storeKey: 'temu',
+    code: 'credit777',
+    badge: 'CREDIT WHEEL & REWARDS',
+    title: 'Account Credit & Reward Wheel Activity (credit777)',
+    howItWorks:
+      'Type "credit777" into the top search bar in the Temu app to open the official credit-back board and spin for wallet credit.'
+  },
+  {
+    id: 'dyn-claimcredit',
+    store: 'Temu App',
+    storeKey: 'temu',
+    code: 'claimcredit',
+    badge: 'DAILY CREDIT CLAIM',
+    title: 'Daily Pending Credit Collection Dashboard (claimcredit)',
+    howItWorks:
+      'If you joined a credit-back promotion, search "claimcredit" in the Temu app every day for 7 days to claim each daily credit installment.'
+  },
+  {
+    id: 'dyn-wincredit',
+    store: 'Temu App',
+    storeKey: 'temu',
+    code: 'wincredit',
+    badge: 'COINS-TO-CASH EVENT',
+    title: 'Coin Accumulation for Wallet Credit (wincredit)',
+    howItWorks:
+      'Searching "wincredit" in the Temu app opens the progressive coin challenge that converts event points into direct shopping balance.'
+  },
+  {
+    id: 'dyn-box777',
+    store: 'Temu App',
+    storeKey: 'temu',
+    code: 'box777',
+    badge: 'MYSTERY CHESTS',
+    title: 'Treasure Box & Flash Bundle Mini-Game (box777)',
+    howItWorks:
+      'Type "box777" in the Temu search bar to trigger the mystery chest activity with stackable flash coupon packs.'
+  },
+  {
+    id: 'dyn-ali-coins',
+    store: 'AliExpress App',
+    storeKey: 'aliexpress',
+    code: 'Coins Discount Finder',
+    badge: 'EXTRA 5%–25% APP DISCOUNT',
+    title: 'AliExpress Coins Center + Super Discount Finder',
+    howItWorks:
+      'Open the "Coins" tab inside the AliExpress mobile app, collect daily coins in one tap, and use the Discount Finder to stack up to 25% extra off.'
+  },
+  {
+    id: 'dyn-ali-mergeboss',
+    store: 'AliExpress App',
+    storeKey: 'aliexpress',
+    code: 'Merge Boss & Prize Land',
+    badge: 'OFFICIAL SHOPPING CREDITS',
+    title: 'AliExpress Merge Boss & Prize Land Reward Games',
+    howItWorks:
+      'Under "Account" in the AliExpress app, play Merge Boss or Prize Land to exchange game points for no-minimum shopping credits.'
+  }
+];
+
+export const US_COUNTRY_LABELS_BY_VIEWER_LANG = {
+  es: {
+    'en-us': 'Estados Unidos (Inglés • US Locker)',
+    'es-us': 'Estados Unidos (Casillero / Locker Miami)'
+  },
+  en: {
+    'en-us': 'United States (Direct & US Locker)',
+    'es-us': 'United States (Spanish • US Locker)'
+  },
+  pt: {
+    'en-us': 'Estados Unidos (Inglês • Locker / Redirecionador EUA)',
+    'es-us': 'Estados Unidos (Espanhol • Locker / Redirecionador EUA)'
+  },
+  fr: {
+    'en-us': 'États-Unis (Anglais • Casier / Locker US)',
+    'es-us': 'États-Unis (Espagnol • Casier / Locker US)'
+  },
+  de: {
+    'en-us': 'Vereinigte Staaten (US-Locker / Weiterleitung)',
+    'es-us': 'Vereinigte Staaten (Spanisch • US-Locker)'
+  },
+  it: {
+    'en-us': 'Stati Uniti (Inglese • Locker USA)',
+    'es-us': 'Stati Uniti (Spagnolo • Locker USA)'
+  },
+  nl: {
+    'en-us': 'Verenigde Staten (US Locker / Doorstuuradres)',
+    'es-us': 'Verenigde Staten (Spaans • US Locker)'
+  },
+  pl: {
+    'en-us': 'Stany Zjednoczone (Skrzynka / Locker USA)',
+    'es-us': 'Stany Zjednoczone (Hiszpański • Locker USA)'
+  },
+  ja: {
+    'en-us': 'アメリカ合衆国（米国転送ロッカー・US Locker）',
+    'es-us': 'アメリカ合衆国（スペイン語・米国ロッカー）'
+  },
+  ko: {
+    'en-us': '미국 (미국 배대지 / US Locker)',
+    'es-us': '미국 (스페인어 • 미국 배대지 / Locker)'
+  },
+  ar: {
+    'en-us': 'الولايات المتحدة (صندوق بريد أمريكي / US Locker)',
+    'es-us': 'الولايات المتحدة (الإسبانية • صندوق بريد أمريكي)'
+  },
+  zh: {
+    'en-us': '美国（美国转运仓 / US Locker）',
+    'es-us': '美国（西语 • 美国转运仓 / Locker）'
+  },
+  ru: {
+    'en-us': 'США (Американский склад / US Locker)',
+    'es-us': 'США (Испанский • Склад / Локер в США)'
+  },
+  tr: {
+    'en-us': 'ABD (Amerika Adresi / US Locker)',
+    'es-us': 'ABD (İspanyolca • US Locker)'
+  }
+};
+
+export function getLocalizedCountryName(loc, viewerLang = 'en') {
+  if (loc.code === 'en-us' || loc.code === 'es-us') {
+    const map = US_COUNTRY_LABELS_BY_VIEWER_LANG[viewerLang] || US_COUNTRY_LABELS_BY_VIEWER_LANG.en;
+    return map[loc.code] || loc.countryName;
+  }
+  return loc.countryName;
+}
 
 export const SECTION_I18N = {
   es: {
@@ -36,9 +167,10 @@ export const SECTION_I18N = {
       'bebes-oficina': 'Bebés y Papelería',
       'redes-wifi': 'Wi-Fi y Redes'
     },
+    usLockerTarget: '/es-us/temu',
     miamiNotice: (country, curr) =>
-      `En ${country}, AliExpress envía directo en ${curr}. Para pedir en Temu con casillero en Miami, puedes ver los códigos de EE. UU.`,
-    miamiBtn: 'Ver Temu (Casillero Miami)',
+      `En ${country}, AliExpress envía directo en ${curr}. Si compras mediante Casillero en Estados Unidos (Miami Locker), cambia a la región de Casillero EE. UU.`,
+    miamiBtn: 'Ver Cupones EE. UU. (Casillero / Locker)',
     dynamics: {
       badge: 'COMANDOS DE BUSCADOR Y MINIJUEGOS DE APP',
       title: (country) => `Dinámicas, Ruletas y Minijuegos de Temu y AliExpress en ${country}`,
@@ -144,10 +276,10 @@ export const SECTION_I18N = {
         'Capa 2 — Monedas de la App: Compra desde la app móvil para descontar automáticamente entre 2% y 15% extra.',
         'Capa 3 — Código Promocional CuponesTech: Pega uno de nuestros códigos verificados (serie IFP) en la casilla de código promocional al pagar.'
       ],
-      g3Title: '3. Envío Directo vs. Casillero Internacional en Miami (Florida)',
-      g3Sub: 'Cómo elegir la mejor ruta logística según tu país',
+      g3Title: '3. Envío Directo vs. Casillero Internacional en EE. UU. (US Locker)',
+      g3Sub: 'Cómo elegir la mejor ruta de envío según tu país',
       g3Desc: (country) =>
-        `Desde ${country}, puedes pedir por envío directo internacional en AliExpress (línea Choice con seguimiento completo) o, si utilizas un casillero en Miami (código postal 33166 / 33122), cambiar el selector de país arriba a "Estados Unidos (Casilleros Miami)" para aprovechar envío doméstico gratuito en EE. UU. tanto en Temu como en AliExpress.`
+        `Desde ${country}, puedes pedir por envío directo internacional a tu domicilio o, si utilizas un casillero internacional en Estados Unidos (Miami / Florida ZIP 33166 o 33122), seleccionar en el menú superior "Estados Unidos (Casillero / Locker)" para activar envío gratis dentro de EE. UU. y acceder al catálogo completo de códigos en USD.`
     }
   },
 
@@ -185,9 +317,10 @@ export const SECTION_I18N = {
       'bebes-oficina': 'Baby & Office',
       'redes-wifi': 'Wi-Fi & Routers'
     },
+    usLockerTarget: '/en-us/temu',
     miamiNotice: (country, curr) =>
-      `In ${country}, AliExpress ships directly in ${curr}. To shop Temu via a US freight forwarder, switch to our US region.`,
-    miamiBtn: 'View US Temu Codes',
+      `In ${country}, AliExpress ships directly in ${curr}. If you use a US Locker / Freight Forwarder address, switch to our United States (US Locker) region.`,
+    miamiBtn: 'View US Locker Codes (USD)',
     dynamics: {
       badge: 'APP SEARCH BAR COMMANDS & MINI-GAMES',
       title: (country) => `Temu & AliExpress App Mini-Games & Search Commands in ${country}`,
@@ -196,68 +329,7 @@ export const SECTION_I18N = {
       typeInSearch: 'TYPE IN SEARCH:',
       copyBtn: (store) => `Copy Keyword (${store})`,
       copiedBtn: 'Keyword Copied!',
-      items: [
-        {
-          id: 'dyn-credit777',
-          store: 'Temu App',
-          storeKey: 'temu',
-          code: 'credit777',
-          badge: 'CREDIT WHEEL & CASHBACK EVENT',
-          title: 'Account Credit & Reward Wheel Activity (credit777)',
-          howItWorks:
-            'Type "credit777" into the top search bar in the Temu app. It opens the official credit-back board where qualifying orders unlock wallet credit.'
-        },
-        {
-          id: 'dyn-claimcredit',
-          store: 'Temu App',
-          storeKey: 'temu',
-          code: 'claimcredit',
-          badge: 'DAILY CREDIT CLAIM',
-          title: 'Daily Pending Credit Collection Dashboard (claimcredit)',
-          howItWorks:
-            'If you joined a credit-back promotion, search "claimcredit" in the Temu app every day for 7 days to claim each daily credit installment.'
-        },
-        {
-          id: 'dyn-wincredit',
-          store: 'Temu App',
-          storeKey: 'temu',
-          code: 'wincredit',
-          badge: 'COINS-TO-CASH EVENT',
-          title: 'Coin Accumulation for Wallet Credit (wincredit)',
-          howItWorks:
-            'Searching "wincredit" in the Temu app opens the progressive coin challenge that converts event points into direct shopping balance.'
-        },
-        {
-          id: 'dyn-box777',
-          store: 'Temu App',
-          storeKey: 'temu',
-          code: 'box777',
-          badge: 'MYSTERY CHESTS',
-          title: 'Treasure Box & Flash Bundle Mini-Game (box777)',
-          howItWorks:
-            'Type "box777" in the Temu search bar to trigger the mystery chest activity with time-limited coupon packs.'
-        },
-        {
-          id: 'dyn-ali-coins',
-          store: 'AliExpress App',
-          storeKey: 'aliexpress',
-          code: 'Coins Discount Finder',
-          badge: 'EXTRA 5%–25% APP DISCOUNT',
-          title: 'AliExpress Coins Center + Super Discount Finder',
-          howItWorks:
-            'Open the "Coins" tab inside the AliExpress mobile app, collect daily coins in one tap, and use the Discount Finder to stack up to 25% extra off on top of our IFP promo codes.'
-        },
-        {
-          id: 'dyn-ali-mergeboss',
-          store: 'AliExpress App',
-          storeKey: 'aliexpress',
-          code: 'Merge Boss & Prize Land',
-          badge: 'OFFICIAL SHOPPING CREDITS',
-          title: 'AliExpress Merge Boss & Prize Land Reward Games',
-          howItWorks:
-            'Under "Account" in the AliExpress app, play Merge Boss or Prize Land during Choice Day events to exchange game points for no-minimum shopping credits.'
-        }
-      ]
+      items: BASE_DYNAMICS_EN
     },
     guides: {
       badge: 'OFFICIAL 30-DAY PRICE ADJUSTMENT & STACKING GUIDE',
@@ -293,10 +365,10 @@ export const SECTION_I18N = {
         'Layer 2 — Mobile App Coins: Checkout in the AliExpress mobile app to automatically deduct 2% to 15% extra.',
         'Layer 3 — CuponesTech Promo Code: Paste one of our verified IFP tiered codes into the Promo Code box at payment.'
       ],
-      g3Title: '3. Direct Local Delivery vs. US Freight Forwarder (Miami Locker)',
-      g3Sub: 'Choosing the fastest shipping route for your country',
+      g3Title: '3. Direct Local Delivery vs. US Locker / Freight Forwarder',
+      g3Sub: 'Choosing between local shipping and a US forwarding locker',
       g3Desc: (country) =>
-        `Shoppers in ${country} can use AliExpress Choice Direct shipping in local currency, or switch our country selector to "United States" when shipping to a Miami freight forwarder (ZIP 33166 / 33122) to unlock US-only Temu & AliExpress bundles.`
+        `From ${country}, you can ship directly to your local address in local currency, or select "United States (Direct & US Locker)" in the region selector when shipping to a US parcel locker / freight forwarder (such as Miami FL 33166 or Delaware) to unlock US domestic free shipping and USD voucher bundles.`
     }
   }
 };
@@ -336,10 +408,36 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'Bebês e Papelaria',
       'redes-wifi': 'Wi-Fi e Redes'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `Em ${country}, o AliExpress envia diretamente em ${curr}. Se você usa um Redirecionador / Locker nos Estados Unidos (EUA), altere para a região Estados Unidos (Locker EUA).`,
+    miamiBtn: 'Ver Cupons EUA (Redirecionador / Locker)',
     dynamicsTitle: (country) => `Dinâmicas, Roletas e Minijogos da Temu e AliExpress (${country})`,
     dynamicsSub: 'Estes comandos NÃO são colados no pagamento. Digite-os na barra de busca superior do app da Temu ou abra a aba Moedas do AliExpress para desbloquear créditos e bônus.',
     guidesTitle: (country) => `Guia de Ajuste de Preço (30 Dias) e Descontos Triplos (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Se você comprar um produto hoje por ${ex20} e ele baixar para ${ex15} em até 30 dias, peça o reembolso de ${ex5} na hora sem devolver o produto.`
+    guidesSub: (ex20, ex15, ex5) => `Se você comprar um produto hoje por ${ex20} e ele baixar para ${ex15} em até 30 dias, peça o reembolso de ${ex5} na hora sem devolver o produto.`,
+    guidesOverride: {
+      badge: 'GUIA OFICIAL DE REEMBOLSO E ECONOMIA',
+      g1Title: '1. Como Pedir o "Ajuste de Preço" (Reembolso de 30 Dias na Temu)',
+      g1Sub: 'Receba a diferença de volta se o produto que você já comprou baixar de preço',
+      g1Desc: (curr) => `Todos os pedidos na Temu têm garantia de preço de 30 dias em ${curr}. Se o preço cair, recupere a diferença em 3 passos:`,
+      steps: (ex20, ex15, ex5) => [
+        { step: 'PASSO 1', title: 'Abra "Seus Pedidos"', desc: 'No app ou site da Temu, entre em "Você" -> "Seus Pedidos" e selecione qualquer compra dos últimos 30 dias.' },
+        { step: 'PASSO 2', title: 'Toque em "Solicitar ajuste de preço"', desc: `Se algum item baixou de preço (ex: de ${ex20} para ${ex15}), o botão de ajuste estará liberado.` },
+        { step: 'PASSO 3', title: `Receba ${ex5} na hora`, desc: 'Escolha Crédito Temu (cai em 1 segundo) ou estorno no método de pagamento original.' }
+      ],
+      g2Title: '2. Como Acumular 3 Descontos ao Mesmo Tempo no AliExpress',
+      g2Sub: (country) => `Válido em ${country} (incluindo Remessa Conforme) e em todos os 66 países`,
+      g2Desc: 'No AliExpress você pode somar três camadas de desconto no mesmo carrinho:',
+      g2Bullets: [
+        'Camada 1 — Cupom da Loja/Vendedor: Resgate grátis na página do produto antes de adicionar ao carrinho.',
+        'Camada 2 — Moedas do App: Compre pelo aplicativo para abater automaticamente de 2% a 15% extra.',
+        'Camada 3 — Código Promocional CuponesTech: Cole um dos nossos códigos verificados (série IFP) no checkout.'
+      ],
+      g3Title: '3. Envio Direto vs. Redirecionador / Locker nos Estados Unidos (EUA)',
+      g3Sub: 'Quando usar entrega direta ou armazém/locker nos EUA',
+      g3Desc: (country) => `Comprando a partir de ${country}, você pode usar o envio direto internacional para seu endereço local ou, caso utilize um redirecionador de encomendas / locker nos Estados Unidos (Miami / Florida ZIP 33166), selecionar "Estados Unidos (Locker / Redirecionador EUA)" no topo para liberar cupons exclusivos em dólar (USD).`
+    }
   },
   fr: {
     navAll: 'Toutes',
@@ -375,10 +473,36 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'Bébés & Bureau',
       'redes-wifi': 'Wi-Fi & Réseaux'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `En ${country}, AliExpress livre directement en ${curr}. Si vous utilisez une adresse de transit / Casier aux États-Unis (US Locker), sélectionnez la région États-Unis (Casier US).`,
+    miamiBtn: 'Voir les Codes États-Unis (Casier / Locker US)',
     dynamicsTitle: (country) => `Mini-Jeux et Commandes de Recherche Temu & AliExpress (${country})`,
     dynamicsSub: 'Ces mots-clés ne se collent pas au paiement : tapez-les dans la barre de recherche de l’application Temu ou ouvrez l’espace Pièces AliExpress pour gagner du crédit.',
     guidesTitle: (country) => `Guide d’Ajustement de Prix (30 Jours) et Cumul de Remises (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Si un article acheté ${ex20} passe à ${ex15} dans les 30 jours, réclamez ${ex5} de remboursement instantané sans renvoyer le colis.`
+    guidesSub: (ex20, ex15, ex5) => `Si un article acheté ${ex20} passe à ${ex15} dans les 30 jours, réclamez ${ex5} de remboursement instantané sans renvoyer le colis.`,
+    guidesOverride: {
+      badge: 'GUIDE OFFICIEL DE REMBOURSEMENT ET D’ÉCONOMIES',
+      g1Title: '1. Comment demander l’Ajustement de Prix (Remboursement 30 Jours sur Temu)',
+      g1Sub: 'Récupérez la différence si le prix baisse après votre achat',
+      g1Desc: (curr) => `Chaque commande Temu bénéficie d’une garantie de prix de 30 jours en ${curr} :`,
+      steps: (ex20, ex15, ex5) => [
+        { step: 'ÉTAPE 1', title: 'Ouvrez "Vos Commandes"', desc: 'Dans l’application Temu, allez dans "Vous" -> "Vos commandes" et choisissez une commande des 30 derniers jours.' },
+        { step: 'ÉTAPE 2', title: 'Cliquez sur "Demander un ajustement de prix"', desc: `Si le prix est passé de ${ex20} à ${ex15}, le bouton d’ajustement sera disponible.` },
+        { step: 'ÉTAPE 3', title: `Recevez ${ex5} instantanément`, desc: 'Choisissez le crédit Temu (en 1 seconde) ou le remboursement sur votre carte bancaire.' }
+      ],
+      g2Title: '2. Comment cumuler 3 réductions simultanément sur AliExpress',
+      g2Sub: (country) => `Valable en ${country} et dans les 66 pays`,
+      g2Desc: 'Cumulez toujours ces trois niveaux de réduction avant de payer :',
+      g2Bullets: [
+        'Niveau 1 — Coupon Vendeur : Récupérez-le gratuitement sur la fiche produit.',
+        'Niveau 2 — Pièces de l’App : Achetez via l’application mobile pour déduire 2% à 15% supplémentaires.',
+        'Niveau 3 — Code Promo CuponesTech : Collez l’un de nos codes vérifiés (série IFP) au moment du paiement.'
+      ],
+      g3Title: '3. Livraison Directe vs. Casier / Transit aux États-Unis (US Locker)',
+      g3Sub: 'Choisir entre la livraison locale et un casier de réexpédition US',
+      g3Desc: (country) => `Depuis ${country}, vous pouvez commander en livraison directe ou sélectionner "États-Unis (Casier / Locker US)" en haut de page si vous utilisez un service de réexpédition américain (Miami FL 33166) pour profiter des codes exclusifs en USD.`
+    }
   },
   de: {
     navAll: 'Alle',
@@ -414,10 +538,36 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'Baby & Büro',
       'redes-wifi': 'Wi-Fi & Router'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `In ${country} liefert AliExpress direkt in ${curr}. Wenn Sie eine US-Weiterleitungsadresse (US Locker) nutzen, wechseln Sie zur Region Vereinigte Staaten (US-Locker).`,
+    miamiBtn: 'US-Locker Gutscheine anzeigen (USD)',
     dynamicsTitle: (country) => `Temu & AliExpress App-Minispiele & Suchbefehle (${country})`,
     dynamicsSub: 'Diese Suchbefehle werden direkt in die obere Suchleiste der Temu-App eingegeben oder im AliExpress-Münzcenter genutzt, um Guthaben freizuschalten.',
     guidesTitle: (country) => `30-Tage-Preisanpassung & Dreifach-Rabatt-Anleitung (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Fällt der Preis eines für ${ex20} gekauften Artikels innerhalb von 30 Tagen auf ${ex15}, erhalten Sie ${ex5} sofort zurück.`
+    guidesSub: (ex20, ex15, ex5) => `Fällt der Preis eines für ${ex20} gekauften Artikels innerhalb von 30 Tagen auf ${ex15}, erhalten Sie ${ex5} sofort zurück.`,
+    guidesOverride: {
+      badge: 'OFFIZIELLER PREISANPASSUNGS- & RABATT-RATGEBER',
+      g1Title: '1. 30-Tage-Preisanpassung bei Temu einfordern',
+      g1Sub: 'Sofortige Rückerstattung der Preisdifferenz bei Preissenkungen',
+      g1Desc: (curr) => `Jede Temu-Bestellung beinhaltet 30 Tage Preisgarantie in ${curr}:`,
+      steps: (ex20, ex15, ex5) => [
+        { step: 'SCHRITT 1', title: '"Ihre Bestellungen" öffnen', desc: 'Gehen Sie in der Temu-App auf "Sie" -> "Ihre Bestellungen".' },
+        { step: 'SCHRITT 2', title: '"Preisanpassung anfordern" tippen', desc: `Ist der Preis z. B. von ${ex20} auf ${ex15} gesunken, erscheint die Schaltfläche.` },
+        { step: 'SCHRITT 3', title: `Sofort ${ex5} erhalten`, desc: 'Wählen Sie Temu-Guthaben (in 1 Sekunde) oder Rückerstattung auf Ihre Zahlungsart.' }
+      ],
+      g2Title: '2. Drei Rabatte gleichzeitig bei AliExpress kombinieren',
+      g2Sub: (country) => `Gültig in ${country} und weltweit`,
+      g2Desc: 'Kombinieren Sie bei AliExpress immer diese drei Rabattstufen im Warenkorb:',
+      g2Bullets: [
+        'Stufe 1 — Verkäufer-Coupon auf der Produktseite aktivieren.',
+        'Stufe 2 — App-Münzen für 2% bis 15% Extra-Abzug nutzen.',
+        'Stufe 3 — CuponesTech Promo-Code (IFP-Serie) an der Kasse eingeben.'
+      ],
+      g3Title: '3. Direktversand vs. US-Locker / Weiterleitungsadresse',
+      g3Sub: 'Wann sich ein US-Paketfach (US Locker) lohnt',
+      g3Desc: (country) => `Aus ${country} können Sie per Direktversand bestellen oder oben "Vereinigte Staaten (US-Locker)" wählen, falls Sie einen US-Paketweiterleitungsdienst nutzen.`
+    }
   },
   it: {
     navAll: 'Tutti',
@@ -453,6 +603,10 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'Bambini e Ufficio',
       'redes-wifi': 'Wi-Fi e Reti'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `In ${country}, AliExpress spedisce direttamente in ${curr}. Se utilizzi un indirizzo Locker negli Stati Uniti (US Locker), seleziona Stati Uniti (Locker USA).`,
+    miamiBtn: 'Vedi Codici Stati Uniti (Locker USA)',
     dynamicsTitle: (country) => `Minigiochi e Comandi di Ricerca App Temu & AliExpress (${country})`,
     dynamicsSub: 'Digita questi comandi nella barra di ricerca dell’app Temu o apri la sezione Monete di AliExpress per sbloccare credito e bonus giornalieri.',
     guidesTitle: (country) => `Guida Adeguamento Prezzo (30 Giorni) e Triplo Sconto (${country})`,
@@ -492,6 +646,10 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'Baby & Kantoor',
       'redes-wifi': 'Wi-Fi & Netwerk'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `In ${country} verzendt AliExpress rechtstreeks in ${curr}. Gebruik je een US Locker / doorstuuradres? Kies dan Verenigde Staten (US Locker).`,
+    miamiBtn: 'Bekijk US Locker Codes (USD)',
     dynamicsTitle: (country) => `Temu & AliExpress App Minigames & Zoekopdrachten (${country})`,
     dynamicsSub: 'Typ deze zoekwoorden in de zoekbalk van de Temu-app of gebruik AliExpress Munten voor extra tegoed.',
     guidesTitle: (country) => `30-Dagen Prijsaanpassing & Stapelkorting Gids (${country})`,
@@ -531,6 +689,10 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'Dzieci i Biuro',
       'redes-wifi': 'Wi-Fi i Sieci'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `W ${country} AliExpress wysyła bezpośrednio w ${curr}. Jeśli korzystasz ze skrzynki / Lockera w USA, wybierz region Stany Zjednoczone (Locker USA).`,
+    miamiBtn: 'Zobacz Kody USA (Locker USA)',
     dynamicsTitle: (country) => `Minigry i Komendy Wyszukiwania Temu oraz AliExpress (${country})`,
     dynamicsSub: 'Wpisz te hasła w pasku wyszukiwania aplikacji Temu lub otwórz zakładkę Monety w AliExpress, aby odebrać środki i kupony.',
     guidesTitle: (country) => `Poradnik Wyrównania Ceny (30 Dni) i Łączenia Rabatów (${country})`,
@@ -570,6 +732,10 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'ベビー・文房具',
       'redes-wifi': 'Wi-Fi・ルーター'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `${country}ではAliExpressが${curr}で直接配送します。米国転送ロッカー（US Locker）をご利用の場合は「アメリカ合衆国（米国ロッカー）」を選択してください。`,
+    miamiBtn: '米国ロッカー用クーポンを見る (USD)',
     dynamicsTitle: (country) => `Temu & AliExpress アプリ検索コマンド・ミニゲーム (${country})`,
     dynamicsSub: 'これらのキーワードはTemuアプリの検索バーに入力するか、AliExpressのコインセンターで利用してクレジットを獲得できます。',
     guidesTitle: (country) => `30日間価格調整（差額返金）＆3重割引ガイド (${country})`,
@@ -609,6 +775,10 @@ const EXTRA_LANGS = {
       'bebes-oficina': '유아·문구/오피스',
       'redes-wifi': 'Wi-Fi·공유기'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `${country}에서는 AliExpress가 ${curr} 통화로 직배송합니다. 미국 배송대행지(배대지 / US Locker)를 이용하시는 경우 미국(US Locker) 지역을 선택하세요.`,
+    miamiBtn: '미국 배대지(US Locker) 전용 쿠폰 보기',
     dynamicsTitle: (country) => `Temu & AliExpress 앱 검색창 미니게임 및 크레딧 코드 (${country})`,
     dynamicsSub: '이 키워드는 결제창이 아닌 Temu 앱 상단 검색창에 입력하거나 AliExpress 코인 탭에서 사용하여 크레딧 보상을 받는 전용 코드입니다.',
     guidesTitle: (country) => `30일 가격 조정(차액 환불) 및 3중 중복 할인 가이드 (${country})`,
@@ -648,6 +818,10 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'أطفال وقرطاسية',
       'redes-wifi': 'واي فاي وشبكات'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `في ${country}، يشحن AliExpress مباشرة بعملة ${curr}. إذا كنت تستخدم صندوق بريد أمريكي (US Locker)، اختر منطقة الولايات المتحدة (US Locker).`,
+    miamiBtn: 'عرض أكواد صندوق البريد الأمريكي (US Locker)',
     dynamicsTitle: (country) => `أكواد البحث والألعاب المصغرة في تطبيق Temu وAliExpress (${country})`,
     dynamicsSub: 'اكتب هذه الكلمات في شريط بحث تطبيق Temu أو افتح قسم العملات في AliExpress للحصول على رصيد ومكافآت يومية.',
     guidesTitle: (country) => `دليل استرداد فرق السعر خلال 30 يوماً والخصم الثلاثي (${country})`,
@@ -687,6 +861,10 @@ const EXTRA_LANGS = {
       'bebes-oficina': '母婴与办公文具',
       'redes-wifi': 'Wi-Fi路由器'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `在 ${country}，速卖通支持 ${curr} 直邮。如果您使用美国转运仓（US Locker），请切换至“美国（US Locker）”地区。`,
+    miamiBtn: '查看美国转运仓 (US Locker) 优惠码',
     dynamicsTitle: (country) => `Temu 与 AliExpress 搜索框隐藏口令及小游戏 (${country})`,
     dynamicsSub: '这些口令无需在结账时粘贴，直接在 Temu App 顶部搜索框输入，或打开速卖通金币中心即可领取余额与叠加礼券。',
     guidesTitle: (country) => `30天价格保护（一键退差价）与三重叠加省钱指南 (${country})`,
@@ -726,6 +904,10 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'Детям и офис',
       'redes-wifi': 'Wi-Fi и роутеры'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `В ${country} AliExpress доставляет напрямую в ${curr}. Если вы используете склад-посредник в США (US Locker), выберите регион США (US Locker).`,
+    miamiBtn: 'Промокоды для склада США (US Locker)',
     dynamicsTitle: (country) => `Поисковые команды и мини-игры Temu & AliExpress (${country})`,
     dynamicsSub: 'Введите эти команды в строку поиска приложения Temu или откройте раздел Монеты в AliExpress для получения бонусов и купонов.',
     guidesTitle: (country) => `Гид по корректировке цены (30 дней) и тройным скидкам (${country})`,
@@ -765,6 +947,10 @@ const EXTRA_LANGS = {
       'bebes-oficina': 'Bebek ve Kırtasiye',
       'redes-wifi': 'Wi-Fi ve Ağ'
     },
+    usLockerTarget: '/en-us/temu',
+    miamiNotice: (country, curr) =>
+      `${country} için AliExpress ${curr} para 세비예신데 doğrudan gönderim yapar. ABD posta kutusu / yönlendirme (US Locker) kullanıyorsanız ABD (US Locker) bölgesini seçin.`,
+    miamiBtn: 'ABD Locker Kuponlarını Gör (USD)',
     dynamicsTitle: (country) => `Temu & AliExpress Uygulama Arama Kodları ve Mini Oyunlar (${country})`,
     dynamicsSub: 'Bu komutları Temu uygulama arama çubuğuna yazın veya AliExpress Jetonlar sekmesini açarak ekstra kredi ve indirim kazanın.',
     guidesTitle: (country) => `30 Günlük Fiyat Ayarlaması (Fark İadesi) ve 3’lü İndirim Rehberi (${country})`,
@@ -788,6 +974,7 @@ export function getSectionText(lang = 'en') {
     },
     guides: {
       ...SECTION_I18N.en.guides,
+      ...(extra.guidesOverride || {}),
       title: extra.guidesTitle || SECTION_I18N.en.guides.title,
       subtitle: extra.guidesSub || SECTION_I18N.en.guides.subtitle
     }
@@ -796,7 +983,6 @@ export function getSectionText(lang = 'en') {
 
 /**
  * LOCALIZED URL ROUTE SLUGS PER LANGUAGE
- * Ensures /en-us/dynamics & /en-us/guides in English, /es-mx/dinamicas & /es-mx/guias in Spanish, etc.
  */
 export const ROUTE_SLUGS_BY_LANG = {
   es: {

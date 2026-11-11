@@ -9,7 +9,12 @@ import {
   CATEGORY_SLUGS
 } from './config/locales.js';
 import { getCouponsForLocale } from './data/couponsGenerator.js';
-import { getSectionText, getLocalizedPath, getRouteSlugsForLang } from './data/multilingualSections.js';
+import {
+  getSectionText,
+  getLocalizedPath,
+  getRouteSlugsForLang,
+  getLocalizedCountryName
+} from './data/multilingualSections.js';
 import { AFFILIATE_CONFIG } from './config/affiliateConfig.js';
 import Layout from './components/Layout.jsx';
 import SEOHead from './components/SEOHead.jsx';
@@ -72,6 +77,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
   const localeConfig = getLocaleConfig(locale);
   const { dict } = localeConfig;
   const ui = getSectionText(localeConfig.lang);
+  const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
   const hasTemuInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
 
   const categoryFilter = slug || null;
@@ -103,10 +109,10 @@ export function MarketCatalogPage({ storeFilter = null }) {
 
   if (storeFilter === 'temu' && categoryFilter) {
     routeSuffix = `/temu/category/${categoryFilter}`;
-    customHeading = `Temu • ${ui.catShort[categoryFilter] || dict.categories[categoryFilter]} (${localeConfig.countryName})`;
+    customHeading = `Temu • ${ui.catShort[categoryFilter] || dict.categories[categoryFilter]} (${displayCountry})`;
   } else if (storeFilter === 'aliexpress' && categoryFilter) {
     routeSuffix = `/aliexpress/category/${categoryFilter}`;
-    customHeading = `AliExpress • ${ui.catShort[categoryFilter] || dict.categories[categoryFilter]} (${localeConfig.countryName})`;
+    customHeading = `AliExpress • ${ui.catShort[categoryFilter] || dict.categories[categoryFilter]} (${displayCountry})`;
   } else if (storeFilter === 'temu') {
     routeSuffix = '/temu';
     customHeading = `Temu — ${dict.heroTitle}`;
@@ -116,7 +122,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
   } else if (categoryFilter) {
     routeSuffix = `/category/${categoryFilter}`;
     const catName = ui.catShort[categoryFilter] || dict.categories[categoryFilter];
-    customHeading = `${catName} — ${localeConfig.countryName} (${localeConfig.currencyCode})`;
+    customHeading = `${catName} — ${displayCountry} (${localeConfig.currencyCode})`;
   }
 
   return (
@@ -142,10 +148,10 @@ export function MarketCatalogPage({ storeFilter = null }) {
           <div className="mt-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-[#D4A359]/60 bg-[#F6F2EA] p-3 text-xs text-[#574B40]">
             <div className="flex items-start sm:items-center gap-2">
               <Info className="h-4 w-4 text-[#B85332] shrink-0 mt-0.5 sm:mt-0" />
-              <span>{ui.miamiNotice(localeConfig.countryName, localeConfig.currencyCode)}</span>
+              <span>{ui.miamiNotice(displayCountry, localeConfig.currencyCode)}</span>
             </div>
             <Link
-              to="/es-us/temu"
+              to={ui.usLockerTarget || '/en-us/temu'}
               className="w-full sm:w-auto text-center shrink-0 rounded-lg bg-[#B85332] px-3 py-1.5 font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition"
             >
               {ui.miamiBtn}
@@ -208,17 +214,17 @@ export function MarketCatalogPage({ storeFilter = null }) {
         {filteredCoupons.length === 0 ? (
           <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 sm:p-8 text-center">
             <p className="text-base sm:text-lg font-extrabold text-[#1F1B18] mb-2">
-              {ui.miamiNotice(localeConfig.countryName, localeConfig.currencyCode)}
+              {ui.miamiNotice(displayCountry, localeConfig.currencyCode)}
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-3">
               <Link
                 to={`/${localeConfig.code}/aliexpress`}
                 className="rounded-xl bg-[#7A3B24] px-4 py-2 text-xs font-bold text-[#FCF9F4]"
               >
-                AliExpress ({localeConfig.countryName})
+                AliExpress ({displayCountry})
               </Link>
               <Link
-                to="/es-us/temu"
+                to={ui.usLockerTarget || '/en-us/temu'}
                 className="rounded-xl border border-[#B85332] px-4 py-2 text-xs font-bold text-[#B85332]"
               >
                 {ui.miamiBtn}
@@ -338,11 +344,11 @@ export function DynamicsPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between gap-2 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] px-3 py-2">
-                  <span className="text-[10px] font-extrabold uppercase text-[#6E6055] shrink-0">
+                <div className="flex flex-wrap items-center justify-between gap-1.5 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] px-3 py-2">
+                  <span className="text-[10px] font-extrabold uppercase text-[#6E6055]">
                     {dyn.typeInSearch}
                   </span>
-                  <code className="font-mono text-sm sm:text-base font-extrabold text-[#8F5B1D] select-all truncate">
+                  <code className="font-mono text-xs sm:text-sm md:text-base font-extrabold text-[#8F5B1D] select-all break-all">
                     {item.code}
                   </code>
                 </div>
