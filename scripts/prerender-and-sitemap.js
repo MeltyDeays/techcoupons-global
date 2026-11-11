@@ -34,7 +34,8 @@ function getAllRouteDescriptors() {
     { type: 'privacy', storeFilter: null },
     { type: 'terms', storeFilter: null },
     { type: 'about', storeFilter: null },
-    { type: 'contact', storeFilter: null }
+    { type: 'contact', storeFilter: null },
+    { type: 'faq', storeFilter: null }
   ];
 
   CATEGORY_SLUGS.forEach((slug) => {
@@ -57,6 +58,7 @@ function getRouteSuffixForLocale(route, localeConfig) {
   if (route.type === 'terms') return `/${slugs.terms}`;
   if (route.type === 'about') return `/${slugs.about}`;
   if (route.type === 'contact') return `/${slugs.contact}`;
+  if (route.type === 'faq') return `/${slugs.faq || 'faq'}`;
   if (route.type === 'category') {
     const fullPath = getLocalizedCategoryPath(localeConfig, route.storeFilter, route.slug);
     return fullPath.slice(`/${localeConfig.code}`.length);
@@ -78,12 +80,13 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
     const catName = dict.categories[route.slug] || route.slug;
     heading = `${catName} — ${displayCountry} (${localeConfig.currencyCode})`;
   }
-  if (['privacy', 'terms', 'about', 'contact'].includes(route.type)) {
+  if (['privacy', 'terms', 'about', 'contact', 'faq'].includes(route.type)) {
     const map = {
       privacy: dict.legal.privacyTitle,
       terms: dict.legal.termsTitle,
       about: dict.legal.aboutTitle,
-      contact: dict.legal.contactTitle
+      contact: dict.legal.contactTitle,
+      faq: `Preguntas Frecuentes (FAQ)`
     };
     heading = `${map[route.type]} — ${displayCountry}`;
   }
@@ -110,6 +113,26 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
     )
     .join('\n');
 
+  let sectionContent = '';
+  if (route.type === 'guides') {
+    sectionContent = `
+        <section class="coupon-stacking-guide">
+          <h2>${escapeHtml(dict.seoGuideTitle)}</h2>
+          <h3>${escapeHtml(dict.seoSection1Title)}</h3>
+          <p>${escapeHtml(dict.seoSection1Body)}</p>
+          <h3>${escapeHtml(dict.seoSection2Title)}</h3>
+          <p>${escapeHtml(dict.seoSection2Body)}</p>
+        </section>`;
+  } else if (route.type === 'faq') {
+    sectionContent = `
+        <section class="country-faq">
+          <h2>FAQ — ${escapeHtml(displayCountry)}</h2>
+          <div class="faqs">
+            ${faqsHtml}
+          </div>
+        </section>`;
+  }
+
   return `
     <div class="ssg-prerendered-shell" dir="${localeConfig.rtl ? 'rtl' : 'ltr'}">
       <header>
@@ -127,19 +150,11 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
         <section class="coupons-list">
           ${couponCardsHtml}
         </section>
-        <section class="native-seo-guide">
-          <h2>${escapeHtml(dict.seoGuideTitle)}</h2>
-          <h3>${escapeHtml(dict.seoSection1Title)}</h3>
-          <p>${escapeHtml(dict.seoSection1Body)}</p>
-          <h3>${escapeHtml(dict.seoSection2Title)}</h3>
-          <p>${escapeHtml(dict.seoSection2Body)}</p>
-          <div class="faqs">
-            ${faqsHtml}
-          </div>
-        </section>
+        ${sectionContent}
       </main>
       <footer>
         <p>${escapeHtml(dict.disclosure)}</p>
+        <a href="/${localeConfig.code}/${slugs.faq || 'faq'}">${escapeHtml(ui.navFaq || 'FAQ')}</a> |
         <a href="/${localeConfig.code}/${slugs.privacy}">${escapeHtml(dict.legal.privacyTitle)}</a> |
         <a href="/${localeConfig.code}/${slugs.terms}">${escapeHtml(dict.legal.termsTitle)}</a> |
         <a href="/${localeConfig.code}/${slugs.about}">${escapeHtml(dict.legal.aboutTitle)}</a> |
@@ -182,12 +197,13 @@ function runPrerenderAndSitemap() {
         const catName = localeConfig.dict.categories[route.slug] || route.slug;
         pageTitle = `${catName} — ${displayCountry} (${localeConfig.currencyCode}) | CuponesTech`;
       }
-      if (['privacy', 'terms', 'about', 'contact'].includes(route.type)) {
+      if (['privacy', 'terms', 'about', 'contact', 'faq'].includes(route.type)) {
         const map = {
           privacy: localeConfig.dict.legal.privacyTitle,
           terms: localeConfig.dict.legal.termsTitle,
           about: localeConfig.dict.legal.aboutTitle,
-          contact: localeConfig.dict.legal.contactTitle
+          contact: localeConfig.dict.legal.contactTitle,
+          faq: `Preguntas Frecuentes (FAQ)`
         };
         pageTitle = `${map[route.type]} — ${displayCountry} | CuponesTech`;
       }
@@ -203,7 +219,7 @@ function runPrerenderAndSitemap() {
       const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${xDefaultSuffix}" />`;
       const canonicalTag = `<link rel="canonical" href="${canonicalUrl}" />`;
 
-      const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl);
+      const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl, route.type);
       const schemaScripts = schemas
         .map((s) => `<script type="application/ld+json">${JSON.stringify(s)}</script>`)
         .join('\n    ');

@@ -51,7 +51,7 @@ export default function SEOHead({ localeConfig, routeSuffix = '', pageTitle, pag
     xDefault.setAttribute('data-dynamic-hreflang', 'true');
     document.head.appendChild(xDefault);
 
-    const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl);
+    const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl, cleanSuffix);
     schemas.forEach((schemaObj) => {
       const script = document.createElement('script');
       script.type = 'application/ld+json';

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getSectionText } from '../data/multilingualSections.js';
+import { resolveCouponExpiration } from '../data/couponLifecycle.js';
 import {
   Copy,
   Check,
@@ -38,6 +39,39 @@ const CATEGORY_ICONS = {
   'redes-wifi': Wifi
 };
 
+function formatExpirationLabel(info, localeConfig, dict) {
+  if (!info) return dict?.expiresLabel || '';
+  if (info.isExpired) {
+    return localeConfig?.lang === 'es' ? 'Expirado' : 'Expired';
+  }
+  if (!isFinite(info.timeRemainingMs)) {
+    return localeConfig?.lang === 'es' ? 'Cupón Permanente' : 'Evergreen Voucher';
+  }
+
+  const days = Math.floor(info.timeRemainingMs / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((info.timeRemainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+  if (days > 14) {
+    try {
+      const expDate = new Date(info.expiresAt);
+      const formatted = expDate.toLocaleDateString(localeConfig?.code || 'en-US', { month: 'short', day: 'numeric' });
+      return localeConfig?.lang === 'es' ? `Hasta ${formatted}` : `Thru ${formatted}`;
+    } catch {
+      return dict?.expiresLabel || '';
+    }
+  }
+  if (days > 1) {
+    return localeConfig?.lang === 'es' ? `Expira en ${days} días` : `Expires in ${days} days`;
+  }
+  if (days === 1) {
+    return localeConfig?.lang === 'es' ? 'Expira mañana' : 'Expires tomorrow';
+  }
+  if (hours > 0) {
+    return localeConfig?.lang === 'es' ? `Expira hoy (${hours}h)` : `Expires today (${hours}h)`;
+  }
+  return localeConfig?.lang === 'es' ? 'Expira hoy' : 'Expires today';
+}
+
 export default function CouponCard({ coupon, localeConfig }) {
   const [copied, setCopied] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -45,6 +79,8 @@ export default function CouponCard({ coupon, localeConfig }) {
   const [modalOpen, setModalOpen] = useState(false);
   const { dict } = localeConfig;
   const ui = getSectionText(localeConfig.lang);
+  const expirationInfo = resolveCouponExpiration(coupon);
+  const expirationBadge = formatExpirationLabel(expirationInfo, localeConfig, dict);
 
   // Step 1: Copy code, reveal it on card, and open the instruction modal FIRST (no immediate redirect!)
   const handleRevealAndCopy = async () => {
@@ -179,7 +215,7 @@ export default function CouponCard({ coupon, localeConfig }) {
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
                 {dict.verifiedBadge}
               </span>
-              <span>{dict.expiresLabel}</span>
+              <span>{expirationBadge}</span>
             </div>
           </div>
         </div>

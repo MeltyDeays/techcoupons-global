@@ -19,6 +19,7 @@ import {
   Search,
   Gamepad2,
   BookOpen,
+  HelpCircle,
   ArrowUp,
   ChevronRight
 } from 'lucide-react';
@@ -108,6 +109,7 @@ export default function Layout({
   const termsUrl = getLocalizedPath(localeConfig, 'terms');
   const aboutUrl = getLocalizedPath(localeConfig, 'about');
   const contactUrl = getLocalizedPath(localeConfig, 'contact');
+  const faqUrl = getLocalizedPath(localeConfig, 'faq');
 
   return (
     <div dir={localeConfig.rtl ? 'rtl' : 'ltr'} className="min-h-screen w-full max-w-[100vw] overflow-x-hidden flex flex-col bg-[#F6F2EA] text-[#1F1B18] font-sans">
@@ -271,15 +273,18 @@ export default function Layout({
             </div>
           </div>
 
-          {/* Row 2 on Mobile/Tablet: Wrapped Pill Navigation so zero tabs are ever clipped */}
-          <nav className="flex flex-wrap lg:hidden items-center gap-1.5 border-t border-[#ECE5D8] py-2 text-[11px] sm:text-xs font-bold">
+          {/* Row 2 on Mobile/Tablet: Horizontally scrollable / deslizable pill bar */}
+          <nav
+            aria-label="Navegación principal móvil"
+            className="flex lg:hidden items-center gap-2 border-t border-[#ECE5D8] py-2 text-xs font-bold overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth touch-pan-x overscroll-x-contain"
+          >
             <Link
               to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'all', activeCategory) : `/${localeConfig.code}`}
               onClick={handleScrollTopClick}
-              className={`rounded-full px-2.5 sm:px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
+              className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none active:scale-95 ${
                 activeSection === 'coupons' && !activeStore
-                  ? 'bg-[#1F1B18] text-[#FCF9F4]'
-                  : 'bg-[#F0E9DF] text-[#574B40]'
+                  ? 'bg-[#1F1B18] text-[#FCF9F4] shadow-sm'
+                  : 'bg-[#F0E9DF] text-[#574B40] hover:bg-[#E5DAC9]'
               }`}
             >
               {ui.navAll}
@@ -289,10 +294,10 @@ export default function Layout({
               <Link
                 to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'temu', activeCategory) : `/${localeConfig.code}/temu`}
                 onClick={handleScrollTopClick}
-                className={`rounded-full px-2.5 sm:px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
+                className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none active:scale-95 ${
                   activeSection === 'coupons' && activeStore === 'temu'
-                    ? 'bg-[#B85332] text-[#FCF9F4]'
-                    : 'bg-[#F0E9DF] text-[#8C3D22]'
+                    ? 'bg-[#B85332] text-[#FCF9F4] shadow-sm'
+                    : 'bg-[#F0E9DF] text-[#8C3D22] hover:bg-[#E5DAC9]'
                 }`}
               >
                 {ui.navTemu}
@@ -302,10 +307,10 @@ export default function Layout({
             <Link
               to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'aliexpress', activeCategory) : `/${localeConfig.code}/aliexpress`}
               onClick={handleScrollTopClick}
-              className={`rounded-full px-2.5 sm:px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
+              className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none active:scale-95 ${
                 activeSection === 'coupons' && activeStore === 'aliexpress'
-                  ? 'bg-[#7A3B24] text-[#FCF9F4]'
-                  : 'bg-[#F0E9DF] text-[#6E3520]'
+                  ? 'bg-[#7A3B24] text-[#FCF9F4] shadow-sm'
+                  : 'bg-[#F0E9DF] text-[#6E3520] hover:bg-[#E5DAC9]'
               }`}
             >
               {ui.navAli}
@@ -314,10 +319,10 @@ export default function Layout({
             <Link
               to={dynamicsUrl}
               onClick={handleScrollTopClick}
-              className={`rounded-full px-2.5 sm:px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap focus:outline-none ${
+              className={`shrink-0 rounded-full px-3 py-1.5 transition flex items-center gap-1.5 whitespace-nowrap focus:outline-none active:scale-95 ${
                 activeSection === 'dynamics'
-                  ? 'bg-[#8F5B1D] text-[#FCF9F4]'
-                  : 'bg-[#F0E9DF] text-[#7A4D16]'
+                  ? 'bg-[#8F5B1D] text-[#FCF9F4] shadow-sm'
+                  : 'bg-[#F0E9DF] text-[#7A4D16] hover:bg-[#E5DAC9]'
               }`}
             >
               <Gamepad2 className="h-3.5 w-3.5 shrink-0" />
@@ -327,10 +332,10 @@ export default function Layout({
             <Link
               to={guidesUrl}
               onClick={handleScrollTopClick}
-              className={`rounded-full px-2.5 sm:px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap focus:outline-none ${
+              className={`shrink-0 rounded-full px-3 py-1.5 transition flex items-center gap-1.5 whitespace-nowrap focus:outline-none active:scale-95 ${
                 activeSection === 'guides'
-                  ? 'bg-[#3D6352] text-[#FCF9F4]'
-                  : 'bg-[#F0E9DF] text-[#3D6352]'
+                  ? 'bg-[#3D6352] text-[#FCF9F4] shadow-sm'
+                  : 'bg-[#F0E9DF] text-[#3D6352] hover:bg-[#E5DAC9]'
               }`}
             >
               <BookOpen className="h-3.5 w-3.5 shrink-0" />
@@ -560,6 +565,18 @@ export default function Layout({
                 {ui.legalHeader}
               </h4>
               <div className="grid grid-cols-1 gap-1.5">
+                <Link
+                  to={faqUrl}
+                  onClick={handleScrollTopClick}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 font-bold text-[#B85332] bg-[#F6F2EA] hover:bg-[#ECE5D8] hover:text-[#9E4224] transition focus:outline-none"
+                >
+                  <span className="flex items-center gap-1.5 truncate">
+                    <HelpCircle className="h-3.5 w-3.5 shrink-0 text-[#B85332]" />
+                    {ui.navFaq || 'Preguntas Frecuentes (FAQ)'}
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#7A6B5E]" />
+                </Link>
+
                 <Link
                   to={privacyUrl}
                   onClick={handleScrollTopClick}

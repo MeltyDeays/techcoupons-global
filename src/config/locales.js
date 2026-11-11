@@ -85,23 +85,169 @@ function interpolateText(str, market) {
     .replace(/\{currency\}/g, `${market.currency} (${market.currencyCode})`);
 }
 
+function buildLocalizedSEOContent(pack, market) {
+  const hasTemu = (market.stores || ['temu', 'aliexpress']).includes('temu');
+  const hasAli = (market.stores || ['temu', 'aliexpress']).includes('aliexpress');
+  const country = market.countryName;
+  const currencyFormatted = `${market.currency} (${market.currencyCode})`;
+  const freeTemuFormatted = `${market.currency}${market.freeShipTemu?.toLocaleString?.() || market.freeShipTemu}`;
+  const freeAliFormatted = `${market.currency}${market.freeShipAli?.toLocaleString?.() || market.freeShipAli}`;
+
+  // 1. Spanish Markets (Central America, South America, Spain, US Lockers)
+  if (market.lang === 'es') {
+    if (!hasTemu && hasAli) {
+      // Countries with AliExpress only (no direct Temu): Nicaragua, Costa Rica, Guatemala, El Salvador, Honduras, Argentina, Ecuador, Paraguay, Bolivia
+      return {
+        seoGuideTitle: `Guía Completa: Cómo Aplicar Cupones de AliExpress y Compras vía Casillero en ${country} (2026)`,
+        seoSection1Title: `1. Cómo Aplicar Cupones de Descuento y Ahorrar en ${country}`,
+        seoSection1Body: `Los compradores en ${country} pueden maximizar su ahorro combinando cupones de vendedor con códigos promocionales globales. En AliExpress, aprovecha las campañas de Choice Day, los descuentos acumulativos de "Gasta y Ahorra" y las Monedas de la aplicación móvil antes de pagar. Ten en cuenta que Temu no realiza envíos directos a ${country}; para comprar en Temu o canjear códigos promocionales de búsqueda como credit777 o box777, debes configurar la app en región Estados Unidos y enviar a un casillero internacional en Miami (Florida ZIP 33166 o 33122) pagando en USD libres de impuestos locales.`,
+        seoSection2Title: `2. Métodos de Envío a ${country}: Envío Directo vs. Casillero en Miami`,
+        seoSection2Body: `Para recibir compras en ${country}, las opciones varían según la tienda: Temu no cuenta con envíos directos a ${country}, por lo que el uso de un casillero en Miami (freight forwarder en Florida) es obligatorio para compras en dicha tienda. En AliExpress, el envío directo (AliExpress Standard Shipping) se canaliza mediante el servicio postal local y demora habitualmente entre 20 y 45 días hábiles. Por esta razón, para tecnología, periféricos o artículos urgentes, la gran mayoría de compradores en ${country} prefieren enviar sus compras a un casillero en Miami, garantizando entrega aérea rápida en 5 a 10 días hábiles con rastreo confiable y mejor gestión aduanera.`,
+        faqs: [
+          {
+            q: `¿Se puede comprar en Temu desde ${country} o usar códigos como credit777?`,
+            a: `Temu no ofrece envíos directos oficiales a ${country}. Para comprar en Temu desde ${country} o activar códigos de búsqueda como credit777, wincredit o box777, debes configurar la región de la aplicación en "Estados Unidos" y registrar la dirección de un casillero internacional en Miami (Florida ZIP 33166 o 33122). Tu pedido se procesará en USD con envío gratis dentro de EE. UU. y tu casillero se encargará de importarlo a ${country}.`
+          },
+          {
+            q: `¿Conviene enviar directo a ${country} o usar casillero en Miami?`,
+            a: `Para compras en Temu el casillero en Miami es indispensable al no existir envío directo oficial. Para compras en AliExpress, en la gran mayoría de los casos conviene usar casillero en Miami: los envíos directos de AliExpress Standard Shipping pueden tardar de 3 a 8 semanas por el correo postal local y enfrentar demoras o retenciones aduaneras. Enviar a un casillero en Miami te da entrega doméstica en Florida en 3 a 5 días y flete aéreo express a ${country} en 5 a 8 días hábiles con rastreo y entrega garantizada.`
+          },
+          {
+            q: `¿Se pueden acumular cupones de AliExpress con monedas y cupones de vendedor?`,
+            a: `Sí. En AliExpress puedes combinar hasta tres descuentos simultáneos al pagar: un cupón del vendedor en la ficha del producto, el descuento automático por Monedas de la aplicación móvil y un código promocional global verificado de nuestra lista.`
+          },
+          {
+            q: `¿Cada cuánto se actualizan estos códigos y qué moneda debo utilizar?`,
+            a: `Actualizamos los cupones diariamente verificando disponibilidad. Si compras con envío directo en AliExpress puedes pagar en ${currencyFormatted} o en USD. Si compras en Temu o consolidas mediante casillero en Miami, los pagos se procesan en USD para aprovechar precios de catálogo estadounidense.`
+          }
+        ]
+      };
+    }
+
+    if (hasTemu && hasAli) {
+      return {
+        seoGuideTitle: `Guía Completa: Cómo Apilar Cupones de Temu y AliExpress en ${country} (2026)`,
+        seoSection1Title: `1. Cómo Aplicar Códigos Ocultos de Búsqueda y Acumular Descuentos`,
+        seoSection1Body: `Los compradores en ${country} pueden maximizar su ahorro en hardware combinando códigos generales con cupones de vendedor. En Temu, escribir comandos secretos como credit777, wincredit o box777 directamente en el buscador de la aplicación desbloquea paquetes de cupones y ruletas de crédito. En AliExpress, combina siempre los códigos de Choice Day con las Monedas de la app y los descuentos automáticos de "Gasta y Ahorra" antes de pagar.`,
+        seoSection2Title: `2. Métodos de Envío Locales, Tiempos de Entrega y Envío Gratis en ${country}`,
+        seoSection2Body: `Los pedidos enviados directamente a ${country} cuentan con logística aérea consolidada y entrega de última milla certificada. El envío estándar demora entre 8 y 16 días hábiles y es gratis superando el umbral mínimo (${freeTemuFormatted} en Temu y ${freeAliFormatted} en AliExpress). Si utilizas un casillero en Miami (freight forwarder en Florida ZIP 33166/33122) para consolidar periféricos gaming o componentes de alto valor, puedes acceder al catálogo exclusivo de EE. UU. y optimizar costos aduaneros.`,
+        faqs: [
+          {
+            q: `¿Cómo funcionan los códigos secretos de búsqueda en Temu como credit777?`,
+            a: `A diferencia de un cupón tradicional de carrito, debes escribir la palabra clave exacta en la barra superior de búsqueda de la app de Temu para abrir la ruleta de crédito o el paquete de recompensas.`
+          },
+          {
+            q: `¿Conviene pedir con envío directo a ${country} o usar casillero en Miami?`,
+            a: `Para compras pequeñas y habituales, el envío directo a ${country} es más económico y conveniente al incluir entrega a domicilio. Si compras hardware de alta gama o artículos con catálogo exclusivo en EE. UU., un casillero en Miami te permite pagar en USD y consolidar paquetes en un solo flete aéreo.`
+          },
+          {
+            q: `¿Se pueden acumular cupones de AliExpress con monedas y cupones de tienda?`,
+            a: `Sí. El sistema de pago permite aplicar simultáneamente un código promocional global, un cupón del vendedor y el descuento automático de Monedas en la app.`
+          },
+          {
+            q: `¿Cada cuánto se actualizan estos códigos para ${country}?`,
+            a: `Nuestro equipo verifica el stock de usos de cada cupón diariamente para garantizar compatibilidad con las campañas vigentes de AliExpress Portals y Temu.`
+          }
+        ]
+      };
+    }
+
+    if (hasTemu && !hasAli) {
+      return {
+        seoGuideTitle: `Guía Completa: Cómo Aplicar Cupones de Temu en ${country} (2026)`,
+        seoSection1Title: `1. Cómo Aplicar Códigos Ocultos de Búsqueda en Temu`,
+        seoSection1Body: `Los compradores en ${country} pueden maximizar su ahorro en Temu escribiendo comandos secretos como credit777, wincredit o box777 directamente en el buscador de la aplicación para desbloquear paquetes de cupones y ruletas de crédito.`,
+        seoSection2Title: `2. Métodos de Envío y Tiempo de Entrega en ${country}`,
+        seoSection2Body: `Los pedidos enviados a ${country} disponen de logística aérea directa con entrega certificada en 8 a 15 días hábiles, con envío gratis desde ${freeTemuFormatted}.`,
+        faqs: [
+          {
+            q: `¿Cómo funcionan los códigos secretos de búsqueda en Temu como credit777?`,
+            a: `Escribe la palabra clave exacta en la barra de búsqueda superior de la app de Temu para abrir el panel de recompensas y créditos.`
+          },
+          {
+            q: `¿Cómo reclamar el ajuste de precio de 30 días en Temu?`,
+            a: `Si un artículo comprado baja de precio en los siguientes 30 días, entra a "Tus Pedidos" y presiona "Solicitar ajuste de precio" para recibir la diferencia al instante.`
+          }
+        ]
+      };
+    }
+  }
+
+  // 2. English Markets
+  if (market.lang === 'en') {
+    if (!hasTemu && hasAli) {
+      return {
+        seoGuideTitle: `Complete Guide: How to Apply AliExpress Coupons & Miami Forwarder Orders in ${country} (2026)`,
+        seoSection1Title: `1. How to Stack Cart Discounts & Store Vouchers in ${country}`,
+        seoSection1Body: `Shoppers in ${country} can maximize savings by combining store-wide promo codes with seller vouchers on AliExpress Choice Day. Please note that Temu does not provide direct shipping to ${country}; to shop on Temu or redeem search triggers like credit777, configure your app to United States with a Miami freight forwarder address (ZIP 33166/33122) in USD.`,
+        seoSection2Title: `2. Shipping Methods to ${country}: Direct Postal vs. Miami Forwarder`,
+        seoSection2Body: `Direct shipping to ${country} via AliExpress Standard Shipping is delivered by local postal services (typically 20 to 45 business days). For faster and safer transit (5 to 10 days) and for shopping on Temu, most international buyers choose a Miami freight forwarder.`,
+        faqs: [
+          {
+            q: `Can I order from Temu or use search codes like credit777 in ${country}?`,
+            a: `Temu does not offer direct delivery to ${country}. To buy from Temu, set your app region to United States and ship to a freight forwarder in Miami (FL 33166/33122) in USD.`
+          },
+          {
+            q: `Is it better to ship directly to ${country} or use a Miami freight forwarder?`,
+            a: `For Temu, a Miami forwarder is mandatory. For AliExpress, while direct postal shipping exists, using a forwarder is generally faster and avoids local postal delays or unpredictable customs duties.`
+          },
+          {
+            q: `Can I combine AliExpress promo codes with seller coupons in ${currencyFormatted}?`,
+            a: `Yes. AliExpress allows stacking one platform-wide promo code, one store coupon, and Coins discounts simultaneously on the same checkout screen.`
+          },
+          {
+            q: `How often are coupons verified for ${country}?`,
+            a: `All coupon codes and thresholds are audited daily for active stock and regional validity.`
+          }
+        ]
+      };
+    }
+  }
+
+  // 3. Fallback for other languages (safeguard against false Temu claims when !hasTemu)
+  let title = interpolateText(pack.seoGuideTitle, market);
+  let s1Body = interpolateText(pack.seoSection1Body, market);
+  let s2Body = interpolateText(pack.seoSection2Body, market);
+  let faqs = (pack.faqs || []).map((f) => ({
+    q: interpolateText(f.q, market),
+    a: interpolateText(f.a, market)
+  }));
+
+  if (!hasTemu) {
+    title = title.replace(/Temu\s*(&|y|\+|and)?\s*/gi, '').trim();
+    faqs = faqs.filter((f) => !/credit777|Temu/i.test(f.q) || /AliExpress/i.test(f.q));
+  } else if (!hasAli) {
+    title = title.replace(/(AliExpress\s*(&|y|\+|and)?\s*)|((\s*(&|y|\+|and))?\s*AliExpress)/gi, '').trim();
+    faqs = faqs.filter((f) => !/AliExpress/i.test(f.q) || /Temu/i.test(f.q));
+  }
+
+  return {
+    seoGuideTitle: title,
+    seoSection1Title: interpolateText(pack.seoSection1Title, market),
+    seoSection1Body: s1Body,
+    seoSection2Title: interpolateText(pack.seoSection2Title, market),
+    seoSection2Body: s2Body,
+    faqs
+  };
+}
+
 function localizePack(pack, market) {
+  const seoContent = buildLocalizedSEOContent(pack, market);
+
   return {
     ...pack,
     heroTitle: interpolateText(pack.heroTitle, market),
     heroSubtitle: interpolateText(pack.heroSubtitle, market),
-    modalSteps: pack.modalSteps.map((s) => interpolateText(s, market)),
-    seoGuideTitle: interpolateText(pack.seoGuideTitle, market),
-    seoSection1Body: interpolateText(pack.seoSection1Body, market),
-    seoSection2Title: interpolateText(pack.seoSection2Title, market),
-    seoSection2Body: interpolateText(pack.seoSection2Body, market),
-    faqs: pack.faqs.map((f) => ({
-      q: interpolateText(f.q, market),
-      a: interpolateText(f.a, market)
-    })),
+    modalSteps: (pack.modalSteps || []).map((s) => interpolateText(s, market)),
+    seoGuideTitle: seoContent.seoGuideTitle,
+    seoSection1Title: seoContent.seoSection1Title,
+    seoSection1Body: seoContent.seoSection1Body,
+    seoSection2Title: seoContent.seoSection2Title,
+    seoSection2Body: seoContent.seoSection2Body,
+    faqs: seoContent.faqs,
     legal: {
       ...pack.legal,
-      termsBody: interpolateText(pack.legal.termsBody, market)
+      termsBody: interpolateText(pack.legal?.termsBody || '', market)
     }
   };
 }
@@ -198,51 +344,63 @@ export function formatLocalPrice(usdAmount, localeConfig) {
   return `${localeConfig.currency}${rounded.toLocaleString()}`;
 }
 
-export function buildStructuredData(localeConfig, coupons, canonicalUrl) {
-  const itemListSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: localeConfig.dict.heroTitle,
-    description: localeConfig.dict.heroSubtitle,
-    url: canonicalUrl,
-    numberOfItems: coupons.length,
-    itemListElement: coupons.slice(0, 15).map((c, idx) => ({
-      '@type': 'ListItem',
-      position: idx + 1,
-      item: {
-        '@type': 'Product',
-        name: c.title,
-        category: c.categoryLabel,
-        brand: {
-          '@type': 'Brand',
-          name: c.store === 'temu' ? 'Temu' : 'AliExpress'
-        },
-        offers: {
-          '@type': 'Offer',
-          url: c.affiliateLink,
-          priceCurrency: c.currencyCode,
-          price: String(c.numericPrice),
-          availability: 'https://schema.org/InStock',
-          priceValidUntil: '2026-12-31'
+export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageType = '') {
+  const schemas = [];
+
+  if (coupons && coupons.length > 0) {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: localeConfig.dict.heroTitle,
+      description: localeConfig.dict.heroSubtitle,
+      url: canonicalUrl,
+      numberOfItems: coupons.length,
+      itemListElement: coupons.slice(0, 15).map((c, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        item: {
+          '@type': 'Product',
+          name: c.title,
+          category: c.categoryLabel,
+          brand: {
+            '@type': 'Brand',
+            name: c.store === 'temu' ? 'Temu' : 'AliExpress'
+          },
+          offers: {
+            '@type': 'Offer',
+            url: c.affiliateLink,
+            priceCurrency: c.currencyCode,
+            price: String(c.numericPrice),
+            availability: 'https://schema.org/InStock',
+            priceValidUntil: '2026-12-31'
+          }
         }
-      }
-    }))
-  };
+      }))
+    });
+  }
 
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: localeConfig.dict.faqs.map((f) => ({
-      '@type': 'Question',
-      name: f.q,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: f.a
-      }
-    }))
-  };
+  // Only inject FAQPage schema on the dedicated FAQ page where FAQs are actually displayed
+  const isFaqPage =
+    (pageType || '').toLowerCase() === 'faq' ||
+    (pageType || '').toLowerCase().endsWith('/faq') ||
+    (pageType || '').toLowerCase() === 'faq/';
 
-  return [itemListSchema, faqSchema];
+  if (isFaqPage && localeConfig.dict.faqs && localeConfig.dict.faqs.length > 0) {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: localeConfig.dict.faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: f.a
+        }
+      }))
+    });
+  }
+
+  return schemas;
 }
 
 export { BASE_DOMAIN, CATEGORY_SLUGS };

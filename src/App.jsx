@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, Link, Navigate } from 'react-router-dom';
 import {
   getLocaleConfig,
@@ -8,7 +8,8 @@ import {
   formatLocalPrice,
   CATEGORY_SLUGS
 } from './config/locales.js';
-import { getCouponsForLocale } from './data/couponsGenerator.js';
+import { getCouponsForLocale, autoPublishAiCoupons } from './data/couponsGenerator.js';
+import { syncAndPurgeStorage } from './data/couponLifecycle.js';
 import {
   getSectionText,
   getLocalizedPath,
@@ -21,7 +22,7 @@ import { AFFILIATE_CONFIG } from './config/affiliateConfig.js';
 import Layout from './components/Layout.jsx';
 import SEOHead from './components/SEOHead.jsx';
 import CouponCard from './components/CouponCard.jsx';
-import NativeSEOGuide from './components/NativeSEOGuide.jsx';
+import { CouponStackingGuide, CountryFAQ } from './components/NativeSEOGuide.jsx';
 import EventCountdownBanner from './components/EventCountdownBanner.jsx';
 import {
   Search,
@@ -32,6 +33,7 @@ import {
   BadgeDollarSign,
   Layers,
   Truck,
+  HelpCircle,
   LayoutGrid,
   Monitor,
   Home,
@@ -74,6 +76,37 @@ export function MarketCatalogPage({ storeFilter = null }) {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyEvent1111, setOnlyEvent1111] = useState(false);
+  const [autoPublishedCount, setAutoPublishedCount] = useState(0);
+
+  // Autonomous background sync & startup storage purge: scans and auto-publishes discovered coupons every 7 days, purging expired codes
+  useEffect(() => {
+    try {
+      syncAndPurgeStorage();
+      const SYNC_STORAGE_KEY = 'cuponestech_ai_radar_sync_v1';
+      const lastSync = Number(localStorage.getItem(SYNC_STORAGE_KEY) || 0);
+      const now = Date.now();
+      const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+      if (now - lastSync >= SEVEN_DAYS_MS) {
+        fetch('/api/ai-radar', { method: 'POST' })
+          .then((res) => (res.ok ? res.json() : null))
+          .then((json) => {
+            if (json?.data?.discoveredCoupons) {
+              const added = autoPublishAiCoupons(json.data.discoveredCoupons);
+              syncAndPurgeStorage();
+              localStorage.setItem(SYNC_STORAGE_KEY, String(now));
+              if (added > 0) {
+                setAutoPublishedCount((c) => c + added);
+              }
+            } else if (json?.ok) {
+              syncAndPurgeStorage();
+              localStorage.setItem(SYNC_STORAGE_KEY, String(now));
+            }
+          })
+          .catch(() => {});
+      }
+    } catch {}
+  }, []);
 
   if (!LOCALE_MAP[(locale || '').toLowerCase()]) {
     return <Navigate to={`/${DEFAULT_LOCALE}`} replace />;
@@ -146,6 +179,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
       {/* Automatic Event Calendar & 11.11 Live Countdown Banner */}
       <EventCountdownBanner
         localeConfig={localeConfig}
+        storeFilter={storeFilter}
         onlyEvent1111={onlyEvent1111}
         onToggleEvent1111={() => setOnlyEvent1111((prev) => !prev)}
       />
@@ -254,8 +288,6 @@ export function MarketCatalogPage({ storeFilter = null }) {
           </div>
         )}
       </section>
-
-      <NativeSEOGuide localeConfig={localeConfig} />
     </Layout>
   );
 }
@@ -284,6 +316,21 @@ export function DynamicsPage() {
   const dyn = ui.dynamics;
   const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
   const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
+  const hasTemuInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
+  const hasAliInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('aliexpress');
+
+  const dynamicHeading =
+    !hasTemuInCountry && hasAliInCountry
+      ? `Dinámicas y Minijuegos de AliExpress en ${displayCountry}`
+      : dyn.title(displayCountry);
+
+  const dynamicItems = [...dyn.items].sort((a, b) => {
+    if (!hasTemuInCountry) {
+      if (a.storeKey === 'aliexpress' && b.storeKey !== 'aliexpress') return -1;
+      if (a.storeKey !== 'aliexpress' && b.storeKey === 'aliexpress') return 1;
+    }
+    return 0;
+  });
 
   const temuUrl = AFFILIATE_CONFIG.temuBaseTrackingUrl || 'https://www.temu.com';
   const aliUrl = AFFILIATE_CONFIG.aliexpressBaseTrackingUrl || 'https://www.aliexpress.com';
@@ -305,7 +352,7 @@ export function DynamicsPage() {
       <SEOHead
         localeConfig={localeConfig}
         routeSuffix={`/${routeSlugs.dynamics}`}
-        pageTitle={`${dyn.title(displayCountry)} | CuponesTech`}
+        pageTitle={`${dynamicHeading} | CuponesTech`}
         pageDescription={dyn.subtitle}
         coupons={[]}
       />
@@ -317,18 +364,37 @@ export function DynamicsPage() {
         </div>
 
         <h1 className="mb-2 text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1F1B18] break-words">
-          {dyn.title(displayCountry)}
+          {dynamicHeading}
         </h1>
 
         <p className="text-xs sm:text-sm md:text-base text-[#574B40] leading-relaxed break-words">
           {dyn.subtitle}
         </p>
+
+        {!hasTemuInCountry && (
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-[#D4A359]/60 bg-[#F6F2EA] p-3 text-xs text-[#574B40]">
+            <div className="flex items-start sm:items-center gap-2 min-w-0">
+              <Info className="h-4 w-4 text-[#B85332] shrink-0 mt-0.5 sm:mt-0" />
+              <span className="break-words">
+                Temu no realiza envíos directos a {displayCountry}. Los minijuegos y comandos de Temu (como credit777 o box777) requieren configurar la app en región Estados Unidos y comprar con casillero en Miami (USD).
+              </span>
+            </div>
+            <Link
+              to={ui.usLockerTarget || '/en-us/temu'}
+              className="w-full sm:w-auto text-center shrink-0 rounded-lg bg-[#B85332] px-3 py-1.5 font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition"
+            >
+              {ui.miamiBtn}
+            </Link>
+          </div>
+        )}
       </section>
 
       <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 w-full">
-        {dyn.items.map((item) => {
+        {dynamicItems.map((item) => {
           const isCopied = copiedId === item.id;
           const isAli = item.storeKey === 'aliexpress';
+          const isTemuLockerOnly = item.storeKey === 'temu' && !hasTemuInCountry;
+          const badgeText = isTemuLockerOnly ? `CASILLERO MIAMI (USD) • ${item.badge}` : item.badge;
           return (
             <article
               key={item.id}
@@ -343,7 +409,7 @@ export function DynamicsPage() {
                         : 'bg-[#8F5B1D]/15 border-[#8F5B1D]/30 text-[#7A4D16]'
                     }`}
                   >
-                    {item.badge}
+                    {badgeText}
                   </span>
                   <span className="font-mono text-[11px] font-bold text-[#6E6055] uppercase shrink-0">
                     {item.store}
@@ -357,6 +423,11 @@ export function DynamicsPage() {
                 <p className="mb-4 rounded-xl border border-[#E5DAC9] bg-[#F3ECE2] p-3 text-xs leading-relaxed text-[#574B40] break-words">
                   {item.howItWorks}
                 </p>
+                {isTemuLockerOnly && (
+                  <p className="mb-4 -mt-2 text-[11px] font-semibold text-[#8F5B1D] bg-[#F0E9DF] px-2.5 py-1 rounded-lg">
+                    ⚠️ Requiere app de Temu en región EE. UU. (Casillero en Miami en USD).
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2 min-w-0">
@@ -422,6 +493,11 @@ export function DynamicsPage() {
             </div>
 
             <p className="mb-1.5 text-sm font-bold text-[#1F1B18]">{selectedDynamic.title}</p>
+            {selectedDynamic.storeKey === 'temu' && !hasTemuInCountry && (
+              <p className="mb-3 rounded-lg border border-[#D4A359]/60 bg-[#F0E9DF] p-2.5 text-xs text-[#7A4D16] font-semibold leading-relaxed">
+                ⚠️ En {displayCountry}, Temu no envía directo. Para usar este comando, debes configurar la app de Temu en región Estados Unidos y enviar a tu casillero en Miami (USD).
+              </p>
+            )}
             <p className="mb-4 text-xs leading-relaxed text-[#574B40]">
               {selectedDynamic.howItWorks}
             </p>
@@ -453,8 +529,6 @@ export function DynamicsPage() {
           </div>
         </div>
       )}
-
-      <NativeSEOGuide localeConfig={localeConfig} />
     </Layout>
   );
 }
@@ -479,6 +553,7 @@ export function GuidesPage() {
   const g = ui.guides;
   const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
   const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
+  const hasTemuInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
 
   const ex20 = formatLocalPrice(20, localeConfig);
   const ex15 = formatLocalPrice(15, localeConfig);
@@ -526,7 +601,9 @@ export function GuidesPage() {
           </div>
 
           <p className="mb-4 text-xs sm:text-sm leading-relaxed text-[#574B40] break-words">
-            {g.g1Desc(localeConfig.currencyCode)}
+            {hasTemuInCountry
+              ? g.g1Desc(localeConfig.currencyCode)
+              : `Todos tus pedidos en Temu realizados mediante Casillero en Miami (EE. UU.) incluyen garantía de precio por 30 días en USD. Si el precio del mismo artículo baja, reclama la diferencia en tres pasos:`}
           </p>
 
           <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
@@ -579,12 +656,15 @@ export function GuidesPage() {
           </div>
 
           <p className="text-xs sm:text-sm leading-relaxed text-[#574B40] break-words">
-            {g.g3Desc(displayCountry)}
+            {!hasTemuInCountry
+              ? `Desde ${displayCountry}, Temu no cuenta con envío directo oficial, por lo que el uso de un Casillero en Miami (Florida ZIP 33166 o 33122) es indispensable para recibir tus compras con flete express en 5 a 8 días hábiles. En AliExpress, el envío directo (AliExpress Standard Shipping) está disponible a través del correo postal local, pero en la mayoría de los casos conviene más usar un casillero en Miami para evitar demoras aduaneras y recibir pedidos con seguimiento garantizado en tiempo récord.`
+              : g.g3Desc(displayCountry)}
           </p>
         </article>
       </div>
 
-      <NativeSEOGuide localeConfig={localeConfig} />
+      {/* Guía Oficial Completa de Compra y Métodos de Envío para el País */}
+      <CouponStackingGuide localeConfig={localeConfig} />
     </Layout>
   );
 }
@@ -606,11 +686,18 @@ export function LegalPage({ type }) {
   const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
   const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
 
+  const isFaq = type === 'faq';
+
   const contentMap = {
     privacy: { title: legal.privacyTitle, body: legal.privacyBody, suffix: `/${routeSlugs.privacy}` },
     terms: { title: legal.termsTitle, body: legal.termsBody, suffix: `/${routeSlugs.terms}` },
     about: { title: legal.aboutTitle, body: legal.aboutBody, suffix: `/${routeSlugs.about}` },
-    contact: { title: legal.contactTitle, body: legal.contactBody, suffix: `/${routeSlugs.contact}` }
+    contact: { title: legal.contactTitle, body: legal.contactBody, suffix: `/${routeSlugs.contact}` },
+    faq: {
+      title: `Preguntas Frecuentes (FAQ) — ${displayCountry}`,
+      body: `Respuestas oficiales sobre cupones de descuento, compras en AliExpress y Temu, envíos locales y uso de casillero en Miami desde ${displayCountry}.`,
+      suffix: `/${routeSlugs.faq || 'faq'}`
+    }
   };
 
   const current = contentMap[type] || contentMap.privacy;
@@ -627,13 +714,19 @@ export function LegalPage({ type }) {
       <article className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 md:p-10 shadow-sm text-[#1F1B18] font-sans">
         <h1 className="mb-4 text-2xl md:text-3xl font-extrabold text-[#1F1B18]">{current.title}</h1>
         <p className="text-sm md:text-base leading-relaxed text-[#574B40] mb-6">{current.body}</p>
+
+        {isFaq && (
+          <div className="my-6">
+            <CountryFAQ localeConfig={localeConfig} />
+          </div>
+        )}
+
         <div className="rounded-xl border border-[#D8C8B4] bg-[#F6F2EA] p-4 text-xs text-[#574B40] space-y-2">
           <p><strong>{ui.regionLabel}</strong> {displayCountry} ({localeConfig.code.toUpperCase()})</p>
           <p><strong>{ui.currencyLabel}</strong> {localeConfig.currencyCode} ({localeConfig.currency})</p>
           <p><strong>{ui.cpaComplianceLabel}</strong> {ui.cpaComplianceText}</p>
         </div>
       </article>
-      <NativeSEOGuide localeConfig={localeConfig} />
     </Layout>
   );
 }

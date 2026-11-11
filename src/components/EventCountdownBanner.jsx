@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getActiveOrNextEvent, getEventBannerText } from '../data/eventsCalendar.js';
+import { getActiveOrNextEvent, getEventBannerText, getEventDateLabel } from '../data/eventsCalendar.js';
 import { Flame, Clock, Sparkles, Calendar } from 'lucide-react';
 
 function computeTimeLeft(targetDate) {
@@ -13,6 +13,7 @@ function computeTimeLeft(targetDate) {
 
 export default function EventCountdownBanner({
   localeConfig,
+  storeFilter = null,
   onlyEvent1111 = false,
   onToggleEvent1111
 }) {
@@ -30,9 +31,15 @@ export default function EventCountdownBanner({
     return () => clearInterval(timer);
   }, []);
 
-  const txt = getEventBannerText(localeConfig.lang, eventInfo.id);
+  const hasTemuInCountry = localeConfig?.stores?.includes('temu') ?? true;
+  const txt = getEventBannerText(localeConfig.lang, eventInfo.id, hasTemuInCountry, storeFilter);
   const isLive = eventInfo.status === 'LIVE';
   const pad = (n) => String(n).padStart(2, '0');
+  const dateLabel = getEventDateLabel(eventInfo, localeConfig.lang);
+
+  const displayTag = storeFilter && eventInfo.codeTagByStore?.[storeFilter]
+    ? eventInfo.codeTagByStore[storeFilter]
+    : eventInfo.codeTag;
 
   return (
     <div className="mb-4 sm:mb-6 w-full max-w-full min-w-0 overflow-hidden rounded-2xl border-2 border-[#B85332]/40 bg-gradient-to-r from-[#FCF9F4] via-[#F6EFE4] to-[#FCF9F4] p-3.5 sm:p-5 shadow-sm">
@@ -42,12 +49,12 @@ export default function EventCountdownBanner({
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#B85332] px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-[#FCF9F4] shadow-sm">
               <Flame className="h-3.5 w-3.5 shrink-0" />
-              <span>{eventInfo.codeTag} • {isLive ? txt.liveBadge : txt.upcomingBadge}</span>
+              <span>{displayTag} • {isLive ? txt.liveBadge : txt.upcomingBadge}</span>
             </span>
 
-            <span className="inline-flex max-w-full items-center gap-1 rounded-lg border border-[#D8C8B4] bg-[#FCF9F4] px-2.5 py-1 text-[10px] font-bold text-[#574B40]">
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#D8C8B4] bg-[#FCF9F4] px-2.5 py-1 text-[10px] sm:text-xs font-bold text-[#574B40] shadow-sm">
               <Calendar className="h-3 w-3 text-[#B85332] shrink-0" />
-              <span className="whitespace-normal leading-snug break-words">{txt.calendarNote}</span>
+              <span>{dateLabel}</span>
             </span>
           </div>
 

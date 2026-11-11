@@ -17,6 +17,7 @@ const PRIVACY_SLUGS = uniqueSlugs('privacy');
 const TERMS_SLUGS = uniqueSlugs('terms');
 const ABOUT_SLUGS = uniqueSlugs('about');
 const CONTACT_SLUGS = uniqueSlugs('contact');
+const FAQ_SLUGS = uniqueSlugs('faq').length > 0 ? uniqueSlugs('faq') : ['faq'];
 const CATEGORY_WORDS = uniqueSlugs('category');
 
 export function AppRoutes() {
@@ -54,6 +55,9 @@ export function AppRoutes() {
       ))}
       {CONTACT_SLUGS.map((s) => (
         <Route key={s} path={`/:locale/${s}`} element={<LegalPage type="contact" />} />
+      ))}
+      {FAQ_SLUGS.map((s) => (
+        <Route key={s} path={`/:locale/${s}`} element={<LegalPage type="faq" />} />
       ))}
 
       <Route path="*" element={<Navigate to={`/${DEFAULT_LOCALE}`} replace />} />

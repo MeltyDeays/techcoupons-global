@@ -1,5 +1,7 @@
-import { getLocaleConfig, formatLocalPrice } from '../config/locales.js';
+import { getLocaleConfig, formatLocalPrice, LOCALES } from '../config/locales.js';
 import { AFFILIATE_CONFIG } from '../config/affiliateConfig.js';
+import { getActiveOrNextEvent } from './eventsCalendar.js';
+import { resolveCouponExpiration, purgeExpiredCoupons, isCouponTombstoned } from './couponLifecycle.js';
 
 /**
  * REGIONAL ALIEXPRESS TIERED PROMO CODES (Official Global Portals / Choice Active Series)
@@ -1249,6 +1251,205 @@ const CHECKOUT_COUPONS = [
 
 export const SEARCH_DYNAMIC_CODES = [];
 
+export function getBaseCouponCodes() {
+  const codes = new Set();
+  for (const c of CHECKOUT_COUPONS) {
+    if (c.code) codes.add(String(c.code).toLowerCase().trim());
+    if (c.backupCode) codes.add(String(c.backupCode).toLowerCase().trim());
+    if (c.tierKey) {
+      codes.add(String(c.tierKey).toLowerCase().trim());
+      const tier = ALIEXPRESS_REGIONAL_TIERS[c.tierKey];
+      if (tier) {
+        for (const loc of Object.values(tier)) {
+          if (loc?.primary) codes.add(String(loc.primary).toLowerCase().trim());
+          if (loc?.backup) codes.add(String(loc.backup).toLowerCase().trim());
+        }
+      }
+    }
+  }
+  return codes;
+}
+
+export function autoPublishAiCoupons(discoveredList) {
+  if (typeof window === 'undefined' || !Array.isArray(discoveredList) || !discoveredList.length) return 0;
+  try {
+    const raw = window.localStorage.getItem('ecosistema_b_custom_coupons_v1');
+    let current = [];
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) current = parsed;
+      } catch {}
+    }
+
+    // Tombstone ledger: skip coupons previously deleted by admin
+    let tombstones = new Set();
+    try {
+      const rawTombstones = window.localStorage.getItem('ecosistema_b_coupon_tombstones_v1');
+      if (rawTombstones) {
+        const parsedTombstones = JSON.parse(rawTombstones);
+        if (Array.isArray(parsedTombstones)) {
+          tombstones = new Set(parsedTombstones.map((t) => String(t).toLowerCase().trim()));
+        }
+      }
+    } catch {}
+
+    const isTombstoned = (item) => {
+      if (isCouponTombstoned(item)) return true;
+      const code = String(item.code || '').toLowerCase().trim();
+      const backup = String(item.backupCode || '').toLowerCase().trim();
+      const id = String(item.id || '').toLowerCase().trim();
+      return (code && (tombstones.has(code) || isCouponTombstoned(code))) ||
+             (backup && (tombstones.has(backup) || isCouponTombstoned(backup))) ||
+             (id && (tombstones.has(id) || isCouponTombstoned(id)));
+    };
+
+    // Extract all existing coupon identifiers without inserting 'undefined'
+    const existingCodes = getBaseCouponCodes();
+
+    if (Array.isArray(current)) {
+      for (const c of current) {
+        if (c.code) existingCodes.add(String(c.code).toLowerCase().trim());
+        if (c.backupCode) existingCodes.add(String(c.backupCode).toLowerCase().trim());
+        if (c.tierKey) existingCodes.add(String(c.tierKey).toLowerCase().trim());
+      }
+    }
+
+    // Refresh existing custom coupons if refreshed data (e.g. renewal batch) is present
+    let currentUpdated = false;
+    if (Array.isArray(current)) {
+      for (const item of discoveredList) {
+        if (!item || !item.code || typeof item.code !== 'string') continue;
+        const codeNorm = item.code.trim().toLowerCase();
+        const existingInCurrent = current.find(
+          (c) => c.code && String(c.code).trim().toLowerCase() === codeNorm
+        );
+        if (existingInCurrent) {
+          if (item.discoveredAt) {
+            existingInCurrent.discoveredAt = item.discoveredAt;
+            if (!item.expiresAt) {
+              const ttl = existingInCurrent.ttlDays || 14;
+              const refD = new Date(item.discoveredAt);
+              existingInCurrent.expiresAt = new Date(refD.getTime() + ttl * 24 * 60 * 60 * 1000).toISOString();
+            }
+          }
+          if (item.expiresAt) existingInCurrent.expiresAt = item.expiresAt;
+          if (item.ttlDays) existingInCurrent.ttlDays = item.ttlDays;
+          currentUpdated = true;
+        }
+      }
+    }
+
+    // Determine active commercial event dynamically
+    const activeEvent = getActiveOrNextEvent(new Date());
+    const isCurrent1111 = Boolean(activeEvent?.status === 'LIVE' && activeEvent?.id === '11-11-singles-day');
+
+    // 27 supported language codes from LOCALES
+    const supportedLangs = Array.isArray(LOCALES)
+      ? [...new Set(LOCALES.map((l) => l.lang))]
+      : ['ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'fi', 'fr', 'he', 'hu', 'it', 'ja', 'ko', 'ms', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'vi', 'zh'];
+
+    const seenInBatch = new Set();
+    const newItems = discoveredList
+      .filter((item) => {
+        if (!item || !item.code || typeof item.code !== 'string' || item.code.trim() === '') return false;
+        const code = item.code.trim().toLowerCase();
+        const tierKey = item.tierKey ? String(item.tierKey).toLowerCase().trim() : null;
+        if (existingCodes.has(code) || (tierKey && existingCodes.has(tierKey))) return false;
+        if (seenInBatch.has(code)) return false;
+        if (isTombstoned(item)) return false;
+        existingCodes.add(code);
+        seenInBatch.add(code);
+        if (tierKey) {
+          existingCodes.add(tierKey);
+          seenInBatch.add(tierKey);
+        }
+        if (item.backupCode) {
+          const backup = String(item.backupCode).toLowerCase().trim();
+          if (backup) {
+            existingCodes.add(backup);
+            seenInBatch.add(backup);
+          }
+        }
+        return true;
+      })
+      .map((item, idx) => {
+        const rawTitle = typeof item.title === 'string'
+          ? item.title
+          : (item.title?.en || item.title?.es || item.productName?.en || item.productName?.es || '');
+
+        const titleMap = { _raw: rawTitle };
+        if (typeof item.productName === 'object' && item.productName !== null) {
+          Object.assign(titleMap, item.productName);
+        }
+        if (typeof item.title === 'object' && item.title !== null) {
+          Object.assign(titleMap, item.title);
+        }
+        for (const lang of supportedLangs) {
+          if (!titleMap[lang]) {
+            titleMap[lang] = rawTitle;
+          }
+        }
+
+        const isEvent = Boolean(item.isEvent1111);
+        const eventWindowId = item.eventWindowId || (isEvent ? '11-11-singles-day' : (item.eventId || null));
+        const nowIso = new Date().toISOString();
+        const discoveredAt = item.discoveredAt || nowIso;
+        const createdAt = item.createdAt || discoveredAt;
+        const ttlDays = typeof item.ttlDays === 'number' && !isNaN(item.ttlDays) ? item.ttlDays : 14;
+
+        let expiresAt = item.expiresAt || null;
+        if (!expiresAt) {
+          const resolved = resolveCouponExpiration({
+            ...item,
+            discoveredAt,
+            createdAt,
+            ttlDays,
+            eventWindowId,
+            isEvent1111: isEvent
+          }, new Date(discoveredAt));
+          expiresAt = resolved.expiresAt;
+        }
+
+        return {
+          id: `auto-ai-${Date.now()}-${idx}-${String(item.code).trim().toUpperCase()}`,
+          store: item.store || 'aliexpress',
+          category: item.category || 'tech-gadgets',
+          code: String(item.code).trim().toUpperCase(),
+          backupCode: item.backupCode ? String(item.backupCode).trim().toUpperCase() : null,
+          tierKey: item.tierKey ? String(item.tierKey).trim() : null,
+          isEvent1111: isEvent,
+          eventWindowId,
+          eventId: item.eventId || eventWindowId,
+          ttlDays,
+          createdAt,
+          discoveredAt,
+          expiresAt,
+          discountPct: Number(item.discountPct) || 20,
+          discountUsd: Number(item.discountUsd) || 15,
+          basePriceUsd: Number(item.discountUsd) || 15,
+          minSpendUsd: Number(item.minSpendUsd) || 45,
+          customAffiliateUrl: item.customAffiliateUrl || '',
+          autoPublished: true,
+          productName: titleMap
+        };
+      });
+
+    if (newItems.length > 0 || currentUpdated) {
+      const updated = [...newItems, ...current];
+      try {
+        window.localStorage.setItem('ecosistema_b_custom_coupons_v1', JSON.stringify(updated));
+      } catch {
+        return 0;
+      }
+      return newItems.length;
+    }
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+
 function getDynamicAdminCoupons() {
   if (typeof window === 'undefined') return [];
   try {
@@ -1256,23 +1457,72 @@ function getDynamicAdminCoupons() {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.map((item) => ({
-      id: item.id || `custom-${item.code}`,
-      store: item.store || 'aliexpress',
-      category: item.category || 'tech-gadgets',
-      code: item.code,
-      backupCode: item.backupCode || null,
-      isEvent1111: true,
-      discountPct: Number(item.discountPct) || 20,
-      discountUsd: Number(item.discountUsd || item.basePriceUsd) || 15,
-      minSpendUsd: Number(item.minSpendUsd) || 45,
-      userEligibility: {},
-      title: {
-        es: item.productName?.es || item.title || '',
-        en: item.productName?.en || item.title || ''
-      },
-      appliesTo: {}
-    }));
+
+    let refDate = new Date();
+    try {
+      const savedRef = window.localStorage.getItem('ecosistema_b_last_ref_date_v1');
+      if (savedRef) {
+        const d = new Date(savedRef);
+        if (!isNaN(d.getTime())) refDate = d;
+      }
+    } catch {}
+
+    // Purge expired coupons from custom coupons storage on read
+    const { activeCoupons, purgedCount } = purgeExpiredCoupons(parsed, refDate);
+    if (purgedCount > 0) {
+      try {
+        window.localStorage.setItem('ecosistema_b_custom_coupons_v1', JSON.stringify(activeCoupons));
+      } catch {}
+    }
+
+    const activeEvent = getActiveOrNextEvent(new Date());
+    const isCurrent1111 = Boolean(activeEvent?.status === 'LIVE' && activeEvent?.id === '11-11-singles-day');
+
+    const supportedLangs = Array.isArray(LOCALES)
+      ? [...new Set(LOCALES.map((l) => l.lang))]
+      : ['ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'fi', 'fr', 'he', 'hu', 'it', 'ja', 'ko', 'ms', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'vi', 'zh'];
+
+    return activeCoupons.map((item) => {
+      const rawTitle = typeof item.title === 'string'
+        ? item.title
+        : (item.productName?._raw || item.title?.en || item.title?.es || item.productName?.en || item.productName?.es || '');
+
+      const titleObj = { _raw: rawTitle };
+      if (typeof item.productName === 'object' && item.productName !== null) {
+        Object.assign(titleObj, item.productName);
+      }
+      if (typeof item.title === 'object' && item.title !== null) {
+        Object.assign(titleObj, item.title);
+      }
+      for (const lang of supportedLangs) {
+        if (!titleObj[lang]) {
+          titleObj[lang] = rawTitle;
+        }
+      }
+
+      return {
+        id: item.id || `custom-${item.code}`,
+        store: item.store || 'aliexpress',
+        category: item.category || 'tech-gadgets',
+        code: item.code,
+        backupCode: item.backupCode || null,
+        tierKey: item.tierKey || null,
+        isEvent1111: item.isEvent1111 !== undefined ? Boolean(item.isEvent1111) : isCurrent1111,
+        eventWindowId: item.eventWindowId || (item.isEvent1111 ? '11-11-singles-day' : null),
+        eventId: item.eventId || (activeEvent?.status === 'LIVE' ? activeEvent.id : null),
+        createdAt: item.createdAt || null,
+        discoveredAt: item.discoveredAt || null,
+        expiresAt: item.expiresAt || null,
+        ttlDays: item.ttlDays || 14,
+        isEvergreen: item.isEvergreen || false,
+        discountPct: Number(item.discountPct) || 20,
+        discountUsd: Number(item.discountUsd || item.basePriceUsd) || 15,
+        minSpendUsd: Number(item.minSpendUsd) || 45,
+        userEligibility: item.userEligibility || {},
+        title: titleObj,
+        appliesTo: item.appliesTo || {}
+      };
+    });
   } catch {
     return [];
   }
@@ -1287,9 +1537,21 @@ export function getCouponsForLocale(
   const availableStores = localeConfig.stores || ['temu', 'aliexpress'];
   const tpl = COUPON_LANG_TEMPLATES[lang] || COUPON_LANG_TEMPLATES.en;
 
-  const allCoupons = [... getDynamicAdminCoupons(), ...CHECKOUT_COUPONS];
+  let refDate = new Date();
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const savedRef = window.localStorage.getItem('ecosistema_b_last_ref_date_v1');
+      if (savedRef) {
+        const d = new Date(savedRef);
+        if (!isNaN(d.getTime())) refDate = d;
+      }
+    } catch {}
+  }
 
-  return allCoupons.filter((c) => {
+  const allCoupons = [...getDynamicAdminCoupons(), ...CHECKOUT_COUPONS];
+  const { activeCoupons } = purgeExpiredCoupons(allCoupons, refDate);
+
+  return activeCoupons.filter((c) => {
     if (!availableStores.includes(c.store)) return false;
     if (storeFilter && c.store !== storeFilter) return false;
     if (categoryFilter && c.category !== categoryFilter) return false;
@@ -1300,13 +1562,14 @@ export function getCouponsForLocale(
     const localMinSpend = formatLocalPrice(c.minSpendUsd, localeConfig);
     const localDiscountAmount = formatLocalPrice(c.discountUsd, localeConfig);
 
-    let localizedTitle = c.title?.[lang];
+    let localizedTitle = c.title?.[lang] || c.title?.en || c.title?.es || c.title?._raw;
     if (!localizedTitle) {
       const baseTitle = c.store === 'aliexpress'
         ? tpl.aliTitle(categoryLabel)
         : tpl.temuTitle(c.discountPct, categoryLabel);
+      const eventPrefix = c.store === 'temu' ? 'BLACK FRIDAY' : '11.11';
       localizedTitle = c.isEvent1111
-        ? `[11.11 • -${localDiscountAmount}] ${baseTitle}`
+        ? `[${eventPrefix} • -${localDiscountAmount}] ${baseTitle}`
         : baseTitle;
     }
 
@@ -1319,7 +1582,8 @@ export function getCouponsForLocale(
     let eligibilityText = c.userEligibility?.[lang];
     if (!eligibilityText) {
       const baseElig = c.store === 'aliexpress' && c.tierKey !== 'tier6_18_new' ? tpl.allUsers : tpl.newUsers;
-      eligibilityText = c.isEvent1111 ? `11.11 • ${baseElig}` : baseElig;
+      const eventPrefix = c.store === 'temu' ? 'BLACK FRIDAY' : '11.11';
+      eligibilityText = c.isEvent1111 ? `${eventPrefix} • ${baseElig}` : baseElig;
     }
 
     let primaryCode = c.code;
@@ -1344,6 +1608,7 @@ export function getCouponsForLocale(
       code: primaryCode,
       backupCode,
       title: localizedTitle,
+      appliesTo: appliesToText,
       appliesToText,
       eligibilityText,
       regionalNote: null,

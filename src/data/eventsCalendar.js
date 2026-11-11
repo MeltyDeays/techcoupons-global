@@ -5,17 +5,25 @@
 export const ANNUAL_EVENTS_SCHEDULE = [
   {
     id: '11-11-singles-day',
-    codeTag: '11.11',
+    codeTag: '11.11 & BLACK FRIDAY',
+    codeTagByStore: {
+      aliexpress: 'ALIEXPRESS 11.11',
+      temu: 'TEMU BLACK FRIDAY'
+    },
     stores: ['aliexpress', 'temu'],
     hasVerifiedEventCodes: true,
-    // Nov 1 to Nov 18 every year
+    // Nov 1 to Nov 18 every year (AliExpress 11.11 Singles Day + Temu Early Black Friday)
     isActiveOnDate: (m, d) => m === 11 && d >= 1 && d <= 18,
     getEndDate: (year) => new Date(year, 10, 18, 23, 59, 59),
     getStartDate: (year) => new Date(year, 10, 1, 0, 0, 0)
   },
   {
     id: 'black-friday-cyber-monday',
-    codeTag: 'BLACK FRIDAY',
+    codeTag: 'BLACK FRIDAY & CYBER WEEK',
+    codeTagByStore: {
+      aliexpress: 'ALIEXPRESS BLACK FRIDAY',
+      temu: 'TEMU BLACK FRIDAY'
+    },
     stores: ['aliexpress', 'temu'],
     hasVerifiedEventCodes: false,
     // Nov 19 to Dec 3 every year
@@ -25,7 +33,11 @@ export const ANNUAL_EVENTS_SCHEDULE = [
   },
   {
     id: '12-12-year-end-sale',
-    codeTag: '12.12',
+    codeTag: '12.12 LIQUIDACIÓN',
+    codeTagByStore: {
+      aliexpress: 'ALIEXPRESS 12.12',
+      temu: 'TEMU 12.12'
+    },
     stores: ['aliexpress', 'temu'],
     hasVerifiedEventCodes: false,
     // Dec 8 to Dec 15 every year
@@ -35,8 +47,12 @@ export const ANNUAL_EVENTS_SCHEDULE = [
   },
   {
     id: 'anniversary-sale',
-    codeTag: 'ANNIVERSARY',
-    stores: ['aliexpress'],
+    codeTag: 'ANIVERSARIO & PRIMAVERA',
+    codeTagByStore: {
+      aliexpress: 'ANIVERSARIO ALIEXPRESS',
+      temu: 'TEMU SPRING SALE'
+    },
+    stores: ['aliexpress', 'temu'],
     hasVerifiedEventCodes: false,
     // Mar 18 to Mar 28 every year
     isActiveOnDate: (m, d) => m === 3 && d >= 18 && d <= 28,
@@ -45,7 +61,11 @@ export const ANNUAL_EVENTS_SCHEDULE = [
   },
   {
     id: '618-mid-year-sale',
-    codeTag: '618 SALE',
+    codeTag: '618 & SUMMER SALE',
+    codeTagByStore: {
+      aliexpress: 'ALIEXPRESS 618',
+      temu: 'TEMU SUMMER MEGA SALE'
+    },
     stores: ['aliexpress', 'temu'],
     hasVerifiedEventCodes: false,
     // Jun 12 to Jun 25 every year
@@ -55,31 +75,44 @@ export const ANNUAL_EVENTS_SCHEDULE = [
   },
   {
     id: 'back-to-school',
-    codeTag: 'BACK TO SCHOOL',
+    codeTag: 'REGRESO A CLASES',
+    codeTagByStore: {
+      aliexpress: 'ALIEXPRESS REGRESO A CLASES',
+      temu: 'TEMU REGRESO A CLASES'
+    },
     stores: ['aliexpress', 'temu'],
     hasVerifiedEventCodes: false,
     // Aug 18 to Aug 28 every year
     isActiveOnDate: (m, d) => m === 8 && d >= 18 && d <= 28,
-    getEndDate: (year) => new Date(year, 7, 28, 23, 59, 59),
-    getStartDate: (year) => new Date(year, 7, 18, 0, 0, 0)
+    getEndDate: (year, monthIdx) => new Date(year, 7, 28, 23, 59, 59),
+    getStartDate: (year, monthIdx) => new Date(year, 7, 18, 0, 0, 0)
   },
   {
     id: 'choice-day-monthly',
-    codeTag: 'CHOICE DAY',
+    codeTag: 'CHOICE & SUPER AHORRO',
+    codeTagByStore: {
+      aliexpress: 'CHOICE DAY',
+      temu: 'TEMU SUPER AHORRO'
+    },
     stores: ['aliexpress', 'temu'],
     hasVerifiedEventCodes: false,
-    // Day 1 to Day 7 of every month (except Nov where 11.11 takes priority)
+    // Day 1 to Day 7 of every month (except Nov where 11.11 / Black Friday takes priority)
     isActiveOnDate: (m, d) => m !== 11 && d >= 1 && d <= 7,
     getEndDate: (year, monthIdx) => new Date(year, monthIdx, 7, 23, 59, 59),
     getStartDate: (year, monthIdx) => new Date(year, monthIdx, 1, 0, 0, 0)
   }
 ];
 
-export function getActiveOrNextEvent(now = new Date()) {
-  const year = now.getFullYear();
-  const monthIdx = now.getMonth(); // 0-11
+export function getActiveOrNextEvent(referenceDate = new Date()) {
+  const ref = referenceDate instanceof Date && !isNaN(referenceDate.getTime())
+    ? referenceDate
+    : new Date(referenceDate);
+  const now = !isNaN(ref.getTime()) ? ref : new Date();
+
+  const year = now.getUTCFullYear();
+  const monthIdx = now.getUTCMonth(); // 0-11
   const month = monthIdx + 1; // 1-12
-  const day = now.getDate();
+  const day = now.getUTCDate();
 
   // 1. Check if any major event is currently active today
   for (const ev of ANNUAL_EVENTS_SCHEDULE) {
@@ -130,37 +163,37 @@ export const EVENT_BANNER_I18N = {
     hours: 'h',
     minutes: 'm',
     seconds: 's',
-    filter1111Btn: 'Ver Solo Cupones 11.11 y Globales',
-    showing1111Btn: 'Mostrando Cupones 11.11 (Ver Todos)',
-    calendarNote: 'Calendario automático anual: Choice Day (días 1-7), 11.11 (Nov 1-18), Black Friday (Nov 19-Dic 3), 12.12 (Dic 8-15).',
+    filter1111Btn: 'Ver Cupones 11.11 y Black Friday',
+    showing1111Btn: 'Mostrando 11.11 y Black Friday (Ver Todos)',
+    calendarNote: 'Calendario automático anual: Choice Day & Súper Ahorro (días 1–7), 11.11 AliExpress & Black Friday Temu (Nov 1–18), Black Friday Global (Nov 19–Dic 3), 12.12 (Dic 8–15).',
     events: {
       '11-11-singles-day': {
-        title: 'Festival Mundial de Compras 11.11 AliExpress & Ofertas Temu',
-        desc: 'Códigos escalonados oficiales del 11.11 verificados hoy (desde $3 hasta $120 USD de descuento directo) + paquetes globales.'
+        title: 'Festival 11.11 AliExpress & Black Friday Temu',
+        desc: 'Escalera oficial 11.11 de AliExpress ($3 a $120 OFF) + Lote de cupones de Black Friday Anticipado en Temu ($100 USD + 30% OFF).'
       },
       'black-friday-cyber-monday': {
-        title: 'Black Friday & Cyber Monday Global en AliExpress y Temu',
-        desc: 'Temporada de rebajas de Viernes Negro y Cyber Monday con cupones de carrito acumulados.'
+        title: 'Black Friday Oficial & Cyber Week en AliExpress y Temu',
+        desc: 'Temporada principal de rebajas de Viernes Negro y Cyber Monday con códigos de carrito acumulables hasta 90% OFF.'
       },
       '12-12-year-end-sale': {
-        title: 'Gran Venta de Fin de Año 12.12 y Regalos',
-        desc: 'Última gran liquidación anual con cupones globales IFP y envío aéreo prioritario.'
+        title: 'Gran Venta 12.12 de Fin de Año y Liquidación Navideña',
+        desc: 'Última gran liquidación anual con cupones globales IFP en AliExpress y paquetes navideños en Temu.'
       },
       'anniversary-sale': {
-        title: 'Aniversario Oficial de AliExpress',
-        desc: 'Evento anual de aniversario con cupones por niveles en todas las categorías.'
+        title: 'Aniversario AliExpress & Venta de Primavera Temu',
+        desc: 'Cumpleaños de AliExpress con cupones por niveles y Gran Venta de Primavera en Temu con envíos prioritarios.'
       },
       '618-mid-year-sale': {
-        title: 'Mega Oferta de Mitad de Año 618',
-        desc: 'Descuentos globales de verano en tecnología, hogar, moda y accesorios.'
+        title: 'Mega Oferta 618 AliExpress & Gran Liquidación de Verano Temu',
+        desc: 'Descuentos masivos de mitad de año en tecnología, moda, herramientas y accesorios del hogar.'
       },
       'back-to-school': {
-        title: 'Temporada de Regreso a Clases y Tecnología',
-        desc: 'Rebajas especiales en laptops, Mini PCs, mochilas, papelería y calzado.'
+        title: 'Temporada de Regreso a Clases en AliExpress y Temu',
+        desc: 'Rebajas especiales en laptops, Mini PCs, mochilas, papelería y tecnología de estudio.'
       },
       'choice-day-monthly': {
-        title: 'Choice Day Mensual de AliExpress y Temu',
-        desc: 'Se activa automáticamente del día 1 al 7 de cada mes con códigos renovados y envío gratis.'
+        title: 'Choice Day AliExpress & Días de Súper Ahorro Temu',
+        desc: 'Activación automática del día 1 al 7 de cada mes con códigos renovados y envíos prioritarios gratis.'
       }
     }
   },
@@ -173,37 +206,37 @@ export const EVENT_BANNER_I18N = {
     hours: 'h',
     minutes: 'm',
     seconds: 's',
-    filter1111Btn: 'Filter 11.11 & Global Event Codes',
-    showing1111Btn: 'Showing 11.11 Codes (Show All)',
-    calendarNote: 'Auto-scheduled annual calendar: Choice Day (1st–7th), 11.11 Sale (Nov 1–18), Black Friday (Nov 19–Dec 3), 12.12 (Dec 8–15).',
+    filter1111Btn: 'Filter 11.11 & Black Friday Codes',
+    showing1111Btn: 'Showing 11.11 & Black Friday (Show All)',
+    calendarNote: 'Auto-scheduled annual calendar: Choice Day & Super Savings (1st–7th), 11.11 AliExpress & Temu Black Friday (Nov 1–18), Black Friday Global (Nov 19–Dec 3), 12.12 (Dec 8–15).',
     events: {
       '11-11-singles-day': {
-        title: 'AliExpress 11.11 Global Shopping Festival & Temu Mega Deals',
-        desc: 'Verified 11.11 tiered promo codes active right now ($3 to $120 OFF sitewide) + universal global codes.'
+        title: 'AliExpress 11.11 Global Festival & Temu Black Friday Deals',
+        desc: 'Verified 11.11 tiered promo codes ($3 to $120 OFF) + Temu Early Black Friday $100 coupon bundles.'
       },
       'black-friday-cyber-monday': {
-        title: 'AliExpress & Temu Black Friday + Cyber Monday Global Sale',
-        desc: 'Major holiday price drops and stackable checkout codes across all 66 countries.'
+        title: 'Official Black Friday & Cyber Week at AliExpress & Temu',
+        desc: 'Major holiday price drops and stackable checkout codes up to 90% OFF across all supported markets.'
       },
       '12-12-year-end-sale': {
         title: '12.12 Year-End Mega Sale & Holiday Clearance',
-        desc: 'Final major global sale of the year with verified IFP checkout coupons.'
+        desc: 'Final major global clearance of the year with verified IFP checkout coupons and holiday bundles.'
       },
       'anniversary-sale': {
-        title: 'AliExpress Official Anniversary Sale',
-        desc: 'Sitewide birthday celebration with tiered checkout codes across all categories.'
+        title: 'AliExpress Anniversary Sale & Temu Spring Clearance',
+        desc: 'Sitewide AliExpress birthday celebration with tiered checkout codes and Temu seasonal spring deals.'
       },
       '618-mid-year-sale': {
-        title: '618 Mid-Year Summer Mega Sale',
+        title: '618 Mid-Year Sale & Temu Summer Mega Clearance',
         desc: 'Mid-year sitewide discounts on electronics, home appliances, fashion, and outdoor gear.'
       },
       'back-to-school': {
-        title: 'Back to School & Tech Savings Event',
+        title: 'Back to School Savings Event at AliExpress & Temu',
         desc: 'Special promo tiers on laptops, Mini PCs, stationery, backpacks, and apparel.'
       },
       'choice-day-monthly': {
-        title: 'Monthly Choice Day Sale (1st–7th of Every Month)',
-        desc: 'Automatically active on the first 7 days of each month with refreshed sitewide codes.'
+        title: 'AliExpress Choice Day & Temu Monthly Super Savings',
+        desc: 'Automatically active on the first 7 days of each month with refreshed sitewide promo codes.'
       }
     }
   },
@@ -684,15 +717,124 @@ export const EVENT_BANNER_I18N = {
   }
 };
 
-export function getEventBannerText(lang = 'en', eventId = '11-11-singles-day') {
+export function getEventDateLabel(event, lang = 'es', now = new Date()) {
+  if (!event) return '';
+  const year = now.getFullYear();
+  const monthIdx = now.getMonth();
+  const start = event.getStartDate ? event.getStartDate(year, monthIdx) : new Date();
+  const end = event.getEndDate ? event.getEndDate(year, monthIdx) : new Date();
+
+  try {
+    const dtf = new Intl.DateTimeFormat(lang, { month: 'long', day: 'numeric' });
+    if (typeof dtf.formatRange === 'function') {
+      return dtf.formatRange(start, end);
+    }
+    return `${start.getDate()} – ${end.getDate()}`;
+  } catch (e) {
+    return `${start.getDate()} – ${end.getDate()}`;
+  }
+}
+
+export function getEventBannerText(
+  lang = 'en',
+  eventId = '11-11-singles-day',
+  hasTemu = true,
+  storeFilter = null
+) {
   const pack = EVENT_BANNER_I18N[lang] || EVENT_BANNER_I18N.en;
   const evText =
     pack.events?.[eventId] ||
     EVENT_BANNER_I18N.en.events[eventId] ||
     EVENT_BANNER_I18N.en.events['11-11-singles-day'];
+
+  let title = evText.title || '';
+  let desc = evText.desc || '';
+  let tagPrefix = '';
+  let filter1111Btn = pack.filter1111Btn;
+  let showing1111Btn = pack.showing1111Btn;
+
+  if (storeFilter === 'temu' && hasTemu) {
+    tagPrefix = 'TEMU';
+    if (eventId === '11-11-singles-day') {
+      title = lang === 'es' ? 'Temu Black Friday Anticipado & Paquetes de Cupones' : 'Temu Early Black Friday Sale & Coupon Bundles';
+      desc = lang === 'es' ? 'Gran venta anticipada de Black Friday en Temu con paquetes de $100 USD en cupones + 30% OFF directo en pedidos calificados de la app.' : 'Early Black Friday clearance in Temu with $100 coupon bundles + 30% OFF on qualifying app orders.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones Black Friday Temu' : 'Filter Temu Black Friday Deals';
+      showing1111Btn = lang === 'es' ? 'Mostrando Black Friday Temu (Ver Todos)' : 'Showing Temu Black Friday Deals (Show All)';
+    } else if (eventId === 'choice-day-monthly') {
+      title = lang === 'es' ? 'Días de Súper Ahorro Mensual en Temu' : 'Temu Monthly Super Savings Week';
+      desc = lang === 'es' ? 'Descuentos relámpago de inicio de mes con envíos prioritarios y créditos promocionales.' : 'Month-start flash discounts with priority shipping and promo credits.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones Súper Ahorro Temu' : 'Filter Temu Super Savings Codes';
+      showing1111Btn = lang === 'es' ? 'Mostrando Súper Ahorro (Ver Todos)' : 'Showing Super Savings (Show All)';
+    } else if (eventId === 'black-friday-cyber-monday') {
+      title = lang === 'es' ? 'Temu Black Friday Oficial & Cyber Week' : 'Temu Official Black Friday & Cyber Week';
+      desc = lang === 'es' ? 'Rebajas principales de Black Friday con hasta 90% OFF y cupones de ajuste de precio garantizados.' : 'Official Black Friday holiday clearance with up to 90% OFF and price adjustment guarantee.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones Black Friday Temu' : 'Filter Temu Black Friday Deals';
+      showing1111Btn = lang === 'es' ? 'Mostrando Black Friday Temu (Ver Todos)' : 'Showing Temu Black Friday Deals (Show All)';
+    } else if (eventId === '12-12-year-end-sale') {
+      title = lang === 'es' ? 'Gran Liquidación 12.12 de Fin de Año en Temu' : 'Temu 12.12 Year-End Mega Clearance';
+      desc = lang === 'es' ? 'Últimas rebajas navideñas con paquetes de cupones y entrega garantizada.' : 'Year-end holiday deals with stackable coupon packs.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones 12.12 Temu' : 'Filter Temu 12.12 Codes';
+      showing1111Btn = lang === 'es' ? 'Mostrando Cupones 12.12 (Ver Todos)' : 'Showing 12.12 Codes (Show All)';
+    } else if (eventId === 'anniversary-sale') {
+      title = lang === 'es' ? 'Gran Venta de Primavera y Ahorro en Temu' : 'Temu Spring Mega Clearance';
+      desc = lang === 'es' ? 'Liquidación oficial de primavera con cupones acumulados y envío gratis.' : 'Spring savings with stackable coupon packs and free shipping.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones de Primavera Temu' : 'Filter Temu Spring Codes';
+      showing1111Btn = lang === 'es' ? 'Mostrando Primavera (Ver Todos)' : 'Showing Spring Codes (Show All)';
+    } else if (eventId === '618-mid-year-sale') {
+      title = lang === 'es' ? 'Gran Liquidación de Verano Temu (Summer Mega Sale)' : 'Temu Summer Mega Sale';
+      desc = lang === 'es' ? 'Mega rebajas de temporada veraniega con descuentos de hasta el 70% en moda y hogar.' : 'Summer mega clearance with sitewide markdowns up to 70% OFF.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones de Verano Temu' : 'Filter Temu Summer Codes';
+      showing1111Btn = lang === 'es' ? 'Mostrando Verano (Ver Todos)' : 'Showing Summer Codes (Show All)';
+    } else if (eventId === 'back-to-school') {
+      title = lang === 'es' ? 'Temporada Escolar y Regreso a Clases en Temu' : 'Temu Back to School Savings';
+      desc = lang === 'es' ? 'Ofertas especiales en papelería, mochilas, calzado y gadgets para estudiantes.' : 'Special discounts on backpacks, stationery, apparel, and study gadgets.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones Escolares Temu' : 'Filter Temu School Codes';
+      showing1111Btn = lang === 'es' ? 'Mostrando Cupones Escolares (Ver Todos)' : 'Showing School Codes (Show All)';
+    }
+  } else if (storeFilter === 'aliexpress' || !hasTemu) {
+    tagPrefix = 'ALIEXPRESS';
+    if (eventId === '11-11-singles-day') {
+      title = lang === 'es' ? 'Festival Mundial de Compras 11.11 AliExpress' : 'AliExpress 11.11 Global Shopping Festival';
+      desc = lang === 'es' ? 'Códigos escalonados oficiales del 11.11 verificados hoy (desde $3 hasta $120 USD de descuento directo).' : 'Verified official 11.11 tiered promo codes active today ($3 to $120 USD direct discount).';
+      filter1111Btn = lang === 'es' ? 'Ver Solo Cupones 11.11 AliExpress' : 'Filter 11.11 AliExpress Codes';
+      showing1111Btn = lang === 'es' ? 'Mostrando Cupones 11.11 (Ver Todos)' : 'Showing 11.11 Codes (Show All)';
+    } else if (eventId === 'choice-day-monthly') {
+      title = lang === 'es' ? 'Choice Day Mensual de AliExpress' : 'AliExpress Monthly Choice Day';
+      desc = lang === 'es' ? 'Días Choice del 1 al 7 de cada mes con códigos renovados y envíos gratis.' : 'Choice Days from the 1st to 7th of every month with refreshed promo codes.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones Choice Day' : 'Filter Choice Day Codes';
+      showing1111Btn = lang === 'es' ? 'Mostrando Choice Day (Ver Todos)' : 'Showing Choice Day (Show All)';
+    } else if (eventId === 'anniversary-sale') {
+      title = lang === 'es' ? 'Aniversario Oficial de AliExpress' : 'AliExpress Official Anniversary Sale';
+      desc = lang === 'es' ? 'Gran celebración de cumpleaños con códigos por niveles en todas las categorías.' : 'Annual birthday celebration with tiered codes across all categories.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones de Aniversario' : 'Filter Anniversary Codes';
+      showing1111Btn = lang === 'es' ? 'Mostrando Aniversario (Ver Todos)' : 'Showing Anniversary (Show All)';
+    } else if (eventId === '618-mid-year-sale') {
+      title = lang === 'es' ? 'Mega Oferta de Mitad de Año 618 AliExpress' : 'AliExpress 618 Mid-Year Mega Sale';
+      desc = lang === 'es' ? 'Festival 618 de mitad de año con subsidios directos y cupones de tienda.' : 'Mid-year 618 festival with sitewide subsidies and tiered coupons.';
+      filter1111Btn = lang === 'es' ? 'Ver Cupones 618' : 'Filter 618 Codes';
+      showing1111Btn = lang === 'es' ? 'Mostrando Cupones 618 (Ver Todos)' : 'Showing 618 Codes (Show All)';
+    } else {
+      title = title
+        .replace(/\s*(&|\+|y|and)\s*(Ofertas\s+|Mega\s+Deals\s+|Tawaran\s+)?Temu(\s+[A-Za-z0-9\s]+)?/gi, '')
+        .replace(/\s+Temu/gi, '')
+        .trim();
+      desc = desc
+        .replace(/\s*(y|and|&)\s*Temu[^.]*/gi, '')
+        .replace(/AliExpress y Temu/gi, 'AliExpress')
+        .replace(/AliExpress and Temu/gi, 'AliExpress')
+        .trim();
+    }
+  } else if (eventId === '11-11-singles-day' && hasTemu) {
+    filter1111Btn = lang === 'es' ? 'Ver Cupones 11.11 y Black Friday' : 'Filter 11.11 & Black Friday Codes';
+    showing1111Btn = lang === 'es' ? 'Mostrando 11.11 y Black Friday (Ver Todos)' : 'Showing 11.11 & Black Friday (Show All)';
+  }
+
   return {
     ...pack,
-    title: evText.title,
-    desc: evText.desc
+    title,
+    desc,
+    tagPrefix,
+    filter1111Btn,
+    showing1111Btn
   };
 }

@@ -475,7 +475,11 @@ export const SECTION_I18N = {
 };
 
 export function getSectionText(lang = 'en') {
-  return SECTION_I18N[lang] || SECTION_I18N.en;
+  const base = SECTION_I18N[lang] || SECTION_I18N.en;
+  return {
+    navFaq: lang === 'es' ? 'Preguntas Frecuentes (FAQ)' : 'Frequently Asked Questions (FAQ)',
+    ...base
+  };
 }
 
 /**
@@ -987,7 +991,11 @@ export const CATEGORY_SLUGS_BY_LANG = {
 };
 
 export function getRouteSlugsForLang(lang = 'en') {
-  return ROUTE_SLUGS_BY_LANG[lang] || ROUTE_SLUGS_BY_LANG.en;
+  const pack = ROUTE_SLUGS_BY_LANG[lang] || ROUTE_SLUGS_BY_LANG.en;
+  return {
+    faq: 'faq',
+    ...pack
+  };
 }
 
 export function getCategorySlugsForLang(lang = 'en') {
@@ -1014,6 +1022,7 @@ export function getLocalizedCategoryPath(localeConfig, storeFilter, canonicalCat
 export function resolvePageKeyFromSlug(rawSlug) {
   if (!rawSlug) return null;
   const clean = rawSlug.toLowerCase();
+  if (clean === 'faq') return 'faq';
   for (const map of Object.values(ROUTE_SLUGS_BY_LANG)) {
     for (const [pageKey, val] of Object.entries(map)) {
       if (pageKey !== 'category' && val === clean) return pageKey;
