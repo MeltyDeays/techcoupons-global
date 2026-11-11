@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LOCALES, BASE_DOMAIN, DEFAULT_LOCALE, CATEGORY_SLUGS, buildStructuredData } from '../src/config/locales.js';
 import { getCouponsForLocale } from '../src/data/couponsGenerator.js';
+import { getRouteSlugsForLang } from '../src/data/multilingualSections.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,28 +21,48 @@ function escapeHtml(str) {
 
 function getAllRouteDescriptors() {
   const routes = [
-    { suffix: '', type: 'home', storeFilter: null },
-    { suffix: '/temu', type: 'temu', storeFilter: 'temu' },
-    { suffix: '/aliexpress', type: 'aliexpress', storeFilter: 'aliexpress' },
-    { suffix: '/dinamicas', type: 'dynamics', storeFilter: null },
-    { suffix: '/guias', type: 'guides', storeFilter: null },
-    { suffix: '/privacy', type: 'privacy', storeFilter: null },
-    { suffix: '/terms', type: 'terms', storeFilter: null },
-    { suffix: '/about', type: 'about', storeFilter: null },
-    { suffix: '/contact', type: 'contact', storeFilter: null }
+    { type: 'home', storeFilter: null },
+    { type: 'temu', storeFilter: 'temu' },
+    { type: 'aliexpress', storeFilter: 'aliexpress' },
+    { type: 'dynamics', storeFilter: null },
+    { type: 'guides', storeFilter: null },
+    { type: 'privacy', storeFilter: null },
+    { type: 'terms', storeFilter: null },
+    { type: 'about', storeFilter: null },
+    { type: 'contact', storeFilter: null }
   ];
 
   CATEGORY_SLUGS.forEach((slug) => {
-    routes.push({ suffix: `/category/${slug}`, type: 'category', storeFilter: null, slug });
-    routes.push({ suffix: `/temu/category/${slug}`, type: 'category', storeFilter: 'temu', slug });
-    routes.push({ suffix: `/aliexpress/category/${slug}`, type: 'category', storeFilter: 'aliexpress', slug });
+    routes.push({ type: 'category', storeFilter: null, slug });
+    routes.push({ type: 'category', storeFilter: 'temu', slug });
+    routes.push({ type: 'category', storeFilter: 'aliexpress', slug });
   });
 
   return routes;
 }
 
+function getRouteSuffixForLocale(route, localeConfig) {
+  const slugs = getRouteSlugsForLang(localeConfig.lang);
+  if (route.type === 'home') return '';
+  if (route.type === 'temu') return '/temu';
+  if (route.type === 'aliexpress') return '/aliexpress';
+  if (route.type === 'dynamics') return `/${slugs.dynamics}`;
+  if (route.type === 'guides') return `/${slugs.guides}`;
+  if (route.type === 'privacy') return `/${slugs.privacy}`;
+  if (route.type === 'terms') return `/${slugs.terms}`;
+  if (route.type === 'about') return `/${slugs.about}`;
+  if (route.type === 'contact') return `/${slugs.contact}`;
+  if (route.type === 'category') {
+    if (route.storeFilter === 'temu') return `/temu/category/${route.slug}`;
+    if (route.storeFilter === 'aliexpress') return `/aliexpress/category/${route.slug}`;
+    return `/category/${route.slug}`;
+  }
+  return '';
+}
+
 function buildStaticBodyMarkup(localeConfig, route, coupons) {
   const { dict } = localeConfig;
+  const slugs = getRouteSlugsForLang(localeConfig.lang);
   let heading = dict.heroTitle;
   if (route.type === 'temu') heading = `Temu — ${dict.heroTitle}`;
   if (route.type === 'aliexpress') heading = `AliExpress — ${dict.heroTitle}`;
@@ -64,7 +85,7 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
       (c) => `
       <article class="coupon-static-card">
         <h3>${escapeHtml(c.title)}</h3>
-        <p>${escapeHtml(dict.minSpend)}: <strong>${escapeHtml(c.localMinSpend)}</strong> | Price: <strong>${escapeHtml(c.localPrice)}</strong> (-${c.discountPct}%)</p>
+        <p>${escapeHtml(dict.minSpend)}: <strong>${escapeHtml(c.localMinSpend)}</strong> (-${c.discountPct}%)</p>
         <p>Promo Code: <code>${escapeHtml(c.code)}</code> (${escapeHtml(dict.verifiedBadge)})</p>
         <a href="${escapeHtml(c.affiliateLink)}" rel="noopener noreferrer sponsored">${escapeHtml(dict.btnGoStore)}</a>
       </article>`
@@ -84,11 +105,12 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
   return `
     <div class="ssg-prerendered-shell" dir="${localeConfig.rtl ? 'rtl' : 'ltr'}">
       <header>
-        <p>${escapeHtml(dict.disclosure)}</p>
         <nav>
           <a href="/${localeConfig.code}">${escapeHtml(dict.navHome)}</a> |
           <a href="/${localeConfig.code}/temu">${escapeHtml(dict.navTemu)}</a> |
-          <a href="/${localeConfig.code}/aliexpress">${escapeHtml(dict.navAli)}</a>
+          <a href="/${localeConfig.code}/aliexpress">${escapeHtml(dict.navAli)}</a> |
+          <a href="/${localeConfig.code}/${slugs.dynamics}">Dynamics</a> |
+          <a href="/${localeConfig.code}/${slugs.guides}">Guides</a>
         </nav>
       </header>
       <main>
@@ -109,10 +131,11 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
         </section>
       </main>
       <footer>
-        <a href="/${localeConfig.code}/privacy">${escapeHtml(dict.legal.privacyTitle)}</a> |
-        <a href="/${localeConfig.code}/terms">${escapeHtml(dict.legal.termsTitle)}</a> |
-        <a href="/${localeConfig.code}/about">${escapeHtml(dict.legal.aboutTitle)}</a> |
-        <a href="/${localeConfig.code}/contact">${escapeHtml(dict.legal.contactTitle)}</a>
+        <p>${escapeHtml(dict.disclosure)}</p>
+        <a href="/${localeConfig.code}/${slugs.privacy}">${escapeHtml(dict.legal.privacyTitle)}</a> |
+        <a href="/${localeConfig.code}/${slugs.terms}">${escapeHtml(dict.legal.termsTitle)}</a> |
+        <a href="/${localeConfig.code}/${slugs.about}">${escapeHtml(dict.legal.aboutTitle)}</a> |
+        <a href="/${localeConfig.code}/${slugs.contact}">${escapeHtml(dict.legal.contactTitle)}</a>
       </footer>
     </div>
   `;
@@ -126,6 +149,7 @@ function runPrerenderAndSitemap() {
   const templateHtml = fs.readFileSync(path.join(DIST_DIR, 'index.html'), 'utf-8');
   const routes = getAllRouteDescriptors();
   const todayIso = new Date().toISOString().split('T')[0];
+  const defaultLocObj = LOCALES.find((l) => l.code === DEFAULT_LOCALE) || LOCALES[0];
 
   let generatedCount = 0;
 
@@ -135,11 +159,13 @@ function runPrerenderAndSitemap() {
       const categoryFilter = route.type === 'category' ? route.slug : null;
       const coupons = getCouponsForLocale(localeConfig.code, { storeFilter, categoryFilter });
 
-      const canonicalUrl = `${BASE_DOMAIN}/${localeConfig.code}${route.suffix}`;
+      const routeSuffix = getRouteSuffixForLocale(route, localeConfig);
+      const canonicalUrl = `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`;
+
       let pageTitle = `${localeConfig.dict.heroTitle} | CuponesTech`;
       if (route.type === 'temu') pageTitle = `Temu — ${localeConfig.dict.heroTitle}`;
       if (route.type === 'aliexpress') pageTitle = `AliExpress — ${localeConfig.dict.heroTitle}`;
-      if (route.type === 'dynamics') pageTitle = `Temu App Mini-Games & Search Codes (${localeConfig.countryName}) | CuponesTech`;
+      if (route.type === 'dynamics') pageTitle = `Temu & AliExpress App Mini-Games (${localeConfig.countryName}) | CuponesTech`;
       if (route.type === 'guides') pageTitle = `30-Day Price Adjustment & Refund Guide (${localeConfig.countryName}) | CuponesTech`;
       if (route.type === 'category') {
         const catName = localeConfig.dict.categories[route.slug] || route.slug;
@@ -148,14 +174,15 @@ function runPrerenderAndSitemap() {
 
       const pageDesc = localeConfig.dict.heroSubtitle;
 
-      // Hreflang matrix tags
-      const hreflangTags = LOCALES.map(
-        (loc) => `<link rel="alternate" hreflang="${loc.code}" href="${BASE_DOMAIN}/${loc.code}${route.suffix}" />`
-      ).join('\n    ');
-      const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${route.suffix}" />`;
+      const hreflangTags = LOCALES.map((loc) => {
+        const altSuffix = getRouteSuffixForLocale(route, loc);
+        return `<link rel="alternate" hreflang="${loc.code}" href="${BASE_DOMAIN}/${loc.code}${altSuffix}" />`;
+      }).join('\n    ');
+
+      const xDefaultSuffix = getRouteSuffixForLocale(route, defaultLocObj);
+      const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${xDefaultSuffix}" />`;
       const canonicalTag = `<link rel="canonical" href="${canonicalUrl}" />`;
 
-      // JSON-LD Schemas
       const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl);
       const schemaScripts = schemas
         .map((s) => `<script type="application/ld+json">${JSON.stringify(s)}</script>`)
@@ -174,7 +201,7 @@ function runPrerenderAndSitemap() {
         .replace('<!--SEO_HEAD_INJECT-->', headInjection)
         .replace('<!--SSG_CONTENT_INJECT-->', staticBody);
 
-      const relativeFolder = path.join(localeConfig.code, route.suffix.replace(/^\//, ''));
+      const relativeFolder = path.join(localeConfig.code, routeSuffix.replace(/^\//, ''));
       const targetFolder = path.join(DIST_DIR, relativeFolder);
       fs.mkdirSync(targetFolder, { recursive: true });
       fs.writeFileSync(path.join(targetFolder, 'index.html'), localizedHtml, 'utf-8');
@@ -182,24 +209,25 @@ function runPrerenderAndSitemap() {
     }
   }
 
-  // Generate Multilingual Sitemap XML with xhtml:link cross-references
+  // Generate Multilingual Sitemap XML with localized hreflang cross-references
   const urlEntries = [];
   for (const route of routes) {
     const xhtmlLinks = [
-      ...LOCALES.map(
-        (altLoc) =>
-          `    <xhtml:link rel="alternate" hreflang="${altLoc.code}" href="${BASE_DOMAIN}/${altLoc.code}${route.suffix}" />`
-      ),
-      `    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${route.suffix}" />`
+      ...LOCALES.map((altLoc) => {
+        const altSuffix = getRouteSuffixForLocale(route, altLoc);
+        return `    <xhtml:link rel="alternate" hreflang="${altLoc.code}" href="${BASE_DOMAIN}/${altLoc.code}${altSuffix}" />`;
+      }),
+      `    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${getRouteSuffixForLocale(route, defaultLocObj)}" />`
     ].join('\n');
 
     for (const localeConfig of LOCALES) {
-      const locUrl = `${BASE_DOMAIN}/${localeConfig.code}${route.suffix}`;
+      const routeSuffix = getRouteSuffixForLocale(route, localeConfig);
+      const locUrl = `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`;
       urlEntries.push(`  <url>
     <loc>${locUrl}</loc>
     <lastmod>${todayIso}</lastmod>
     <changefreq>daily</changefreq>
-    <priority>${route.suffix === '' ? '1.0' : '0.8'}</priority>
+    <priority>${routeSuffix === '' ? '1.0' : '0.8'}</priority>
 ${xhtmlLinks}
   </url>`);
     }

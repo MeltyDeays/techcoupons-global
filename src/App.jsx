@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, useLocation, Link, Navigate } from 'react-router-dom';
 import {
   getLocaleConfig,
   LOCALE_MAP,
@@ -9,7 +9,7 @@ import {
   CATEGORY_SLUGS
 } from './config/locales.js';
 import { getCouponsForLocale } from './data/couponsGenerator.js';
-import { getSectionText } from './data/multilingualSections.js';
+import { getSectionText, getLocalizedPath, getRouteSlugsForLang } from './data/multilingualSections.js';
 import { AFFILIATE_CONFIG } from './config/affiliateConfig.js';
 import Layout from './components/Layout.jsx';
 import SEOHead from './components/SEOHead.jsx';
@@ -244,6 +244,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
  */
 export function DynamicsPage() {
   const { locale } = useParams();
+  const location = useLocation();
   const [copiedId, setCopiedId] = useState(null);
   const [selectedDynamic, setSelectedDynamic] = useState(null);
 
@@ -252,9 +253,15 @@ export function DynamicsPage() {
   }
 
   const localeConfig = getLocaleConfig(locale);
+  const canonicalPath = getLocalizedPath(localeConfig, 'dynamics');
+  if (location.pathname.toLowerCase() !== canonicalPath.toLowerCase()) {
+    return <Navigate to={canonicalPath} replace />;
+  }
+
   const { dict } = localeConfig;
   const ui = getSectionText(localeConfig.lang);
   const dyn = ui.dynamics;
+  const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
 
   const temuUrl = AFFILIATE_CONFIG.temuBaseTrackingUrl || 'https://www.temu.com';
   const aliUrl = AFFILIATE_CONFIG.aliexpressBaseTrackingUrl || 'https://www.aliexpress.com';
@@ -275,7 +282,7 @@ export function DynamicsPage() {
     <Layout localeConfig={localeConfig} activeSection="dynamics">
       <SEOHead
         localeConfig={localeConfig}
-        routeSuffix="/dinamicas"
+        routeSuffix={`/${routeSlugs.dynamics}`}
         pageTitle={`${dyn.title(localeConfig.countryName)} | CuponesTech`}
         pageDescription={dyn.subtitle}
         coupons={[]}
@@ -435,13 +442,20 @@ export function DynamicsPage() {
  */
 export function GuidesPage() {
   const { locale } = useParams();
+  const location = useLocation();
   if (!LOCALE_MAP[(locale || '').toLowerCase()]) {
     return <Navigate to={`/${DEFAULT_LOCALE}`} replace />;
   }
 
   const localeConfig = getLocaleConfig(locale);
+  const canonicalPath = getLocalizedPath(localeConfig, 'guides');
+  if (location.pathname.toLowerCase() !== canonicalPath.toLowerCase()) {
+    return <Navigate to={canonicalPath} replace />;
+  }
+
   const ui = getSectionText(localeConfig.lang);
   const g = ui.guides;
+  const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
 
   const ex20 = formatLocalPrice(20, localeConfig);
   const ex15 = formatLocalPrice(15, localeConfig);
@@ -452,7 +466,7 @@ export function GuidesPage() {
     <Layout localeConfig={localeConfig} activeSection="guides">
       <SEOHead
         localeConfig={localeConfig}
-        routeSuffix="/guias"
+        routeSuffix={`/${routeSlugs.guides}`}
         pageTitle={`${g.title(localeConfig.countryName)} | CuponesTech`}
         pageDescription={g.subtitle(ex20, ex15, ex5)}
         coupons={[]}
@@ -554,17 +568,24 @@ export function GuidesPage() {
 
 export function LegalPage({ type }) {
   const { locale } = useParams();
+  const location = useLocation();
   if (!LOCALE_MAP[(locale || '').toLowerCase()]) {
     return <Navigate to={`/${DEFAULT_LOCALE}`} replace />;
   }
   const localeConfig = getLocaleConfig(locale);
+  const canonicalPath = getLocalizedPath(localeConfig, type);
+  if (location.pathname.toLowerCase() !== canonicalPath.toLowerCase()) {
+    return <Navigate to={canonicalPath} replace />;
+  }
+
   const { legal } = localeConfig.dict;
+  const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
 
   const contentMap = {
-    privacy: { title: legal.privacyTitle, body: legal.privacyBody, suffix: '/privacy' },
-    terms: { title: legal.termsTitle, body: legal.termsBody, suffix: '/terms' },
-    about: { title: legal.aboutTitle, body: legal.aboutBody, suffix: '/about' },
-    contact: { title: legal.contactTitle, body: legal.contactBody, suffix: '/contact' }
+    privacy: { title: legal.privacyTitle, body: legal.privacyBody, suffix: `/${routeSlugs.privacy}` },
+    terms: { title: legal.termsTitle, body: legal.termsBody, suffix: `/${routeSlugs.terms}` },
+    about: { title: legal.aboutTitle, body: legal.aboutBody, suffix: `/${routeSlugs.about}` },
+    contact: { title: legal.contactTitle, body: legal.contactBody, suffix: `/${routeSlugs.contact}` }
   };
 
   const current = contentMap[type] || contentMap.privacy;

@@ -793,3 +793,92 @@ export function getSectionText(lang = 'en') {
     }
   };
 }
+
+/**
+ * LOCALIZED URL ROUTE SLUGS PER LANGUAGE
+ * Ensures /en-us/dynamics & /en-us/guides in English, /es-mx/dinamicas & /es-mx/guias in Spanish, etc.
+ */
+export const ROUTE_SLUGS_BY_LANG = {
+  es: {
+    dynamics: 'dinamicas',
+    guides: 'guias',
+    privacy: 'privacidad',
+    terms: 'terminos',
+    about: 'nosotros',
+    contact: 'contacto'
+  },
+  en: {
+    dynamics: 'dynamics',
+    guides: 'guides',
+    privacy: 'privacy',
+    terms: 'terms',
+    about: 'about',
+    contact: 'contact'
+  },
+  pt: {
+    dynamics: 'dinamicas',
+    guides: 'guias',
+    privacy: 'privacidade',
+    terms: 'termos',
+    about: 'sobre',
+    contact: 'contato'
+  },
+  fr: {
+    dynamics: 'dynamiques',
+    guides: 'guides',
+    privacy: 'confidentialite',
+    terms: 'conditions',
+    about: 'a-propos',
+    contact: 'contact'
+  },
+  de: {
+    dynamics: 'minispiele',
+    guides: 'ratgeber',
+    privacy: 'datenschutz',
+    terms: 'bedingungen',
+    about: 'ueber-uns',
+    contact: 'kontakt'
+  },
+  it: {
+    dynamics: 'dinamiche',
+    guides: 'guide',
+    privacy: 'privacy',
+    terms: 'termini',
+    about: 'chi-siamo',
+    contact: 'contatti'
+  }
+};
+
+export function getRouteSlugsForLang(lang = 'en') {
+  return ROUTE_SLUGS_BY_LANG[lang] || ROUTE_SLUGS_BY_LANG.en;
+}
+
+export function getLocalizedPath(localeConfig, pageKey) {
+  const slugs = getRouteSlugsForLang(localeConfig.lang);
+  const slug = slugs[pageKey] || pageKey;
+  return `/${localeConfig.code}/${slug}`;
+}
+
+export function resolvePageKeyFromSlug(rawSlug) {
+  if (!rawSlug) return null;
+  const clean = rawSlug.toLowerCase();
+  for (const map of Object.values(ROUTE_SLUGS_BY_LANG)) {
+    for (const [pageKey, val] of Object.entries(map)) {
+      if (val === clean) return pageKey;
+    }
+  }
+  return null;
+}
+
+export function translatePathToLocale(pathname, newLocaleConfig) {
+  const parts = pathname.split('/').filter(Boolean);
+  if (parts.length === 0) return `/${newLocaleConfig.code}`;
+  parts[0] = newLocaleConfig.code;
+  if (parts.length === 2) {
+    const pageKey = resolvePageKeyFromSlug(parts[1]);
+    if (pageKey) {
+      parts[1] = getRouteSlugsForLang(newLocaleConfig.lang)[pageKey];
+    }
+  }
+  return '/' + parts.join('/');
+}

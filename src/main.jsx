@@ -6,6 +6,13 @@ import AdminDashboard from './components/AdminDashboard.jsx';
 import { DEFAULT_LOCALE } from './config/locales.js';
 import './index.css';
 
+const DYNAMICS_SLUGS = ['dynamics', 'dinamicas', 'dynamiques', 'minispiele', 'dinamiche'];
+const GUIDES_SLUGS = ['guides', 'guias', 'ratgeber', 'guide'];
+const PRIVACY_SLUGS = ['privacy', 'privacidad', 'privacidade', 'confidentialite', 'datenschutz'];
+const TERMS_SLUGS = ['terms', 'terminos', 'termos', 'conditions', 'bedingungen', 'termini'];
+const ABOUT_SLUGS = ['about', 'nosotros', 'sobre', 'a-propos', 'ueber-uns', 'chi-siamo'];
+const CONTACT_SLUGS = ['contact', 'contacto', 'contato', 'kontakt', 'contatti'];
+
 export function AppRoutes() {
   return (
     <Routes>
@@ -18,12 +25,26 @@ export function AppRoutes() {
       <Route path="/:locale/aliexpress" element={<MarketCatalogPage storeFilter="aliexpress" />} />
       <Route path="/:locale/aliexpress/category/:slug" element={<MarketCatalogPage storeFilter="aliexpress" />} />
       <Route path="/:locale/category/:slug" element={<MarketCatalogPage storeFilter={null} />} />
-      <Route path="/:locale/dinamicas" element={<DynamicsPage />} />
-      <Route path="/:locale/guias" element={<GuidesPage />} />
-      <Route path="/:locale/privacy" element={<LegalPage type="privacy" />} />
-      <Route path="/:locale/terms" element={<LegalPage type="terms" />} />
-      <Route path="/:locale/about" element={<LegalPage type="about" />} />
-      <Route path="/:locale/contact" element={<LegalPage type="contact" />} />
+
+      {DYNAMICS_SLUGS.map((s) => (
+        <Route key={s} path={`/:locale/${s}`} element={<DynamicsPage />} />
+      ))}
+      {GUIDES_SLUGS.map((s) => (
+        <Route key={s} path={`/:locale/${s}`} element={<GuidesPage />} />
+      ))}
+      {PRIVACY_SLUGS.map((s) => (
+        <Route key={s} path={`/:locale/${s}`} element={<LegalPage type="privacy" />} />
+      ))}
+      {TERMS_SLUGS.map((s) => (
+        <Route key={s} path={`/:locale/${s}`} element={<LegalPage type="terms" />} />
+      ))}
+      {ABOUT_SLUGS.map((s) => (
+        <Route key={s} path={`/:locale/${s}`} element={<LegalPage type="about" />} />
+      ))}
+      {CONTACT_SLUGS.map((s) => (
+        <Route key={s} path={`/:locale/${s}`} element={<LegalPage type="contact" />} />
+      ))}
+
       <Route path="*" element={<Navigate to={`/${DEFAULT_LOCALE}`} replace />} />
     </Routes>
   );

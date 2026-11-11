@@ -1,8 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LOCALES, formatLocalPrice } from '../config/locales.js';
+import { LOCALES, getLocaleConfig, formatLocalPrice } from '../config/locales.js';
 import { AFFILIATE_CONFIG } from '../config/affiliateConfig.js';
-import { getSectionText } from '../data/multilingualSections.js';
+import {
+  getSectionText,
+  getLocalizedPath,
+  translatePathToLocale
+} from '../data/multilingualSections.js';
 import {
   ShieldAlert,
   TicketPercent,
@@ -11,9 +15,10 @@ import {
   ChevronDown,
   Check,
   Search,
-  CheckCircle2,
   Gamepad2,
-  BookOpen
+  BookOpen,
+  ArrowUp,
+  ChevronRight
 } from 'lucide-react';
 
 export function FlagImg({ iso, className = 'h-4 w-5' }) {
@@ -45,6 +50,13 @@ export default function Layout({
   const ui = getSectionText(localeConfig.lang);
   const hasTemuInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
 
+  // Auto-scroll to top on every route change so footer/sidebar links never leave the user stuck at the bottom
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -55,16 +67,19 @@ export default function Layout({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleScrollTopClick = () => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleLocaleSelect = (newLocaleCode) => {
     setRegionModalOpen(false);
     setCountrySearch('');
-    const parts = location.pathname.split('/').filter(Boolean);
-    if (parts.length > 0) {
-      parts[0] = newLocaleCode;
-      navigate('/' + parts.join('/'));
-    } else {
-      navigate('/' + newLocaleCode);
-    }
+    const targetConfig = getLocaleConfig(newLocaleCode);
+    const nextPath = translatePathToLocale(location.pathname, targetConfig);
+    navigate(nextPath);
+    handleScrollTopClick();
   };
 
   const filteredLocales = LOCALES.filter((loc) => {
@@ -82,16 +97,24 @@ export default function Layout({
   const ex15 = formatLocalPrice(15, localeConfig);
   const ex5 = formatLocalPrice(5, localeConfig);
 
+  const dynamicsUrl = getLocalizedPath(localeConfig, 'dynamics');
+  const guidesUrl = getLocalizedPath(localeConfig, 'guides');
+  const privacyUrl = getLocalizedPath(localeConfig, 'privacy');
+  const termsUrl = getLocalizedPath(localeConfig, 'terms');
+  const aboutUrl = getLocalizedPath(localeConfig, 'about');
+  const contactUrl = getLocalizedPath(localeConfig, 'contact');
+
   return (
     <div dir={localeConfig.rtl ? 'rtl' : 'ltr'} className="min-h-screen flex flex-col bg-[#F6F2EA] text-[#1F1B18] font-sans">
-      {/* Ultra-Clean Minimalist Header (No bulky top banner, no cluttered multi-row boxes) */}
+      {/* Ultra-Clean Minimalist Header */}
       <header className="sticky top-0 z-40 border-b border-[#DED4C6] bg-[#FCF9F4]/95 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-3 sm:px-4">
           {/* Row 1: Logo + Country Selector */}
           <div className="flex h-14 sm:h-16 items-center justify-between gap-2">
             <Link
               to={`/${localeConfig.code}`}
-              className="flex items-center gap-2 text-lg font-extrabold tracking-tight text-[#1F1B18] shrink-0"
+              onClick={handleScrollTopClick}
+              className="flex items-center gap-2 text-lg font-extrabold tracking-tight text-[#1F1B18] shrink-0 focus:outline-none"
             >
               <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-[#B85332] text-[#FCF9F4] shadow-sm">
                 <TicketPercent className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -105,7 +128,8 @@ export default function Layout({
             <nav className="hidden lg:flex items-center gap-1 rounded-xl border border-[#E5DAC9] bg-[#F3ECE2] p-1 text-xs font-bold">
               <Link
                 to={activeCategory ? `/${localeConfig.code}/category/${activeCategory}` : `/${localeConfig.code}`}
-                className={`rounded-lg px-3 py-1.5 transition whitespace-nowrap ${
+                onClick={handleScrollTopClick}
+                className={`rounded-lg px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                   activeSection === 'coupons' && !activeStore
                     ? 'bg-[#1F1B18] text-[#FCF9F4] shadow-sm'
                     : 'text-[#574B40] hover:text-[#1F1B18]'
@@ -117,7 +141,8 @@ export default function Layout({
               {hasTemuInCountry && (
                 <Link
                   to={activeCategory ? `/${localeConfig.code}/temu/category/${activeCategory}` : `/${localeConfig.code}/temu`}
-                  className={`rounded-lg px-3 py-1.5 transition whitespace-nowrap ${
+                  onClick={handleScrollTopClick}
+                  className={`rounded-lg px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                     activeSection === 'coupons' && activeStore === 'temu'
                       ? 'bg-[#B85332] text-[#FCF9F4] shadow-sm'
                       : 'text-[#8C3D22] hover:bg-[#B85332]/10'
@@ -129,7 +154,8 @@ export default function Layout({
 
               <Link
                 to={activeCategory ? `/${localeConfig.code}/aliexpress/category/${activeCategory}` : `/${localeConfig.code}/aliexpress`}
-                className={`rounded-lg px-3 py-1.5 transition whitespace-nowrap ${
+                onClick={handleScrollTopClick}
+                className={`rounded-lg px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                   activeSection === 'coupons' && activeStore === 'aliexpress'
                     ? 'bg-[#7A3B24] text-[#FCF9F4] shadow-sm'
                     : 'text-[#6E3520] hover:bg-[#7A3B24]/10'
@@ -141,8 +167,9 @@ export default function Layout({
               <span className="h-4 w-[1px] bg-[#D8C8B4] mx-0.5" />
 
               <Link
-                to={`/${localeConfig.code}/dinamicas`}
-                className={`rounded-lg px-3 py-1.5 transition flex items-center gap-1.5 whitespace-nowrap ${
+                to={dynamicsUrl}
+                onClick={handleScrollTopClick}
+                className={`rounded-lg px-3 py-1.5 transition flex items-center gap-1.5 whitespace-nowrap focus:outline-none ${
                   activeSection === 'dynamics'
                     ? 'bg-[#8F5B1D] text-[#FCF9F4] shadow-sm'
                     : 'text-[#7A4D16] hover:bg-[#8F5B1D]/10'
@@ -153,8 +180,9 @@ export default function Layout({
               </Link>
 
               <Link
-                to={`/${localeConfig.code}/guias`}
-                className={`rounded-lg px-3 py-1.5 transition flex items-center gap-1.5 whitespace-nowrap ${
+                to={guidesUrl}
+                onClick={handleScrollTopClick}
+                className={`rounded-lg px-3 py-1.5 transition flex items-center gap-1.5 whitespace-nowrap focus:outline-none ${
                   activeSection === 'guides'
                     ? 'bg-[#3D6352] text-[#FCF9F4] shadow-sm'
                     : 'text-[#3D6352] hover:bg-[#3D6352]/10'
@@ -170,7 +198,7 @@ export default function Layout({
               <button
                 type="button"
                 onClick={() => setRegionModalOpen(!regionModalOpen)}
-                className="flex items-center gap-1.5 rounded-xl border border-[#D8C8B4] bg-[#F6F2EA] px-2.5 py-1.5 text-xs font-bold text-[#1F1B18] hover:border-[#B85332] transition"
+                className="flex items-center gap-1.5 rounded-xl border border-[#D8C8B4] bg-[#F6F2EA] px-2.5 py-1.5 text-xs font-bold text-[#1F1B18] hover:border-[#B85332] transition focus:outline-none"
               >
                 <FlagImg iso={localeConfig.iso} className="h-3.5 w-5" />
                 <span className="max-w-[85px] sm:max-w-[130px] truncate">{localeConfig.countryName}</span>
@@ -237,11 +265,12 @@ export default function Layout({
             </div>
           </div>
 
-          {/* Row 2 on Mobile/Tablet: Single Clean Horizontal Tab Strip (No wrapping, no boxy clutter) */}
+          {/* Row 2 on Mobile/Tablet: Single Clean Horizontal Tab Strip */}
           <nav className="flex lg:hidden items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-[#ECE5D8] py-2 text-xs font-bold">
             <Link
               to={activeCategory ? `/${localeConfig.code}/category/${activeCategory}` : `/${localeConfig.code}`}
-              className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap ${
+              onClick={handleScrollTopClick}
+              className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                 activeSection === 'coupons' && !activeStore
                   ? 'bg-[#1F1B18] text-[#FCF9F4]'
                   : 'bg-[#F0E9DF] text-[#574B40]'
@@ -253,7 +282,8 @@ export default function Layout({
             {hasTemuInCountry && (
               <Link
                 to={activeCategory ? `/${localeConfig.code}/temu/category/${activeCategory}` : `/${localeConfig.code}/temu`}
-                className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap ${
+                onClick={handleScrollTopClick}
+                className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                   activeSection === 'coupons' && activeStore === 'temu'
                     ? 'bg-[#B85332] text-[#FCF9F4]'
                     : 'bg-[#F0E9DF] text-[#8C3D22]'
@@ -265,7 +295,8 @@ export default function Layout({
 
             <Link
               to={activeCategory ? `/${localeConfig.code}/aliexpress/category/${activeCategory}` : `/${localeConfig.code}/aliexpress`}
-              className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap ${
+              onClick={handleScrollTopClick}
+              className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                 activeSection === 'coupons' && activeStore === 'aliexpress'
                   ? 'bg-[#7A3B24] text-[#FCF9F4]'
                   : 'bg-[#F0E9DF] text-[#6E3520]'
@@ -275,8 +306,9 @@ export default function Layout({
             </Link>
 
             <Link
-              to={`/${localeConfig.code}/dinamicas`}
-              className={`shrink-0 rounded-full px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap ${
+              to={dynamicsUrl}
+              onClick={handleScrollTopClick}
+              className={`shrink-0 rounded-full px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap focus:outline-none ${
                 activeSection === 'dynamics'
                   ? 'bg-[#8F5B1D] text-[#FCF9F4]'
                   : 'bg-[#F0E9DF] text-[#7A4D16]'
@@ -287,8 +319,9 @@ export default function Layout({
             </Link>
 
             <Link
-              to={`/${localeConfig.code}/guias`}
-              className={`shrink-0 rounded-full px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap ${
+              to={guidesUrl}
+              onClick={handleScrollTopClick}
+              className={`shrink-0 rounded-full px-3 py-1.5 transition flex items-center gap-1 whitespace-nowrap focus:outline-none ${
                 activeSection === 'guides'
                   ? 'bg-[#3D6352] text-[#FCF9F4]'
                   : 'bg-[#F0E9DF] text-[#3D6352]'
@@ -372,8 +405,9 @@ export default function Layout({
               </p>
 
               <Link
-                to={`/${localeConfig.code}/guias`}
-                className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#3D6352] px-3.5 py-2.5 text-xs font-bold text-[#FCF9F4] hover:bg-[#2F4E40] transition"
+                to={guidesUrl}
+                onClick={handleScrollTopClick}
+                className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#3D6352] px-3.5 py-2.5 text-xs font-bold text-[#FCF9F4] hover:bg-[#2F4E40] transition focus:outline-none"
               >
                 <BookOpen className="h-3.5 w-3.5" />
                 <span>{ui.navGuides}</span>
@@ -390,8 +424,9 @@ export default function Layout({
               {LOCALES.map((loc) => (
                 <Link
                   key={loc.code}
-                  to={activeStore ? `/${loc.code}/${activeStore}` : `/${loc.code}`}
-                  className={`flex items-center gap-2 truncate rounded-lg px-2 py-1.5 transition border ${
+                  to={translatePathToLocale(location.pathname, loc)}
+                  onClick={handleScrollTopClick}
+                  className={`flex items-center gap-2 truncate rounded-lg px-2 py-1.5 transition border focus:outline-none ${
                     loc.code === localeConfig.code
                       ? 'bg-[#B85332]/15 border-[#B85332]/40 font-bold text-[#9E472A]'
                       : 'border-transparent text-[#574B40] hover:bg-[#ECE5D8] hover:text-[#1F1B18]'
@@ -406,46 +441,155 @@ export default function Layout({
         </aside>
       </div>
 
-      {/* Footer with Clean Affiliate Disclosure Card */}
-      <footer className="mt-10 border-t border-[#DED4C6] bg-[#ECE5D8] px-3 sm:px-4 py-7 text-xs text-[#574B40]">
-        <div className="mx-auto max-w-7xl space-y-5">
-          {/* Clean, Unobtrusive Affiliate Disclosure Box */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-[#D8C8B4] bg-[#F6F2EA] px-3.5 py-2.5 text-[11px] text-[#574B40]">
-            <div className="flex items-start sm:items-center gap-2">
-              <ShieldAlert className="h-4 w-4 text-[#B85332] shrink-0 mt-0.5 sm:mt-0" />
-              <span>{ui.disclosureShort}</span>
-            </div>
-            <span className="font-mono text-[10px] font-bold uppercase text-[#3D6352] shrink-0">
-              {ui.disclosureBadge}
-            </span>
-          </div>
+      {/* Redesigned Structured Footer (Auto-scrolls to top & uses localized URLs per language) */}
+      <footer className="mt-12 border-t border-[#D8C8B4] bg-[#ECE5D8] px-3 sm:px-4 py-8 sm:py-10 text-xs text-[#574B40]">
+        <div className="mx-auto max-w-7xl space-y-6">
+          {/* Structured 3-Column Grid */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Col 1: Brand, Active Region & Back to Top */}
+            <div className="flex flex-col justify-between rounded-2xl border border-[#D8C8B4] bg-[#FCF9F4] p-4 sm:p-5 shadow-sm">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <Link
+                    to={`/${localeConfig.code}`}
+                    onClick={handleScrollTopClick}
+                    className="flex items-center gap-2 font-display text-base font-bold text-[#1F1B18] focus:outline-none"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#B85332] text-[#FCF9F4]">
+                      <TicketPercent className="h-4 w-4" />
+                    </span>
+                    <span>
+                      Cupones<span className="text-[#B85332]">Tech</span>
+                    </span>
+                  </Link>
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <FlagImg iso={localeConfig.iso} className="h-4 w-6" />
-              <p className="font-display text-xs sm:text-sm font-bold text-[#1F1B18]">
-                CuponesTech (cuponestech.tech) — {localeConfig.countryName} ({localeConfig.currencyCode})
-              </p>
+                  <button
+                    type="button"
+                    onClick={handleScrollTopClick}
+                    className="inline-flex items-center gap-1 rounded-lg border border-[#D8C8B4] bg-[#F6F2EA] hover:border-[#B85332] px-2.5 py-1 text-[11px] font-bold text-[#1F1B18] transition focus:outline-none"
+                  >
+                    <ArrowUp className="h-3 w-3 text-[#B85332]" />
+                    <span>Top</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2 rounded-xl bg-[#F3ECE2] px-3 py-2 border border-[#E5DAC9] mb-3">
+                  <FlagImg iso={localeConfig.iso} className="h-4 w-6" />
+                  <span className="font-bold text-[#1F1B18] truncate">
+                    {localeConfig.countryName} ({localeConfig.currencyCode})
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 rounded-xl bg-[#F6F2EA] p-2.5 border border-[#E5DAC9] text-[11px] leading-relaxed text-[#6E6055]">
+                <ShieldAlert className="h-4 w-4 text-[#B85332] shrink-0 mt-0.5" />
+                <span>{ui.disclosureShort}</span>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-4 font-semibold text-[#574B40]">
-              <Link to={`/${localeConfig.code}/guias`} className="hover:text-[#B85332]">
-                {ui.navGuides}
-              </Link>
-              <Link to={`/${localeConfig.code}/dinamicas`} className="hover:text-[#B85332]">
-                {ui.navDynamics}
-              </Link>
-              <Link to={`/${localeConfig.code}/privacy`} className="hover:text-[#B85332]">
-                {dict.legal.privacyTitle}
-              </Link>
-              <Link to={`/${localeConfig.code}/terms`} className="hover:text-[#B85332]">
-                {dict.legal.termsTitle}
-              </Link>
-              <Link to={`/${localeConfig.code}/about`} className="hover:text-[#B85332]">
-                {dict.legal.aboutTitle}
-              </Link>
-              <Link to={`/${localeConfig.code}/contact`} className="hover:text-[#B85332]">
-                {dict.legal.contactTitle}
-              </Link>
+
+            {/* Col 2: Quick Navigation & Guides */}
+            <div className="rounded-2xl border border-[#D8C8B4] bg-[#FCF9F4] p-4 sm:p-5 shadow-sm">
+              <h4 className="mb-3 text-xs font-extrabold uppercase tracking-wider text-[#B85332]">
+                {ui.navAll} & {ui.navGuides}
+              </h4>
+              <div className="grid grid-cols-1 gap-1.5">
+                <Link
+                  to={`/${localeConfig.code}`}
+                  onClick={handleScrollTopClick}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 font-bold text-[#1F1B18] bg-[#F6F2EA] hover:bg-[#ECE5D8] transition focus:outline-none"
+                >
+                  <span>{ui.navAll}</span>
+                  <ChevronRight className="h-3.5 w-3.5 text-[#7A6B5E]" />
+                </Link>
+
+                {hasTemuInCountry && (
+                  <Link
+                    to={`/${localeConfig.code}/temu`}
+                    onClick={handleScrollTopClick}
+                    className="flex items-center justify-between rounded-xl px-3 py-2 font-bold text-[#8C3D22] bg-[#F6F2EA] hover:bg-[#ECE5D8] transition focus:outline-none"
+                  >
+                    <span>{ui.navTemu}</span>
+                    <ChevronRight className="h-3.5 w-3.5 text-[#7A6B5E]" />
+                  </Link>
+                )}
+
+                <Link
+                  to={`/${localeConfig.code}/aliexpress`}
+                  onClick={handleScrollTopClick}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 font-bold text-[#7A3B24] bg-[#F6F2EA] hover:bg-[#ECE5D8] transition focus:outline-none"
+                >
+                  <span>{ui.navAli}</span>
+                  <ChevronRight className="h-3.5 w-3.5 text-[#7A6B5E]" />
+                </Link>
+
+                <Link
+                  to={dynamicsUrl}
+                  onClick={handleScrollTopClick}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 font-bold text-[#7A4D16] bg-[#F6F2EA] hover:bg-[#ECE5D8] transition focus:outline-none"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Gamepad2 className="h-3.5 w-3.5 text-[#8F5B1D]" />
+                    {ui.navDynamics}
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5 text-[#7A6B5E]" />
+                </Link>
+
+                <Link
+                  to={guidesUrl}
+                  onClick={handleScrollTopClick}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 font-bold text-[#3D6352] bg-[#F6F2EA] hover:bg-[#ECE5D8] transition focus:outline-none"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <BookOpen className="h-3.5 w-3.5 text-[#3D6352]" />
+                    {ui.navGuides}
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5 text-[#7A6B5E]" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Col 3: Legal, Privacy & Contact */}
+            <div className="rounded-2xl border border-[#D8C8B4] bg-[#FCF9F4] p-4 sm:p-5 shadow-sm">
+              <h4 className="mb-3 text-xs font-extrabold uppercase tracking-wider text-[#3D6352]">
+                Legal & Info
+              </h4>
+              <div className="grid grid-cols-1 gap-1.5">
+                <Link
+                  to={privacyUrl}
+                  onClick={handleScrollTopClick}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 font-semibold text-[#574B40] bg-[#F6F2EA] hover:bg-[#ECE5D8] hover:text-[#1F1B18] transition focus:outline-none"
+                >
+                  <span className="truncate">{dict.legal.privacyTitle}</span>
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#7A6B5E]" />
+                </Link>
+
+                <Link
+                  to={termsUrl}
+                  onClick={handleScrollTopClick}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 font-semibold text-[#574B40] bg-[#F6F2EA] hover:bg-[#ECE5D8] hover:text-[#1F1B18] transition focus:outline-none"
+                >
+                  <span className="truncate">{dict.legal.termsTitle}</span>
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#7A6B5E]" />
+                </Link>
+
+                <Link
+                  to={aboutUrl}
+                  onClick={handleScrollTopClick}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 font-semibold text-[#574B40] bg-[#F6F2EA] hover:bg-[#ECE5D8] hover:text-[#1F1B18] transition focus:outline-none"
+                >
+                  <span className="truncate">{dict.legal.aboutTitle}</span>
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#7A6B5E]" />
+                </Link>
+
+                <Link
+                  to={contactUrl}
+                  onClick={handleScrollTopClick}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 font-semibold text-[#574B40] bg-[#F6F2EA] hover:bg-[#ECE5D8] hover:text-[#1F1B18] transition focus:outline-none"
+                >
+                  <span className="truncate">{dict.legal.contactTitle}</span>
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#7A6B5E]" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
