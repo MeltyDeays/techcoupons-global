@@ -11,6 +11,7 @@ const CATEGORY_ICONS = {
 
 export default function CouponCard({ coupon, localeConfig }) {
   const [copied, setCopied] = useState(false);
+  const [copiedBackup, setCopiedBackup] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const { dict } = localeConfig;
   const isEs = localeConfig.lang === 'es';
@@ -27,6 +28,20 @@ export default function CouponCard({ coupon, localeConfig }) {
     setModalOpen(true);
     window.open(coupon.affiliateLink, '_blank', 'noopener,noreferrer');
     setTimeout(() => setCopied(false), 3500);
+  };
+
+  const handleCopyBackup = async (e) => {
+    e.stopPropagation();
+    if (!coupon.backupCode) return;
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(coupon.backupCode);
+      }
+    } catch {
+      // Fallback silent
+    }
+    setCopiedBackup(true);
+    setTimeout(() => setCopiedBackup(false), 3000);
   };
 
   const isTemu = coupon.store === 'temu';
@@ -54,14 +69,19 @@ export default function CouponCard({ coupon, localeConfig }) {
             </span>
           </div>
 
-          {/* Direct Checkout Usage Tag */}
-          <div className="mb-2.5">
+          {/* Direct Checkout Usage Tag + Eligibility Badge */}
+          <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
             <span className="inline-flex items-center gap-1.5 rounded-md bg-[#3D6352]/12 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-[#3D6352] border border-[#3D6352]/25">
               <ShoppingCart className="h-3 w-3 shrink-0" />
               <span className="truncate">
-                {isEs ? 'Cupón real de pago (al finalizar compra)' : 'Real Checkout Coupon (paste at payment)'}
+                {isEs ? 'Cupón real de carrito' : 'Real Checkout Coupon'}
               </span>
             </span>
+            {coupon.eligibilityText && (
+              <span className="inline-flex items-center rounded-md bg-[#B85332]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#9E4224] border border-[#B85332]/25">
+                {coupon.eligibilityText}
+              </span>
+            )}
           </div>
 
           {/* Clean Sans-Serif High-Readability Title */}
@@ -69,11 +89,20 @@ export default function CouponCard({ coupon, localeConfig }) {
             {coupon.title}
           </h3>
 
-          {/* Explicit "What does this coupon cover?" */}
-          {coupon.appliesToText && (
-            <p className="mb-4 text-xs leading-relaxed text-[#574B40] bg-[#F3ECE2] rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 border border-[#E5DAC9]">
-              {coupon.appliesToText}
-            </p>
+          {/* Explicit "What does this coupon cover?" + Regional Rule */}
+          {(coupon.appliesToText || coupon.regionalNote) && (
+            <div className="mb-4 space-y-1.5 rounded-xl bg-[#F3ECE2] px-3 sm:px-3.5 py-2 sm:py-2.5 border border-[#E5DAC9]">
+              {coupon.appliesToText && (
+                <p className="text-xs leading-relaxed text-[#574B40]">
+                  {coupon.appliesToText}
+                </p>
+              )}
+              {coupon.regionalNote && (
+                <p className="text-[11px] font-semibold leading-snug text-[#3D6352]">
+                  • {coupon.regionalNote}
+                </p>
+              )}
+            </div>
           )}
 
           {/* Two-Column Benefit Summary (Responsive wrap for narrow screens) */}
@@ -123,6 +152,32 @@ export default function CouponCard({ coupon, localeConfig }) {
               {coupon.code}
             </code>
           </div>
+
+          {coupon.backupCode && (
+            <div className="flex items-center justify-between gap-2 rounded-lg border border-[#E5DAC9] bg-[#F3ECE2] px-2.5 py-1.5 text-[11px]">
+              <span className="text-[#6E6055] font-semibold truncate">
+                {isEs ? 'Respaldo (si se agota):' : 'Backup code:'}{' '}
+                <code className="font-mono font-bold text-[#1F1B18] select-all">{coupon.backupCode}</code>
+              </span>
+              <button
+                type="button"
+                onClick={handleCopyBackup}
+                className="inline-flex items-center gap-1 rounded bg-[#E6DDD0] hover:bg-[#D8C8B4] px-2 py-0.5 text-[10px] font-bold text-[#1F1B18] transition shrink-0"
+              >
+                {copiedBackup ? (
+                  <>
+                    <Check className="h-3 w-3 text-[#3D6352]" />
+                    <span>{isEs ? 'Copiado' : 'Copied'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3 w-3" />
+                    <span>{isEs ? 'Copiar' : 'Copy'}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
 
           <button
             type="button"
