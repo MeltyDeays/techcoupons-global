@@ -5,6 +5,7 @@ import { AFFILIATE_CONFIG } from '../config/affiliateConfig.js';
 import {
   getSectionText,
   getLocalizedPath,
+  getLocalizedCategoryPath,
   translatePathToLocale,
   getLocalizedCountryName
 } from '../data/multilingualSections.js';
@@ -131,7 +132,7 @@ export default function Layout({
             {/* Desktop Inline Navigation (lg and up) */}
             <nav className="hidden lg:flex items-center gap-1 rounded-xl border border-[#E5DAC9] bg-[#F3ECE2] p-1 text-xs font-bold">
               <Link
-                to={activeCategory ? `/${localeConfig.code}/category/${activeCategory}` : `/${localeConfig.code}`}
+                to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'all', activeCategory) : `/${localeConfig.code}`}
                 onClick={handleScrollTopClick}
                 className={`rounded-lg px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                   activeSection === 'coupons' && !activeStore
@@ -144,7 +145,7 @@ export default function Layout({
 
               {hasTemuInCountry && (
                 <Link
-                  to={activeCategory ? `/${localeConfig.code}/temu/category/${activeCategory}` : `/${localeConfig.code}/temu`}
+                  to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'temu', activeCategory) : `/${localeConfig.code}/temu`}
                   onClick={handleScrollTopClick}
                   className={`rounded-lg px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                     activeSection === 'coupons' && activeStore === 'temu'
@@ -157,7 +158,7 @@ export default function Layout({
               )}
 
               <Link
-                to={activeCategory ? `/${localeConfig.code}/aliexpress/category/${activeCategory}` : `/${localeConfig.code}/aliexpress`}
+                to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'aliexpress', activeCategory) : `/${localeConfig.code}/aliexpress`}
                 onClick={handleScrollTopClick}
                 className={`rounded-lg px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                   activeSection === 'coupons' && activeStore === 'aliexpress'
@@ -273,7 +274,7 @@ export default function Layout({
           {/* Row 2 on Mobile/Tablet: Single Clean Horizontal Tab Strip */}
           <nav className="flex lg:hidden items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-[#ECE5D8] py-2 text-xs font-bold">
             <Link
-              to={activeCategory ? `/${localeConfig.code}/category/${activeCategory}` : `/${localeConfig.code}`}
+              to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'all', activeCategory) : `/${localeConfig.code}`}
               onClick={handleScrollTopClick}
               className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                 activeSection === 'coupons' && !activeStore
@@ -286,7 +287,7 @@ export default function Layout({
 
             {hasTemuInCountry && (
               <Link
-                to={activeCategory ? `/${localeConfig.code}/temu/category/${activeCategory}` : `/${localeConfig.code}/temu`}
+                to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'temu', activeCategory) : `/${localeConfig.code}/temu`}
                 onClick={handleScrollTopClick}
                 className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                   activeSection === 'coupons' && activeStore === 'temu'
@@ -299,7 +300,7 @@ export default function Layout({
             )}
 
             <Link
-              to={activeCategory ? `/${localeConfig.code}/aliexpress/category/${activeCategory}` : `/${localeConfig.code}/aliexpress`}
+              to={activeCategory ? getLocalizedCategoryPath(localeConfig, 'aliexpress', activeCategory) : `/${localeConfig.code}/aliexpress`}
               onClick={handleScrollTopClick}
               className={`shrink-0 rounded-full px-3 py-1.5 transition whitespace-nowrap focus:outline-none ${
                 activeSection === 'coupons' && activeStore === 'aliexpress'
@@ -401,7 +402,7 @@ export default function Layout({
                   {ui.navGuides}
                 </span>
                 <span className="rounded bg-[#3D6352]/15 px-2 py-0.5 text-[10px] font-bold text-[#3D6352]">
-                  30 DAYS
+                  {ui.days30Badge}
                 </span>
               </div>
 
@@ -423,7 +424,7 @@ export default function Layout({
           {/* Global Regions Directory */}
           <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-5 shadow-sm">
             <h3 className="mb-3 text-xs font-extrabold uppercase tracking-wider text-[#574B40]">
-              {activeCountryDisplay} • {LOCALES.length} Regions
+              {activeCountryDisplay} • {ui.regionsCountLabel(LOCALES.length)}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-1.5 text-xs max-h-72 overflow-y-auto pr-1">
               {LOCALES.map((loc) => (
@@ -474,7 +475,7 @@ export default function Layout({
                     className="inline-flex items-center gap-1 rounded-lg border border-[#D8C8B4] bg-[#F6F2EA] hover:border-[#B85332] px-2.5 py-1 text-[11px] font-bold text-[#1F1B18] transition focus:outline-none"
                   >
                     <ArrowUp className="h-3 w-3 text-[#B85332]" />
-                    <span>Top</span>
+                    <span>{ui.topBtn}</span>
                   </button>
                 </div>
 
@@ -556,7 +557,7 @@ export default function Layout({
             {/* Col 3: Legal, Privacy & Contact */}
             <div className="rounded-2xl border border-[#D8C8B4] bg-[#FCF9F4] p-4 sm:p-5 shadow-sm">
               <h4 className="mb-3 text-xs font-extrabold uppercase tracking-wider text-[#3D6352]">
-                Legal & Info
+                {ui.legalHeader}
               </h4>
               <div className="grid grid-cols-1 gap-1.5">
                 <Link

@@ -42,40 +42,40 @@ const RAW_MARKETS = [
   { code: 'nl-nl', iso: 'nl', lang: 'nl', countryName: 'Nederland', languageName: 'Nederlands', currency: '€', currencyCode: 'EUR', rate: 0.92, flag: '🇳🇱', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 10, freeShipAli: 10 },
   { code: 'pl-pl', iso: 'pl', lang: 'pl', countryName: 'Polska', languageName: 'Polski', currency: 'zł', currencyCode: 'PLN', rate: 4.0, flag: '🇵🇱', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 40, freeShipAli: 40 },
   { code: 'pt-pt', iso: 'pt', lang: 'pt', countryName: 'Portugal', languageName: 'Português (PT)', currency: '€', currencyCode: 'EUR', rate: 0.92, flag: '🇵🇹', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 10, freeShipAli: 10 },
-  { code: 'en-se', iso: 'se', lang: 'en', countryName: 'Sverige (Sweden)', languageName: 'English / Svenska', currency: 'kr ', currencyCode: 'SEK', rate: 10.6, flag: '🇸🇪', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 120, freeShipAli: 110 },
-  { code: 'en-no', iso: 'no', lang: 'en', countryName: 'Norge (Norway)', languageName: 'English / Norsk', currency: 'kr ', currencyCode: 'NOK', rate: 11.0, flag: '🇳🇴', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 130, freeShipAli: 110 },
-  { code: 'en-dk', iso: 'dk', lang: 'en', countryName: 'Danmark (Denmark)', languageName: 'English / Dansk', currency: 'kr. ', currencyCode: 'DKK', rate: 6.9, flag: '🇩🇰', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 80, freeShipAli: 75 },
-  { code: 'en-fi', iso: 'fi', lang: 'en', countryName: 'Suomi (Finland)', languageName: 'English / Suomi', currency: '€', currencyCode: 'EUR', rate: 0.92, flag: '🇫🇮', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 10, freeShipAli: 10 },
-  { code: 'en-gr', iso: 'gr', lang: 'en', countryName: 'Ελλάδα (Greece)', languageName: 'English / Ελληνικά', currency: '€', currencyCode: 'EUR', rate: 0.92, flag: '🇬🇷', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 10, freeShipAli: 10 },
-  { code: 'en-cz', iso: 'cz', lang: 'en', countryName: 'Česko (Czechia)', languageName: 'English / Čeština', currency: 'Kč ', currencyCode: 'CZK', rate: 23.5, flag: '🇨🇿', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 250, freeShipAli: 240 },
-  { code: 'en-ro', iso: 'ro', lang: 'en', countryName: 'România', languageName: 'English / Română', currency: 'lei ', currencyCode: 'RON', rate: 4.6, flag: '🇷🇴', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 50, freeShipAli: 45 },
-  { code: 'en-hu', iso: 'hu', lang: 'en', countryName: 'Magyarország (Hungary)', languageName: 'English / Magyar', currency: 'Ft ', currencyCode: 'HUF', rate: 375, flag: '🇭🇺', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 4000, freeShipAli: 3800 },
+  { code: 'sv-se', iso: 'se', lang: 'sv', countryName: 'Sverige', languageName: 'Svenska', currency: 'kr ', currencyCode: 'SEK', rate: 10.6, flag: '🇸🇪', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 120, freeShipAli: 110 },
+  { code: 'no-no', iso: 'no', lang: 'no', countryName: 'Norge', languageName: 'Norsk', currency: 'kr ', currencyCode: 'NOK', rate: 11.0, flag: '🇳🇴', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 130, freeShipAli: 110 },
+  { code: 'da-dk', iso: 'dk', lang: 'da', countryName: 'Danmark', languageName: 'Dansk', currency: 'kr. ', currencyCode: 'DKK', rate: 6.9, flag: '🇩🇰', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 80, freeShipAli: 75 },
+  { code: 'fi-fi', iso: 'fi', lang: 'fi', countryName: 'Suomi', languageName: 'Suomi', currency: '€', currencyCode: 'EUR', rate: 0.92, flag: '🇫🇮', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 10, freeShipAli: 10 },
+  { code: 'el-gr', iso: 'gr', lang: 'el', countryName: 'Ελλάδα', languageName: 'Ελληνικά', currency: '€', currencyCode: 'EUR', rate: 0.92, flag: '🇬🇷', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 10, freeShipAli: 10 },
+  { code: 'cs-cz', iso: 'cz', lang: 'cs', countryName: 'Česko', languageName: 'Čeština', currency: 'Kč ', currencyCode: 'CZK', rate: 23.5, flag: '🇨🇿', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 250, freeShipAli: 240 },
+  { code: 'ro-ro', iso: 'ro', lang: 'ro', countryName: 'România', languageName: 'Română', currency: 'lei ', currencyCode: 'RON', rate: 4.6, flag: '🇷🇴', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 50, freeShipAli: 45 },
+  { code: 'hu-hu', iso: 'hu', lang: 'hu', countryName: 'Magyarország', languageName: 'Magyar', currency: 'Ft ', currencyCode: 'HUF', rate: 375, flag: '🇭🇺', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 4000, freeShipAli: 3800 },
   { code: 'tr-tr', iso: 'tr', lang: 'tr', countryName: 'Türkiye', languageName: 'Türkçe', currency: '₺', currencyCode: 'TRY', rate: 34.5, flag: '🇹🇷', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 450, freeShipAli: 350 },
-  { code: 'ru-kz', iso: 'kz', lang: 'ru', countryName: 'Казахстан (Kazakhstan)', languageName: 'Русский (KZ)', currency: '₸', currencyCode: 'KZT', rate: 490, flag: '🇰🇿', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 5500, freeShipAli: 4900 },
-  { code: 'ru-ua', iso: 'ua', lang: 'ru', countryName: 'Україна (Ukraine)', languageName: 'Русский / UA', currency: '₴', currencyCode: 'UAH', rate: 41.5, flag: '🇺🇦', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 450, freeShipAli: 400 },
+  { code: 'ru-kz', iso: 'kz', lang: 'ru', countryName: 'Казахстан', languageName: 'Русский (KZ)', currency: '₸', currencyCode: 'KZT', rate: 490, flag: '🇰🇿', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 5500, freeShipAli: 4900 },
+  { code: 'uk-ua', iso: 'ua', lang: 'uk', countryName: 'Україна', languageName: 'Українська', currency: '₴', currencyCode: 'UAH', rate: 41.5, flag: '🇺🇦', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 450, freeShipAli: 400 },
 
   // Asia-Pacífico, Comunidad China, Medio Oriente y África
-  { code: 'zh-tw', iso: 'tw', lang: 'zh', countryName: '台灣 (Taiwan)', languageName: '繁體中文 / 中文 (TW)', currency: 'NT$', currencyCode: 'TWD', rate: 32.2, flag: '🇹🇼', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 399, freeShipAli: 320 },
-  { code: 'zh-hk', iso: 'hk', lang: 'zh', countryName: '香港 (Hong Kong)', languageName: '中文 (HK)', currency: 'HK$', currencyCode: 'HKD', rate: 7.78, flag: '🇭🇰', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 90, freeShipAli: 80 },
-  { code: 'zh-cn', iso: 'cn', lang: 'zh', countryName: '中国 / Global Chinese', languageName: '简体中文 (CN)', currency: '¥', currencyCode: 'CNY', rate: 7.2, flag: '🇨🇳', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 79, freeShipAli: 69 },
-  { code: 'zh-sg', iso: 'sg', lang: 'zh', countryName: '新加坡 (Singapore 中文)', languageName: '中文 (SG)', currency: 'S$', currencyCode: 'SGD', rate: 1.34, flag: '🇸🇬', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 20, freeShipAli: 15 },
+  { code: 'zh-tw', iso: 'tw', lang: 'zh', countryName: '台灣', languageName: '繁體中文 (TW)', currency: 'NT$', currencyCode: 'TWD', rate: 32.2, flag: '🇹🇼', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 399, freeShipAli: 320 },
+  { code: 'zh-hk', iso: 'hk', lang: 'zh', countryName: '香港', languageName: '繁體中文 (HK)', currency: 'HK$', currencyCode: 'HKD', rate: 7.78, flag: '🇭🇰', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 90, freeShipAli: 80 },
+  { code: 'zh-cn', iso: 'cn', lang: 'zh', countryName: '中国', languageName: '简体中文 (CN)', currency: '¥', currencyCode: 'CNY', rate: 7.2, flag: '🇨🇳', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 79, freeShipAli: 69 },
+  { code: 'zh-sg', iso: 'sg', lang: 'zh', countryName: '新加坡 (中文)', languageName: '简体中文 (SG)', currency: 'S$', currencyCode: 'SGD', rate: 1.34, flag: '🇸🇬', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 20, freeShipAli: 15 },
   { code: 'en-sg', iso: 'sg', lang: 'en', countryName: 'Singapore', languageName: 'English (SG)', currency: 'S$', currencyCode: 'SGD', rate: 1.34, flag: '🇸🇬', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 20, freeShipAli: 15 },
-  { code: 'ja-jp', iso: 'jp', lang: 'ja', countryName: '日本 (Japan)', languageName: '日本語', currency: '¥', currencyCode: 'JPY', rate: 152, flag: '🇯🇵', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 2100, freeShipAli: 1500 },
-  { code: 'ko-kr', iso: 'kr', lang: 'ko', countryName: '대한민국 (South Korea)', languageName: '한국어', currency: '₩', currencyCode: 'KRW', rate: 1380, flag: '🇰🇷', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 15000, freeShipAli: 13000 },
-  { code: 'en-my', iso: 'my', lang: 'en', countryName: 'Malaysia', languageName: 'English (MY)', currency: 'RM', currencyCode: 'MYR', rate: 4.4, flag: '🇲🇾', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 55, freeShipAli: 45 },
+  { code: 'ja-jp', iso: 'jp', lang: 'ja', countryName: '日本', languageName: '日本語', currency: '¥', currencyCode: 'JPY', rate: 152, flag: '🇯🇵', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 2100, freeShipAli: 1500 },
+  { code: 'ko-kr', iso: 'kr', lang: 'ko', countryName: '대한민국', languageName: '한국어', currency: '₩', currencyCode: 'KRW', rate: 1380, flag: '🇰🇷', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 15000, freeShipAli: 13000 },
+  { code: 'ms-my', iso: 'my', lang: 'ms', countryName: 'Malaysia', languageName: 'Bahasa Melayu', currency: 'RM', currencyCode: 'MYR', rate: 4.4, flag: '🇲🇾', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 55, freeShipAli: 45 },
   { code: 'en-ph', iso: 'ph', lang: 'en', countryName: 'Philippines', languageName: 'English (PH)', currency: '₱', currencyCode: 'PHP', rate: 58, flag: '🇵🇭', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 650, freeShipAli: 550 },
-  { code: 'en-th', iso: 'th', lang: 'en', countryName: 'Thailand (ประเทศไทย)', languageName: 'English (TH)', currency: '฿', currencyCode: 'THB', rate: 34.5, flag: '🇹🇭', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 390, freeShipAli: 350 },
-  { code: 'en-vn', iso: 'vn', lang: 'en', countryName: 'Việt Nam (Vietnam)', languageName: 'English (VN)', currency: '₫', currencyCode: 'VND', rate: 25300, flag: '🇻🇳', rtl: false, stores: ['aliexpress'], freeShipTemu: 0, freeShipAli: 250000 },
+  { code: 'th-th', iso: 'th', lang: 'th', countryName: 'ประเทศไทย', languageName: 'ไทย', currency: '฿', currencyCode: 'THB', rate: 34.5, flag: '🇹🇭', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 390, freeShipAli: 350 },
+  { code: 'vi-vn', iso: 'vn', lang: 'vi', countryName: 'Việt Nam', languageName: 'Tiếng Việt', currency: '₫', currencyCode: 'VND', rate: 25300, flag: '🇻🇳', rtl: false, stores: ['aliexpress'], freeShipTemu: 0, freeShipAli: 250000 },
   { code: 'en-au', iso: 'au', lang: 'en', countryName: 'Australia', languageName: 'English (AU)', currency: 'A$', currencyCode: 'AUD', rate: 1.52, flag: '🇦🇺', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 20, freeShipAli: 15 },
   { code: 'en-nz', iso: 'nz', lang: 'en', countryName: 'New Zealand', languageName: 'English (NZ)', currency: 'NZ$', currencyCode: 'NZD', rate: 1.66, flag: '🇳🇿', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 25, freeShipAli: 18 },
-  { code: 'ar-ae', iso: 'ae', lang: 'ar', countryName: 'الإمارات العربية المتحدة (UAE)', languageName: 'العربية (الإمارات)', currency: 'AED ', currencyCode: 'AED', rate: 3.67, flag: '🇦🇪', rtl: true, stores: ['temu', 'aliexpress'], freeShipTemu: 50, freeShipAli: 40 },
+  { code: 'ar-ae', iso: 'ae', lang: 'ar', countryName: 'الإمارات العربية المتحدة', languageName: 'العربية (الإمارات)', currency: 'AED ', currencyCode: 'AED', rate: 3.67, flag: '🇦🇪', rtl: true, stores: ['temu', 'aliexpress'], freeShipTemu: 50, freeShipAli: 40 },
   { code: 'en-ae', iso: 'ae', lang: 'en', countryName: 'United Arab Emirates', languageName: 'English (UAE)', currency: 'AED ', currencyCode: 'AED', rate: 3.67, flag: '🇦🇪', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 50, freeShipAli: 40 },
-  { code: 'ar-sa', iso: 'sa', lang: 'ar', countryName: 'المملكة العربية السعودية (Saudi Arabia)', languageName: 'العربية (السعودية)', currency: 'SAR ', currencyCode: 'SAR', rate: 3.75, flag: '🇸🇦', rtl: true, stores: ['temu', 'aliexpress'], freeShipTemu: 55, freeShipAli: 45 },
-  { code: 'ar-qa', iso: 'qa', lang: 'ar', countryName: 'قطر (Qatar)', languageName: 'العربية (قطر)', currency: 'QAR ', currencyCode: 'QAR', rate: 3.64, flag: '🇶🇦', rtl: true, stores: ['temu', 'aliexpress'], freeShipTemu: 55, freeShipAli: 45 },
-  { code: 'ar-kw', iso: 'kw', lang: 'ar', countryName: 'الكويت (Kuwait)', languageName: 'العربية (الكويت)', currency: 'KWD ', currencyCode: 'KWD', rate: 0.31, flag: '🇰🇼', rtl: true, stores: ['temu', 'aliexpress'], freeShipTemu: 5, freeShipAli: 4 },
-  { code: 'en-il', iso: 'il', lang: 'en', countryName: 'Israel (ישראל)', languageName: 'English (IL)', currency: '₪', currencyCode: 'ILS', rate: 3.75, flag: '🇮🇱', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 55, freeShipAli: 45 },
+  { code: 'ar-sa', iso: 'sa', lang: 'ar', countryName: 'المملكة العربية السعودية', languageName: 'العربية (السعودية)', currency: 'SAR ', currencyCode: 'SAR', rate: 3.75, flag: '🇸🇦', rtl: true, stores: ['temu', 'aliexpress'], freeShipTemu: 55, freeShipAli: 45 },
+  { code: 'ar-qa', iso: 'qa', lang: 'ar', countryName: 'قطر', languageName: 'العربية (قطر)', currency: 'QAR ', currencyCode: 'QAR', rate: 3.64, flag: '🇶🇦', rtl: true, stores: ['temu', 'aliexpress'], freeShipTemu: 55, freeShipAli: 45 },
+  { code: 'ar-kw', iso: 'kw', lang: 'ar', countryName: 'الكويت', languageName: 'العربية (الكويت)', currency: 'KWD ', currencyCode: 'KWD', rate: 0.31, flag: '🇰🇼', rtl: true, stores: ['temu', 'aliexpress'], freeShipTemu: 5, freeShipAli: 4 },
+  { code: 'he-il', iso: 'il', lang: 'he', countryName: 'ישראל', languageName: 'עברית', currency: '₪', currencyCode: 'ILS', rate: 3.75, flag: '🇮🇱', rtl: true, stores: ['temu', 'aliexpress'], freeShipTemu: 55, freeShipAli: 45 },
   { code: 'en-za', iso: 'za', lang: 'en', countryName: 'South Africa', languageName: 'English (ZA)', currency: 'R ', currencyCode: 'ZAR', rate: 18.2, flag: '🇿🇦', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 250, freeShipAli: 200 },
-  { code: 'fr-ma', iso: 'ma', lang: 'fr', countryName: 'Maroc (Morocco)', languageName: 'Français (MA)', currency: 'MAD ', currencyCode: 'MAD', rate: 10.0, flag: '🇲🇦', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 150, freeShipAli: 120 }
+  { code: 'fr-ma', iso: 'ma', lang: 'fr', countryName: 'Maroc', languageName: 'Français (MA)', currency: 'MAD ', currencyCode: 'MAD', rate: 10.0, flag: '🇲🇦', rtl: false, stores: ['temu', 'aliexpress'], freeShipTemu: 150, freeShipAli: 120 }
 ];
 
 function interpolateText(str, market) {
@@ -114,18 +114,41 @@ export const LOCALES = RAW_MARKETS.map((market) => {
   };
 });
 
-export const LOCALE_MAP = Object.fromEntries(LOCALES.map((l) => [l.code, l]));
+export const LEGACY_LOCALE_ALIASES = {
+  'en-se': 'sv-se',
+  'en-no': 'no-no',
+  'en-dk': 'da-dk',
+  'en-fi': 'fi-fi',
+  'en-gr': 'el-gr',
+  'en-cz': 'cs-cz',
+  'en-ro': 'ro-ro',
+  'en-hu': 'hu-hu',
+  'ru-ua': 'uk-ua',
+  'en-my': 'ms-my',
+  'en-th': 'th-th',
+  'en-vn': 'vi-vn',
+  'en-il': 'he-il'
+};
+
+export const LOCALE_MAP = Object.fromEntries([
+  ...LOCALES.map((l) => [l.code, l]),
+  ...Object.entries(LEGACY_LOCALE_ALIASES).map(([oldCode, newCode]) => [
+    oldCode,
+    LOCALES.find((l) => l.code === newCode)
+  ])
+]);
 export const DEFAULT_LOCALE = 'en-us';
 
 export function getLocaleConfig(code) {
   const normalized = (code || DEFAULT_LOCALE).toLowerCase();
-  return LOCALE_MAP[normalized] || LOCALE_MAP[DEFAULT_LOCALE];
+  const resolved = LEGACY_LOCALE_ALIASES[normalized] || normalized;
+  return LOCALE_MAP[resolved] || LOCALE_MAP[DEFAULT_LOCALE];
 }
 
 export function detectBrowserLocale() {
   if (typeof navigator === 'undefined') return DEFAULT_LOCALE;
   const raw = (navigator.language || 'en-us').toLowerCase();
-  if (LOCALE_MAP[raw]) return raw;
+  if (LOCALE_MAP[raw]) return LOCALE_MAP[raw].code;
   const prefix = raw.split('-')[0];
   const fallbackByPrefix = {
     es: 'es-mx',
@@ -141,6 +164,22 @@ export function detectBrowserLocale() {
     zh: 'zh-tw',
     ru: 'ru-kz',
     tr: 'tr-tr',
+    sv: 'sv-se',
+    no: 'no-no',
+    nb: 'no-no',
+    nn: 'no-no',
+    da: 'da-dk',
+    fi: 'fi-fi',
+    el: 'el-gr',
+    cs: 'cs-cz',
+    ro: 'ro-ro',
+    hu: 'hu-hu',
+    uk: 'uk-ua',
+    th: 'th-th',
+    vi: 'vi-vn',
+    he: 'he-il',
+    iw: 'he-il',
+    ms: 'ms-my',
     en: 'en-us'
   };
   return fallbackByPrefix[prefix] || DEFAULT_LOCALE;

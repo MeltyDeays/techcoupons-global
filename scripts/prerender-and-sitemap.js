@@ -3,7 +3,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LOCALES, BASE_DOMAIN, DEFAULT_LOCALE, CATEGORY_SLUGS, buildStructuredData } from '../src/config/locales.js';
 import { getCouponsForLocale } from '../src/data/couponsGenerator.js';
-import { getRouteSlugsForLang } from '../src/data/multilingualSections.js';
+import {
+  getRouteSlugsForLang,
+  getLocalizedCategoryPath,
+  getSectionText,
+  getLocalizedCountryName
+} from '../src/data/multilingualSections.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -53,22 +58,25 @@ function getRouteSuffixForLocale(route, localeConfig) {
   if (route.type === 'about') return `/${slugs.about}`;
   if (route.type === 'contact') return `/${slugs.contact}`;
   if (route.type === 'category') {
-    if (route.storeFilter === 'temu') return `/temu/category/${route.slug}`;
-    if (route.storeFilter === 'aliexpress') return `/aliexpress/category/${route.slug}`;
-    return `/category/${route.slug}`;
+    const fullPath = getLocalizedCategoryPath(localeConfig, route.storeFilter, route.slug);
+    return fullPath.slice(`/${localeConfig.code}`.length);
   }
   return '';
 }
 
 function buildStaticBodyMarkup(localeConfig, route, coupons) {
   const { dict } = localeConfig;
+  const ui = getSectionText(localeConfig.lang);
+  const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
   const slugs = getRouteSlugsForLang(localeConfig.lang);
   let heading = dict.heroTitle;
   if (route.type === 'temu') heading = `Temu — ${dict.heroTitle}`;
   if (route.type === 'aliexpress') heading = `AliExpress — ${dict.heroTitle}`;
+  if (route.type === 'dynamics') heading = ui.dynamics.title(displayCountry);
+  if (route.type === 'guides') heading = ui.guides.title(displayCountry);
   if (route.type === 'category') {
     const catName = dict.categories[route.slug] || route.slug;
-    heading = `${catName} — ${localeConfig.countryName} (${localeConfig.currencyCode})`;
+    heading = `${catName} — ${displayCountry} (${localeConfig.currencyCode})`;
   }
   if (['privacy', 'terms', 'about', 'contact'].includes(route.type)) {
     const map = {
@@ -77,7 +85,7 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
       about: dict.legal.aboutTitle,
       contact: dict.legal.contactTitle
     };
-    heading = `${map[route.type]} — ${localeConfig.countryName}`;
+    heading = `${map[route.type]} — ${displayCountry}`;
   }
 
   const couponCardsHtml = coupons
@@ -86,7 +94,7 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
       <article class="coupon-static-card">
         <h3>${escapeHtml(c.title)}</h3>
         <p>${escapeHtml(dict.minSpend)}: <strong>${escapeHtml(c.localMinSpend)}</strong> (-${c.discountPct}%)</p>
-        <p>Promo Code: <code>${escapeHtml(c.code)}</code> (${escapeHtml(dict.verifiedBadge)})</p>
+        <p>${escapeHtml(ui.promoCodeLabel)} <code>${escapeHtml(c.code)}</code> (${escapeHtml(dict.verifiedBadge)})</p>
         <a href="${escapeHtml(c.affiliateLink)}" rel="noopener noreferrer sponsored">${escapeHtml(dict.btnGoStore)}</a>
       </article>`
     )
@@ -106,11 +114,11 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
     <div class="ssg-prerendered-shell" dir="${localeConfig.rtl ? 'rtl' : 'ltr'}">
       <header>
         <nav>
-          <a href="/${localeConfig.code}">${escapeHtml(dict.navHome)}</a> |
-          <a href="/${localeConfig.code}/temu">${escapeHtml(dict.navTemu)}</a> |
-          <a href="/${localeConfig.code}/aliexpress">${escapeHtml(dict.navAli)}</a> |
-          <a href="/${localeConfig.code}/${slugs.dynamics}">Dynamics</a> |
-          <a href="/${localeConfig.code}/${slugs.guides}">Guides</a>
+          <a href="/${localeConfig.code}">${escapeHtml(ui.navAll)}</a> |
+          <a href="/${localeConfig.code}/temu">${escapeHtml(ui.navTemu)}</a> |
+          <a href="/${localeConfig.code}/aliexpress">${escapeHtml(ui.navAli)}</a> |
+          <a href="/${localeConfig.code}/${slugs.dynamics}">${escapeHtml(ui.navDynamics)}</a> |
+          <a href="/${localeConfig.code}/${slugs.guides}">${escapeHtml(ui.navGuides)}</a>
         </nav>
       </header>
       <main>
@@ -162,14 +170,26 @@ function runPrerenderAndSitemap() {
       const routeSuffix = getRouteSuffixForLocale(route, localeConfig);
       const canonicalUrl = `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`;
 
+      const ui = getSectionText(localeConfig.lang);
+      const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
+
       let pageTitle = `${localeConfig.dict.heroTitle} | CuponesTech`;
       if (route.type === 'temu') pageTitle = `Temu — ${localeConfig.dict.heroTitle}`;
       if (route.type === 'aliexpress') pageTitle = `AliExpress — ${localeConfig.dict.heroTitle}`;
-      if (route.type === 'dynamics') pageTitle = `Temu & AliExpress App Mini-Games (${localeConfig.countryName}) | CuponesTech`;
-      if (route.type === 'guides') pageTitle = `30-Day Price Adjustment & Refund Guide (${localeConfig.countryName}) | CuponesTech`;
+      if (route.type === 'dynamics') pageTitle = `${ui.dynamics.title(displayCountry)} | CuponesTech`;
+      if (route.type === 'guides') pageTitle = `${ui.guides.title(displayCountry)} | CuponesTech`;
       if (route.type === 'category') {
         const catName = localeConfig.dict.categories[route.slug] || route.slug;
-        pageTitle = `${catName} — ${localeConfig.countryName} (${localeConfig.currencyCode}) | CuponesTech`;
+        pageTitle = `${catName} — ${displayCountry} (${localeConfig.currencyCode}) | CuponesTech`;
+      }
+      if (['privacy', 'terms', 'about', 'contact'].includes(route.type)) {
+        const map = {
+          privacy: localeConfig.dict.legal.privacyTitle,
+          terms: localeConfig.dict.legal.termsTitle,
+          about: localeConfig.dict.legal.aboutTitle,
+          contact: localeConfig.dict.legal.contactTitle
+        };
+        pageTitle = `${map[route.type]} — ${displayCountry} | CuponesTech`;
       }
 
       const pageDesc = localeConfig.dict.heroSubtitle;

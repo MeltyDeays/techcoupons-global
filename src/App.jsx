@@ -12,6 +12,8 @@ import { getCouponsForLocale } from './data/couponsGenerator.js';
 import {
   getSectionText,
   getLocalizedPath,
+  getLocalizedCategoryPath,
+  resolveCanonicalCategory,
   getRouteSlugsForLang,
   getLocalizedCountryName
 } from './data/multilingualSections.js';
@@ -68,6 +70,7 @@ export function RootRedirect() {
 
 export function MarketCatalogPage({ storeFilter = null }) {
   const { locale, slug } = useParams();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
 
   if (!LOCALE_MAP[(locale || '').toLowerCase()]) {
@@ -75,12 +78,27 @@ export function MarketCatalogPage({ storeFilter = null }) {
   }
 
   const localeConfig = getLocaleConfig(locale);
+  const categoryFilter = slug ? resolveCanonicalCategory(slug) : null;
+
+  const getCategoryPath = (catSlug) => {
+    if (!catSlug) {
+      if (storeFilter === 'temu') return `/${localeConfig.code}/temu`;
+      if (storeFilter === 'aliexpress') return `/${localeConfig.code}/aliexpress`;
+      return `/${localeConfig.code}`;
+    }
+    return getLocalizedCategoryPath(localeConfig, storeFilter, catSlug);
+  };
+
+  const canonicalCatalogPath = getCategoryPath(categoryFilter);
+  if (location.pathname.toLowerCase() !== canonicalCatalogPath.toLowerCase()) {
+    return <Navigate to={canonicalCatalogPath} replace />;
+  }
+
   const { dict } = localeConfig;
   const ui = getSectionText(localeConfig.lang);
   const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
   const hasTemuInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
 
-  const categoryFilter = slug || null;
   const coupons = getCouponsForLocale(localeConfig.code, { storeFilter, categoryFilter });
 
   const filteredCoupons = coupons.filter((c) => {
@@ -93,34 +111,18 @@ export function MarketCatalogPage({ storeFilter = null }) {
     );
   });
 
-  const getCategoryPath = (catSlug) => {
-    if (!catSlug) {
-      if (storeFilter === 'temu') return `/${localeConfig.code}/temu`;
-      if (storeFilter === 'aliexpress') return `/${localeConfig.code}/aliexpress`;
-      return `/${localeConfig.code}`;
-    }
-    if (storeFilter === 'temu') return `/${localeConfig.code}/temu/category/${catSlug}`;
-    if (storeFilter === 'aliexpress') return `/${localeConfig.code}/aliexpress/category/${catSlug}`;
-    return `/${localeConfig.code}/category/${catSlug}`;
-  };
-
-  let routeSuffix = '';
+  const routeSuffix = canonicalCatalogPath.slice(`/${localeConfig.code}`.length);
   let customHeading = dict.heroTitle;
 
   if (storeFilter === 'temu' && categoryFilter) {
-    routeSuffix = `/temu/category/${categoryFilter}`;
     customHeading = `Temu • ${ui.catShort[categoryFilter] || dict.categories[categoryFilter]} (${displayCountry})`;
   } else if (storeFilter === 'aliexpress' && categoryFilter) {
-    routeSuffix = `/aliexpress/category/${categoryFilter}`;
     customHeading = `AliExpress • ${ui.catShort[categoryFilter] || dict.categories[categoryFilter]} (${displayCountry})`;
   } else if (storeFilter === 'temu') {
-    routeSuffix = '/temu';
     customHeading = `Temu — ${dict.heroTitle}`;
   } else if (storeFilter === 'aliexpress') {
-    routeSuffix = '/aliexpress';
     customHeading = `AliExpress — ${dict.heroTitle}`;
   } else if (categoryFilter) {
-    routeSuffix = `/category/${categoryFilter}`;
     const catName = ui.catShort[categoryFilter] || dict.categories[categoryFilter];
     customHeading = `${catName} — ${displayCountry} (${localeConfig.currencyCode})`;
   }
@@ -268,6 +270,7 @@ export function DynamicsPage() {
   const ui = getSectionText(localeConfig.lang);
   const dyn = ui.dynamics;
   const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
+  const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
 
   const temuUrl = AFFILIATE_CONFIG.temuBaseTrackingUrl || 'https://www.temu.com';
   const aliUrl = AFFILIATE_CONFIG.aliexpressBaseTrackingUrl || 'https://www.aliexpress.com';
@@ -289,7 +292,7 @@ export function DynamicsPage() {
       <SEOHead
         localeConfig={localeConfig}
         routeSuffix={`/${routeSlugs.dynamics}`}
-        pageTitle={`${dyn.title(localeConfig.countryName)} | CuponesTech`}
+        pageTitle={`${dyn.title(displayCountry)} | CuponesTech`}
         pageDescription={dyn.subtitle}
         coupons={[]}
       />
@@ -301,7 +304,7 @@ export function DynamicsPage() {
         </div>
 
         <h1 className="mb-2 text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1F1B18]">
-          {dyn.title(localeConfig.countryName)}
+          {dyn.title(displayCountry)}
         </h1>
 
         <p className="text-xs sm:text-sm md:text-base text-[#574B40] leading-relaxed">
@@ -462,6 +465,7 @@ export function GuidesPage() {
   const ui = getSectionText(localeConfig.lang);
   const g = ui.guides;
   const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
+  const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
 
   const ex20 = formatLocalPrice(20, localeConfig);
   const ex15 = formatLocalPrice(15, localeConfig);
@@ -473,7 +477,7 @@ export function GuidesPage() {
       <SEOHead
         localeConfig={localeConfig}
         routeSuffix={`/${routeSlugs.guides}`}
-        pageTitle={`${g.title(localeConfig.countryName)} | CuponesTech`}
+        pageTitle={`${g.title(displayCountry)} | CuponesTech`}
         pageDescription={g.subtitle(ex20, ex15, ex5)}
         coupons={[]}
       />
@@ -485,7 +489,7 @@ export function GuidesPage() {
         </div>
 
         <h1 className="mb-2 text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1F1B18]">
-          {g.title(localeConfig.countryName)}
+          {g.title(displayCountry)}
         </h1>
 
         <p className="text-xs sm:text-sm md:text-base text-[#574B40] leading-relaxed">
@@ -534,7 +538,7 @@ export function GuidesPage() {
                 {g.g2Title}
               </h2>
               <p className="text-xs font-semibold text-[#B85332]">
-                {g.g2Sub(localeConfig.countryName)}
+                {g.g2Sub(displayCountry)}
               </p>
             </div>
           </div>
@@ -562,7 +566,7 @@ export function GuidesPage() {
           </div>
 
           <p className="text-xs sm:text-sm leading-relaxed text-[#574B40]">
-            {g.g3Desc(localeConfig.countryName)}
+            {g.g3Desc(displayCountry)}
           </p>
         </article>
       </div>
@@ -585,7 +589,9 @@ export function LegalPage({ type }) {
   }
 
   const { legal } = localeConfig.dict;
+  const ui = getSectionText(localeConfig.lang);
   const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
+  const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
 
   const contentMap = {
     privacy: { title: legal.privacyTitle, body: legal.privacyBody, suffix: `/${routeSlugs.privacy}` },
@@ -601,7 +607,7 @@ export function LegalPage({ type }) {
       <SEOHead
         localeConfig={localeConfig}
         routeSuffix={current.suffix}
-        pageTitle={`${current.title} — ${localeConfig.countryName}`}
+        pageTitle={`${current.title} — ${displayCountry}`}
         pageDescription={current.body}
         coupons={[]}
       />
@@ -609,9 +615,9 @@ export function LegalPage({ type }) {
         <h1 className="mb-4 text-2xl md:text-3xl font-extrabold text-[#1F1B18]">{current.title}</h1>
         <p className="text-sm md:text-base leading-relaxed text-[#574B40] mb-6">{current.body}</p>
         <div className="rounded-xl border border-[#D8C8B4] bg-[#F6F2EA] p-4 text-xs text-[#574B40] space-y-2">
-          <p><strong>Region:</strong> {localeConfig.countryName} ({localeConfig.code.toUpperCase()})</p>
-          <p><strong>Currency:</strong> {localeConfig.currencyCode} ({localeConfig.currency})</p>
-          <p><strong>CPA Compliance:</strong> rel=&quot;noopener noreferrer sponsored&quot; active on all outbound links.</p>
+          <p><strong>{ui.regionLabel}</strong> {displayCountry} ({localeConfig.code.toUpperCase()})</p>
+          <p><strong>{ui.currencyLabel}</strong> {localeConfig.currencyCode} ({localeConfig.currency})</p>
+          <p><strong>{ui.cpaComplianceLabel}</strong> {ui.cpaComplianceText}</p>
         </div>
       </article>
       <NativeSEOGuide localeConfig={localeConfig} />

@@ -4,14 +4,20 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { RootRedirect, MarketCatalogPage, DynamicsPage, GuidesPage, LegalPage } from './App.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
 import { DEFAULT_LOCALE } from './config/locales.js';
+import { ROUTE_SLUGS_BY_LANG } from './data/multilingualSections.js';
 import './index.css';
 
-const DYNAMICS_SLUGS = ['dynamics', 'dinamicas', 'dynamiques', 'minispiele', 'dinamiche'];
-const GUIDES_SLUGS = ['guides', 'guias', 'ratgeber', 'guide'];
-const PRIVACY_SLUGS = ['privacy', 'privacidad', 'privacidade', 'confidentialite', 'datenschutz'];
-const TERMS_SLUGS = ['terms', 'terminos', 'termos', 'conditions', 'bedingungen', 'termini'];
-const ABOUT_SLUGS = ['about', 'nosotros', 'sobre', 'a-propos', 'ueber-uns', 'chi-siamo'];
-const CONTACT_SLUGS = ['contact', 'contacto', 'contato', 'kontakt', 'contatti'];
+const uniqueSlugs = (key) => [
+  ...new Set(Object.values(ROUTE_SLUGS_BY_LANG).map((m) => m[key]).filter(Boolean))
+];
+
+const DYNAMICS_SLUGS = uniqueSlugs('dynamics');
+const GUIDES_SLUGS = uniqueSlugs('guides');
+const PRIVACY_SLUGS = uniqueSlugs('privacy');
+const TERMS_SLUGS = uniqueSlugs('terms');
+const ABOUT_SLUGS = uniqueSlugs('about');
+const CONTACT_SLUGS = uniqueSlugs('contact');
+const CATEGORY_WORDS = uniqueSlugs('category');
 
 export function AppRoutes() {
   return (
@@ -21,10 +27,15 @@ export function AppRoutes() {
       <Route path="/:locale/admin" element={<AdminDashboard />} />
       <Route path="/:locale" element={<MarketCatalogPage storeFilter={null} />} />
       <Route path="/:locale/temu" element={<MarketCatalogPage storeFilter="temu" />} />
-      <Route path="/:locale/temu/category/:slug" element={<MarketCatalogPage storeFilter="temu" />} />
       <Route path="/:locale/aliexpress" element={<MarketCatalogPage storeFilter="aliexpress" />} />
-      <Route path="/:locale/aliexpress/category/:slug" element={<MarketCatalogPage storeFilter="aliexpress" />} />
-      <Route path="/:locale/category/:slug" element={<MarketCatalogPage storeFilter={null} />} />
+
+      {CATEGORY_WORDS.map((catWord) => (
+        <React.Fragment key={catWord}>
+          <Route path={`/:locale/temu/${catWord}/:slug`} element={<MarketCatalogPage storeFilter="temu" />} />
+          <Route path={`/:locale/aliexpress/${catWord}/:slug`} element={<MarketCatalogPage storeFilter="aliexpress" />} />
+          <Route path={`/:locale/${catWord}/:slug`} element={<MarketCatalogPage storeFilter={null} />} />
+        </React.Fragment>
+      ))}
 
       {DYNAMICS_SLUGS.map((s) => (
         <Route key={s} path={`/:locale/${s}`} element={<DynamicsPage />} />

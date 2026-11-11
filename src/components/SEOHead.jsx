@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
-import { LOCALES, BASE_DOMAIN, DEFAULT_LOCALE, buildStructuredData } from '../config/locales.js';
+import { LOCALES, BASE_DOMAIN, DEFAULT_LOCALE, getLocaleConfig, buildStructuredData } from '../config/locales.js';
+import { translatePathToLocale } from '../data/multilingualSections.js';
 
 export default function SEOHead({ localeConfig, routeSuffix = '', pageTitle, pageDescription, coupons = [] }) {
   const cleanSuffix = routeSuffix ? (routeSuffix.startsWith('/') ? routeSuffix : `/${routeSuffix}`) : '';
-  const canonicalUrl = `${BASE_DOMAIN}/${localeConfig.code}${cleanSuffix}`;
+  const currentPath = `/${localeConfig.code}${cleanSuffix}`;
+  const canonicalUrl = `${BASE_DOMAIN}${currentPath}`;
   const title = pageTitle || `${localeConfig.dict.heroTitle} | Temu & AliExpress`;
   const description = pageDescription || localeConfig.dict.heroSubtitle;
 
@@ -35,15 +37,17 @@ export default function SEOHead({ localeConfig, routeSuffix = '', pageTitle, pag
       const link = document.createElement('link');
       link.setAttribute('rel', 'alternate');
       link.setAttribute('hreflang', loc.code);
-      link.setAttribute('href', `${BASE_DOMAIN}/${loc.code}${cleanSuffix}`);
+      const localizedHref = `${BASE_DOMAIN}${translatePathToLocale(currentPath, loc)}`;
+      link.setAttribute('href', localizedHref);
       link.setAttribute('data-dynamic-hreflang', 'true');
       document.head.appendChild(link);
     });
 
+    const xDefaultLoc = getLocaleConfig(DEFAULT_LOCALE);
     const xDefault = document.createElement('link');
     xDefault.setAttribute('rel', 'alternate');
     xDefault.setAttribute('hreflang', 'x-default');
-    xDefault.setAttribute('href', `${BASE_DOMAIN}/${DEFAULT_LOCALE}${cleanSuffix}`);
+    xDefault.setAttribute('href', `${BASE_DOMAIN}${translatePathToLocale(currentPath, xDefaultLoc)}`);
     xDefault.setAttribute('data-dynamic-hreflang', 'true');
     document.head.appendChild(xDefault);
 

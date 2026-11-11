@@ -1,4 +1,5 @@
 import { AFFILIATE_CONFIG } from '../config/affiliateConfig.js';
+import { FULL_CATEGORIES_BY_LANG, EXTRA_NATIONAL_LANGUAGE_PACKS } from './extraLanguagesPacks.js';
 
 export const BASE_DOMAIN = AFFILIATE_CONFIG.siteDomain;
 
@@ -960,13 +961,24 @@ export const LANGUAGE_PACKS = {
     ],
     legal: {
       privacyTitle: 'Gizlilik Politikası',
-      privacyBody: 'Zorunlu yönlendirme veya zararlı takip 스크립트가 없습니다. Tüm bağlantılar rel="noopener noreferrer sponsored" standardındadır.',
+      privacyBody: 'Zorunlu yönlendirme veya zararlı takip komut dosyaları kullanmıyoruz. Tüm bağlantılar rel="noopener noreferrer sponsored" standardındadır.',
       termsTitle: 'Kullanım Koşulları',
       termsBody: 'Tüm kuponlar {country} mağaza koşullarına tabidir.',
       aboutTitle: 'Hakkımızda',
-      aboutBody: '60’tan fazla ülkede doğrulanmış teknoloji ve ev ürünleri kupon platformu.',
+      aboutBody: '66 ülkede doğrulanmış teknoloji ve ev ürünleri kupon platformu.',
       contactTitle: 'İletişim',
       contactBody: 'İletişim: contacto@cuponestech.tech'
     }
-  }
+  },
+  ...EXTRA_NATIONAL_LANGUAGE_PACKS
 };
+
+// Inject full 11-category dictionaries and normalize contact email across all 27 language packs
+for (const [langKey, pack] of Object.entries(LANGUAGE_PACKS)) {
+  if (FULL_CATEGORIES_BY_LANG[langKey]) {
+    pack.categories = { ...FULL_CATEGORIES_BY_LANG[langKey] };
+  }
+  if (pack.legal?.contactBody) {
+    pack.legal.contactBody = pack.legal.contactBody.replace(/compliance@tudominio\.xyz/g, 'contacto@cuponestech.tech');
+  }
+}

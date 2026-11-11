@@ -1,6 +1,10 @@
-// Complete 14-Language Native Dictionary:
+// Complete 27-Language Native Dictionary:
 // UI Micro-labels, Localized US Locker / Freight Forwarder terms, 11 Categories,
-// App Dynamics & Mini-Games, and 30-Day Price Adjustment & US Locker Guides.
+// App Dynamics & Mini-Games, 30-Day Price Adjustment & US Locker Guides,
+// Shipping Tables, and Localized Route & Category Slugs.
+
+import { EXTRA_LANG_SECTIONS } from './multilingualExtraSections.js';
+import { NATIONAL_LANG_SECTIONS } from './multilingualNationalSections.js';
 
 const BASE_DYNAMICS_EN = [
   {
@@ -121,6 +125,58 @@ export const US_COUNTRY_LABELS_BY_VIEWER_LANG = {
   tr: {
     'en-us': 'ABD (Amerika Adresi / US Locker)',
     'es-us': 'ABD (İspanyolca • US Locker)'
+  },
+  sv: {
+    'en-us': 'USA (Amerikansk adress / US Locker)',
+    'es-us': 'USA (Spanska • US Locker)'
+  },
+  no: {
+    'en-us': 'USA (Amerikansk adresse / US Locker)',
+    'es-us': 'USA (Spansk • US Locker)'
+  },
+  da: {
+    'en-us': 'USA (Amerikansk adresse / US Locker)',
+    'es-us': 'USA (Spansk • US Locker)'
+  },
+  fi: {
+    'en-us': 'Yhdysvallat (USA:n edelleenlähetys / US Locker)',
+    'es-us': 'Yhdysvallat (Espanja • US Locker)'
+  },
+  el: {
+    'en-us': 'Ηνωμένες Πολιτείες (Θυρίδα ΗΠΑ / US Locker)',
+    'es-us': 'Ηνωμένες Πολιτείες (Ισπανικά • US Locker)'
+  },
+  cs: {
+    'en-us': 'Spojené státy (Americká schránka / US Locker)',
+    'es-us': 'Spojené státy (Španělština • US Locker)'
+  },
+  ro: {
+    'en-us': 'Statele Unite (Adresă SUA / US Locker)',
+    'es-us': 'Statele Unite (Spaniolă • US Locker)'
+  },
+  hu: {
+    'en-us': 'Egyesült Államok (Amerikai csomagpont / US Locker)',
+    'es-us': 'Egyesült Államok (Spanyol • US Locker)'
+  },
+  uk: {
+    'en-us': 'США (Американський склад / US Locker)',
+    'es-us': 'США (Іспанська • US Locker)'
+  },
+  th: {
+    'en-us': 'สหรัฐอเมริกา (ที่อยู่ชิปปิ้งสหรัฐฯ / US Locker)',
+    'es-us': 'สหรัฐอเมริกา (ภาษาสเปน • US Locker)'
+  },
+  vi: {
+    'en-us': 'Hoa Kỳ (Kho nhận hàng Mỹ / US Locker)',
+    'es-us': 'Hoa Kỳ (Tiếng Tây Ban Nha • US Locker)'
+  },
+  he: {
+    'en-us': 'ארצות הברית (כתובת אמריקאית / US Locker)',
+    'es-us': 'ארצות הברית (ספרדית • US Locker)'
+  },
+  ms: {
+    'en-us': 'Amerika Syarikat (Alamat Kargo AS / US Locker)',
+    'es-us': 'Amerika Syarikat (Bahasa Sepanyol • US Locker)'
   }
 };
 
@@ -153,6 +209,14 @@ export const SECTION_I18N = {
     copyShort: 'Copiar',
     copiedShort: 'Copiado',
     allCategoriesChip: 'Todas',
+    days30Badge: '30 DÍAS',
+    regionsCountLabel: (n) => `${n} Regiones`,
+    topBtn: 'Subir',
+    legalHeader: 'Legal e Información',
+    regionLabel: 'Región:',
+    currencyLabel: 'Moneda:',
+    cpaComplianceLabel: 'Cumplimiento CPA:',
+    cpaComplianceText: 'Sin incentivos por clic, sin cookie-stuffing y sin redirecciones forzadas.',
     catShort: {
       'moda-ropa': 'Ropa y Calzado',
       'smart-home': 'Hogar y Cocina',
@@ -171,6 +235,19 @@ export const SECTION_I18N = {
     miamiNotice: (country, curr) =>
       `En ${country}, AliExpress envía directo en ${curr}. Si compras mediante Casillero en Estados Unidos (Miami Locker), cambia a la región de Casillero EE. UU.`,
     miamiBtn: 'Ver Cupones EE. UU. (Casillero / Locker)',
+    shippingTable: {
+      aliStore: 'AliExpress Direct / Choice',
+      aliMethod: 'Correo Aéreo Estándar / Entrega Local y Casillero',
+      aliDays: '6 - 14 Días',
+      temuStore: 'Temu Oficial',
+      temuMethodDirect: 'Envío Aéreo Directo a Domicilio',
+      temuMethodLocker: 'Envío Gratis a Casillero en EE. UU. (Miami Locker)',
+      temuFreeLockerLabel: 'Vía Casillero EE. UU. (USD)',
+      temuDays: '5 - 9 Días',
+      expressStore: 'Express DHL / FedEx',
+      expressMethod: 'Prioritario para Computadoras, Mini PCs y Electrónica',
+      expressDays: '3 - 6 Días'
+    },
     dynamics: {
       badge: 'COMANDOS DE BUSCADOR Y MINIJUEGOS DE APP',
       title: (country) => `Dinámicas, Ruletas y Minijuegos de Temu y AliExpress en ${country}`,
@@ -303,6 +380,14 @@ export const SECTION_I18N = {
     copyShort: 'Copy',
     copiedShort: 'Copied',
     allCategoriesChip: 'All',
+    days30Badge: '30 DAYS',
+    regionsCountLabel: (n) => `${n} Regions`,
+    topBtn: 'Top',
+    legalHeader: 'Legal & Info',
+    regionLabel: 'Region:',
+    currencyLabel: 'Currency:',
+    cpaComplianceLabel: 'CPA Compliance:',
+    cpaComplianceText: 'No incentivized clicks, no cookie-stuffing, no forced redirects.',
     catShort: {
       'moda-ropa': 'Fashion & Shoes',
       'smart-home': 'Home & Kitchen',
@@ -321,6 +406,19 @@ export const SECTION_I18N = {
     miamiNotice: (country, curr) =>
       `In ${country}, AliExpress ships directly in ${curr}. If you use a US Locker / Freight Forwarder address, switch to our United States (US Locker) region.`,
     miamiBtn: 'View US Locker Codes (USD)',
+    shippingTable: {
+      aliStore: 'AliExpress Direct / Choice',
+      aliMethod: 'Standard Tracked Air / National Post & US Locker',
+      aliDays: '6 - 14 Days',
+      temuStore: 'Temu Official',
+      temuMethodDirect: 'Direct Air Delivery to Your Door',
+      temuMethodLocker: 'Free Shipping to US Locker / Freight Forwarder',
+      temuFreeLockerLabel: 'Via US Locker (USD)',
+      temuDays: '5 - 9 Days',
+      expressStore: 'Express DHL / FedEx',
+      expressMethod: 'Priority Express for PCs, Mini PCs & Electronics',
+      expressDays: '3 - 6 Days'
+    },
     dynamics: {
       badge: 'APP SEARCH BAR COMMANDS & MINI-GAMES',
       title: (country) => `Temu & AliExpress App Mini-Games & Search Commands in ${country}`,
@@ -349,640 +447,39 @@ export const SECTION_I18N = {
         {
           step: 'STEP 2',
           title: 'Tap "Request Price Adjustment"',
-          desc: `If any item dropped in price (for example from ${ex20} to ${ex15}), the "Request price adjustment" button will be active.`
+          desc: `If any item in your order dropped in price (for example from ${ex20} to ${ex15}), the "Request price adjustment" button will be active.`
         },
         {
           step: 'STEP 3',
           title: `Receive ${ex5} Instantly`,
-          desc: 'Choose Temu Credit (added in 1 second) or refund to your original payment method. You can check again every few days!'
+          desc: 'Choose Temu Credit (added in 1 second) or refund to your original payment method. You can repeat this multiple times within 30 days.'
         }
       ],
       g2Title: '2. How to Stack 3 Discounts Simultaneously on AliExpress',
-      g2Sub: (country) => `Works in ${country} and across all 66 supported markets`,
-      g2Desc: 'Never pay full retail on AliExpress. Combine these three discount layers on the exact same checkout screen:',
+      g2Sub: (country) => `Valid in ${country} and across all 66 global regions`,
+      g2Desc: 'AliExpress allows you to combine three distinct discount layers on the exact same cart before paying:',
       g2Bullets: [
-        'Layer 1 — Seller Store Coupon: Claim it for free on the product page before adding the item to your cart.',
-        'Layer 2 — Mobile App Coins: Checkout in the AliExpress mobile app to automatically deduct 2% to 15% extra.',
-        'Layer 3 — CuponesTech Promo Code: Paste one of our verified IFP tiered codes into the Promo Code box at payment.'
+        'Layer 1 — Store / Seller Coupon: Claim it for free on the product page before adding the item to your cart.',
+        'Layer 2 — Mobile App Coins: Checkout inside the AliExpress mobile app to automatically apply an extra 2% to 15% Coins discount.',
+        'Layer 3 — CuponesTech Promo Code: Paste one of our verified IFP promo codes into the checkout promo code box.'
       ],
-      g3Title: '3. Direct Local Delivery vs. US Locker / Freight Forwarder',
-      g3Sub: 'Choosing between local shipping and a US forwarding locker',
+      g3Title: '3. Direct Local Shipping vs. US Freight Forwarder / Locker Address',
+      g3Sub: 'How to pick the best shipping mode for your order',
       g3Desc: (country) =>
-        `From ${country}, you can ship directly to your local address in local currency, or select "United States (Direct & US Locker)" in the region selector when shipping to a US parcel locker / freight forwarder (such as Miami FL 33166 or Delaware) to unlock US domestic free shipping and USD voucher bundles.`
+        `When shopping from ${country}, you can either ship directly to your home address in local currency or—if you use a US freight forwarder / locker address (Miami, FL 33166 / 33122)—select "United States (US Locker)" in the top region selector to unlock US domestic free shipping and USD promo codes.`
     }
-  }
-};
+  },
 
-const EXTRA_LANGS = {
-  pt: {
-    navAll: 'Todas',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'Minijogos e Dinâmicas',
-    navGuides: 'Ajuste de Preço (30 Dias)',
-    disclosureShort: 'Transparência: Recebemos comissão em compras qualificadas (Admitad / AliExpress Portals) sem custo extra para você.',
-    disclosureBadge: 'Aviso de Afiliados',
-    searchPlaceholder: (curr) => `Buscar cupom: roupas, calçados, casa, beleza, ferramentas, brinquedos... (${curr})`,
-    storeBadgeTemu: 'CUPOM TEMU',
-    storeBadgeAli: 'CUPOM ALIEXPRESS',
-    checkoutBadge: 'Cupom real no carrinho',
-    directDiscount: 'Desconto direto',
-    saveUpTo: (amt) => `Economize até ${amt}`,
-    minSpendLabel: 'Compra mínima',
-    promoCodeLabel: 'CÓDIGO:',
-    backupCodeLabel: 'Reserva (se esgotar):',
-    copyShort: 'Copiar',
-    copiedShort: 'Copiado',
-    allCategoriesChip: 'Todas',
-    catShort: {
-      'moda-ropa': 'Moda e Calçados',
-      'smart-home': 'Casa e Cozinha',
-      'belleza-cuidado': 'Beleza e Saúde',
-      'tech-gadgets': 'Tecnologia e PC',
-      'accesorios-moviles': 'Celulares e Áudio',
-      'perifericos-gaming': 'Videojogos',
-      'herramientas-autos': 'Ferramentas e Auto',
-      'juguetes-hobbies': 'Brinquedos e Drones',
-      'deportes-outdoor': 'Esportes e Lazer',
-      'mascotas': 'Pets',
-      'bebes-oficina': 'Bebês e Papelaria',
-      'redes-wifi': 'Wi-Fi e Redes'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `Em ${country}, o AliExpress envia diretamente em ${curr}. Se você usa um Redirecionador / Locker nos Estados Unidos (EUA), altere para a região Estados Unidos (Locker EUA).`,
-    miamiBtn: 'Ver Cupons EUA (Redirecionador / Locker)',
-    dynamicsTitle: (country) => `Dinâmicas, Roletas e Minijogos da Temu e AliExpress (${country})`,
-    dynamicsSub: 'Estes comandos NÃO são colados no pagamento. Digite-os na barra de busca superior do app da Temu ou abra a aba Moedas do AliExpress para desbloquear créditos e bônus.',
-    guidesTitle: (country) => `Guia de Ajuste de Preço (30 Dias) e Descontos Triplos (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Se você comprar um produto hoje por ${ex20} e ele baixar para ${ex15} em até 30 dias, peça o reembolso de ${ex5} na hora sem devolver o produto.`,
-    guidesOverride: {
-      badge: 'GUIA OFICIAL DE REEMBOLSO E ECONOMIA',
-      g1Title: '1. Como Pedir o "Ajuste de Preço" (Reembolso de 30 Dias na Temu)',
-      g1Sub: 'Receba a diferença de volta se o produto que você já comprou baixar de preço',
-      g1Desc: (curr) => `Todos os pedidos na Temu têm garantia de preço de 30 dias em ${curr}. Se o preço cair, recupere a diferença em 3 passos:`,
-      steps: (ex20, ex15, ex5) => [
-        { step: 'PASSO 1', title: 'Abra "Seus Pedidos"', desc: 'No app ou site da Temu, entre em "Você" -> "Seus Pedidos" e selecione qualquer compra dos últimos 30 dias.' },
-        { step: 'PASSO 2', title: 'Toque em "Solicitar ajuste de preço"', desc: `Se algum item baixou de preço (ex: de ${ex20} para ${ex15}), o botão de ajuste estará liberado.` },
-        { step: 'PASSO 3', title: `Receba ${ex5} na hora`, desc: 'Escolha Crédito Temu (cai em 1 segundo) ou estorno no método de pagamento original.' }
-      ],
-      g2Title: '2. Como Acumular 3 Descontos ao Mesmo Tempo no AliExpress',
-      g2Sub: (country) => `Válido em ${country} (incluindo Remessa Conforme) e em todos os 66 países`,
-      g2Desc: 'No AliExpress você pode somar três camadas de desconto no mesmo carrinho:',
-      g2Bullets: [
-        'Camada 1 — Cupom da Loja/Vendedor: Resgate grátis na página do produto antes de adicionar ao carrinho.',
-        'Camada 2 — Moedas do App: Compre pelo aplicativo para abater automaticamente de 2% a 15% extra.',
-        'Camada 3 — Código Promocional CuponesTech: Cole um dos nossos códigos verificados (série IFP) no checkout.'
-      ],
-      g3Title: '3. Envio Direto vs. Redirecionador / Locker nos Estados Unidos (EUA)',
-      g3Sub: 'Quando usar entrega direta ou armazém/locker nos EUA',
-      g3Desc: (country) => `Comprando a partir de ${country}, você pode usar o envio direto internacional para seu endereço local ou, caso utilize um redirecionador de encomendas / locker nos Estados Unidos (Miami / Florida ZIP 33166), selecionar "Estados Unidos (Locker / Redirecionador EUA)" no topo para liberar cupons exclusivos em dólar (USD).`
-    }
-  },
-  fr: {
-    navAll: 'Toutes',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'Mini-Jeux App',
-    navGuides: 'Ajustement de Prix',
-    disclosureShort: 'Transparence : Commission perçue sur les achats éligibles (Admitad / AliExpress Portals) sans frais supplémentaires.',
-    disclosureBadge: 'Affiliation',
-    searchPlaceholder: (curr) => `Rechercher : vêtements, maison, beauté, outils, jouets, tech... (${curr})`,
-    storeBadgeTemu: 'CODE TEMU',
-    storeBadgeAli: 'CODE ALIEXPRESS',
-    checkoutBadge: 'Code panier vérifié',
-    directDiscount: 'Remise directe',
-    saveUpTo: (amt) => `Économisez jusqu'à ${amt}`,
-    minSpendLabel: 'Achat min.',
-    promoCodeLabel: 'CODE :',
-    backupCodeLabel: 'Secours :',
-    copyShort: 'Copier',
-    copiedShort: 'Copié',
-    allCategoriesChip: 'Toutes',
-    catShort: {
-      'moda-ropa': 'Mode & Chaussures',
-      'smart-home': 'Maison & Cuisine',
-      'belleza-cuidado': 'Beauté & Soins',
-      'tech-gadgets': 'Tech & PC',
-      'accesorios-moviles': 'Mobiles & Audio',
-      'perifericos-gaming': 'Gaming',
-      'herramientas-autos': 'Outils & Auto',
-      'juguetes-hobbies': 'Jouets & Drones',
-      'deportes-outdoor': 'Sport & Loisirs',
-      'mascotas': 'Animaux',
-      'bebes-oficina': 'Bébés & Bureau',
-      'redes-wifi': 'Wi-Fi & Réseaux'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `En ${country}, AliExpress livre directement en ${curr}. Si vous utilisez une adresse de transit / Casier aux États-Unis (US Locker), sélectionnez la région États-Unis (Casier US).`,
-    miamiBtn: 'Voir les Codes États-Unis (Casier / Locker US)',
-    dynamicsTitle: (country) => `Mini-Jeux et Commandes de Recherche Temu & AliExpress (${country})`,
-    dynamicsSub: 'Ces mots-clés ne se collent pas au paiement : tapez-les dans la barre de recherche de l’application Temu ou ouvrez l’espace Pièces AliExpress pour gagner du crédit.',
-    guidesTitle: (country) => `Guide d’Ajustement de Prix (30 Jours) et Cumul de Remises (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Si un article acheté ${ex20} passe à ${ex15} dans les 30 jours, réclamez ${ex5} de remboursement instantané sans renvoyer le colis.`,
-    guidesOverride: {
-      badge: 'GUIDE OFFICIEL DE REMBOURSEMENT ET D’ÉCONOMIES',
-      g1Title: '1. Comment demander l’Ajustement de Prix (Remboursement 30 Jours sur Temu)',
-      g1Sub: 'Récupérez la différence si le prix baisse après votre achat',
-      g1Desc: (curr) => `Chaque commande Temu bénéficie d’une garantie de prix de 30 jours en ${curr} :`,
-      steps: (ex20, ex15, ex5) => [
-        { step: 'ÉTAPE 1', title: 'Ouvrez "Vos Commandes"', desc: 'Dans l’application Temu, allez dans "Vous" -> "Vos commandes" et choisissez une commande des 30 derniers jours.' },
-        { step: 'ÉTAPE 2', title: 'Cliquez sur "Demander un ajustement de prix"', desc: `Si le prix est passé de ${ex20} à ${ex15}, le bouton d’ajustement sera disponible.` },
-        { step: 'ÉTAPE 3', title: `Recevez ${ex5} instantanément`, desc: 'Choisissez le crédit Temu (en 1 seconde) ou le remboursement sur votre carte bancaire.' }
-      ],
-      g2Title: '2. Comment cumuler 3 réductions simultanément sur AliExpress',
-      g2Sub: (country) => `Valable en ${country} et dans les 66 pays`,
-      g2Desc: 'Cumulez toujours ces trois niveaux de réduction avant de payer :',
-      g2Bullets: [
-        'Niveau 1 — Coupon Vendeur : Récupérez-le gratuitement sur la fiche produit.',
-        'Niveau 2 — Pièces de l’App : Achetez via l’application mobile pour déduire 2% à 15% supplémentaires.',
-        'Niveau 3 — Code Promo CuponesTech : Collez l’un de nos codes vérifiés (série IFP) au moment du paiement.'
-      ],
-      g3Title: '3. Livraison Directe vs. Casier / Transit aux États-Unis (US Locker)',
-      g3Sub: 'Choisir entre la livraison locale et un casier de réexpédition US',
-      g3Desc: (country) => `Depuis ${country}, vous pouvez commander en livraison directe ou sélectionner "États-Unis (Casier / Locker US)" en haut de page si vous utilisez un service de réexpédition américain (Miami FL 33166) pour profiter des codes exclusifs en USD.`
-    }
-  },
-  de: {
-    navAll: 'Alle',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'App Mini-Spiele',
-    navGuides: 'Preisanpassung (30 Tage)',
-    disclosureShort: 'Hinweis: Wir erhalten eine Provision bei qualifizierten Käufen (Admitad / AliExpress Portals) ohne Mehrkosten für Sie.',
-    disclosureBadge: 'Affiliate-Hinweis',
-    searchPlaceholder: (curr) => `Gutscheine suchen: Kleidung, Haushalt, Beauty, Werkzeug, Spielzeug, Tech... (${curr})`,
-    storeBadgeTemu: 'TEMU GUTSCHEIN',
-    storeBadgeAli: 'ALIEXPRESS CODE',
-    checkoutBadge: 'Warenkorb-Gutscheincode',
-    directDiscount: 'Direktrabatt',
-    saveUpTo: (amt) => `Spare bis zu ${amt}`,
-    minSpendLabel: 'Mindestbestellwert',
-    promoCodeLabel: 'CODE:',
-    backupCodeLabel: 'Ersatzcode:',
-    copyShort: 'Kopieren',
-    copiedShort: 'Kopiert',
-    allCategoriesChip: 'Alle',
-    catShort: {
-      'moda-ropa': 'Mode & Schuhe',
-      'smart-home': 'Haus & Küche',
-      'belleza-cuidado': 'Beauty & Pflege',
-      'tech-gadgets': 'Technik & PC',
-      'accesorios-moviles': 'Handy & Audio',
-      'perifericos-gaming': 'Gaming',
-      'herramientas-autos': 'Werkzeug & Auto',
-      'juguetes-hobbies': 'Spielzeug & Drohnen',
-      'deportes-outdoor': 'Sport & Outdoor',
-      'mascotas': 'Haustiere',
-      'bebes-oficina': 'Baby & Büro',
-      'redes-wifi': 'Wi-Fi & Router'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `In ${country} liefert AliExpress direkt in ${curr}. Wenn Sie eine US-Weiterleitungsadresse (US Locker) nutzen, wechseln Sie zur Region Vereinigte Staaten (US-Locker).`,
-    miamiBtn: 'US-Locker Gutscheine anzeigen (USD)',
-    dynamicsTitle: (country) => `Temu & AliExpress App-Minispiele & Suchbefehle (${country})`,
-    dynamicsSub: 'Diese Suchbefehle werden direkt in die obere Suchleiste der Temu-App eingegeben oder im AliExpress-Münzcenter genutzt, um Guthaben freizuschalten.',
-    guidesTitle: (country) => `30-Tage-Preisanpassung & Dreifach-Rabatt-Anleitung (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Fällt der Preis eines für ${ex20} gekauften Artikels innerhalb von 30 Tagen auf ${ex15}, erhalten Sie ${ex5} sofort zurück.`,
-    guidesOverride: {
-      badge: 'OFFIZIELLER PREISANPASSUNGS- & RABATT-RATGEBER',
-      g1Title: '1. 30-Tage-Preisanpassung bei Temu einfordern',
-      g1Sub: 'Sofortige Rückerstattung der Preisdifferenz bei Preissenkungen',
-      g1Desc: (curr) => `Jede Temu-Bestellung beinhaltet 30 Tage Preisgarantie in ${curr}:`,
-      steps: (ex20, ex15, ex5) => [
-        { step: 'SCHRITT 1', title: '"Ihre Bestellungen" öffnen', desc: 'Gehen Sie in der Temu-App auf "Sie" -> "Ihre Bestellungen".' },
-        { step: 'SCHRITT 2', title: '"Preisanpassung anfordern" tippen', desc: `Ist der Preis z. B. von ${ex20} auf ${ex15} gesunken, erscheint die Schaltfläche.` },
-        { step: 'SCHRITT 3', title: `Sofort ${ex5} erhalten`, desc: 'Wählen Sie Temu-Guthaben (in 1 Sekunde) oder Rückerstattung auf Ihre Zahlungsart.' }
-      ],
-      g2Title: '2. Drei Rabatte gleichzeitig bei AliExpress kombinieren',
-      g2Sub: (country) => `Gültig in ${country} und weltweit`,
-      g2Desc: 'Kombinieren Sie bei AliExpress immer diese drei Rabattstufen im Warenkorb:',
-      g2Bullets: [
-        'Stufe 1 — Verkäufer-Coupon auf der Produktseite aktivieren.',
-        'Stufe 2 — App-Münzen für 2% bis 15% Extra-Abzug nutzen.',
-        'Stufe 3 — CuponesTech Promo-Code (IFP-Serie) an der Kasse eingeben.'
-      ],
-      g3Title: '3. Direktversand vs. US-Locker / Weiterleitungsadresse',
-      g3Sub: 'Wann sich ein US-Paketfach (US Locker) lohnt',
-      g3Desc: (country) => `Aus ${country} können Sie per Direktversand bestellen oder oben "Vereinigte Staaten (US-Locker)" wählen, falls Sie einen US-Paketweiterleitungsdienst nutzen.`
-    }
-  },
-  it: {
-    navAll: 'Tutti',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'Minigiochi App',
-    navGuides: 'Adeguamento Prezzo',
-    disclosureShort: 'Trasparenza: Riceviamo una commissione sugli acquisti idonei (Admitad / AliExpress Portals) senza costi aggiuntivi.',
-    disclosureBadge: 'Affiliazione',
-    searchPlaceholder: (curr) => `Cerca codice: abbigliamento, casa, bellezza, attrezzi, giocattoli, tech... (${curr})`,
-    storeBadgeTemu: 'CODICE TEMU',
-    storeBadgeAli: 'CODICE ALIEXPRESS',
-    checkoutBadge: 'Codice carrello verificato',
-    directDiscount: 'Sconto diretto',
-    saveUpTo: (amt) => `Risparmi fino a ${amt}`,
-    minSpendLabel: 'Spesa minima',
-    promoCodeLabel: 'CODICE:',
-    backupCodeLabel: 'Codice riserva:',
-    copyShort: 'Copia',
-    copiedShort: 'Copiato',
-    allCategoriesChip: 'Tutte',
-    catShort: {
-      'moda-ropa': 'Moda e Scarpe',
-      'smart-home': 'Casa e Cucina',
-      'belleza-cuidado': 'Bellezza e Cura',
-      'tech-gadgets': 'Tech e PC',
-      'accesorios-moviles': 'Smartphone e Audio',
-      'perifericos-gaming': 'Gaming',
-      'herramientas-autos': 'Fai da te e Auto',
-      'juguetes-hobbies': 'Giochi e Droni',
-      'deportes-outdoor': 'Sport e Outdoor',
-      'mascotas': 'Animali',
-      'bebes-oficina': 'Bambini e Ufficio',
-      'redes-wifi': 'Wi-Fi e Reti'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `In ${country}, AliExpress spedisce direttamente in ${curr}. Se utilizzi un indirizzo Locker negli Stati Uniti (US Locker), seleziona Stati Uniti (Locker USA).`,
-    miamiBtn: 'Vedi Codici Stati Uniti (Locker USA)',
-    dynamicsTitle: (country) => `Minigiochi e Comandi di Ricerca App Temu & AliExpress (${country})`,
-    dynamicsSub: 'Digita questi comandi nella barra di ricerca dell’app Temu o apri la sezione Monete di AliExpress per sbloccare credito e bonus giornalieri.',
-    guidesTitle: (country) => `Guida Adeguamento Prezzo (30 Giorni) e Triplo Sconto (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Se acquisti un articolo a ${ex20} e scende a ${ex15} entro 30 giorni, richiedi subito ${ex5} di rimborso senza restituire il prodotto.`
-  },
-  nl: {
-    navAll: 'Alle',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'App Minigames',
-    navGuides: 'Prijsaanpassing',
-    disclosureShort: 'Transparantie: Wij ontvangen een commissie bij gekwalificeerde aankopen zonder extra kosten voor jou.',
-    disclosureBadge: 'Affiliate-melding',
-    searchPlaceholder: (curr) => `Zoek kortingscode: kleding, huis, beauty, gereedschap, speelgoed, tech... (${curr})`,
-    storeBadgeTemu: 'TEMU CODE',
-    storeBadgeAli: 'ALIEXPRESS CODE',
-    checkoutBadge: 'Winkelwagen kortingscode',
-    directDiscount: 'Directe korting',
-    saveUpTo: (amt) => `Bespaar tot ${amt}`,
-    minSpendLabel: 'Min. besteding',
-    promoCodeLabel: 'CODE:',
-    backupCodeLabel: 'Reservecode:',
-    copyShort: 'Kopieer',
-    copiedShort: 'Gekopieerd',
-    allCategoriesChip: 'Alle',
-    catShort: {
-      'moda-ropa': 'Mode & Schoenen',
-      'smart-home': 'Huis & Keuken',
-      'belleza-cuidado': 'Beauty & Verzorging',
-      'tech-gadgets': 'Tech & PC',
-      'accesorios-moviles': 'Telefoon & Audio',
-      'perifericos-gaming': 'Gaming',
-      'herramientas-autos': 'Gereedschap & Auto',
-      'juguetes-hobbies': 'Speelgoed & Drones',
-      'deportes-outdoor': 'Sport & Outdoor',
-      'mascotas': 'Huisdieren',
-      'bebes-oficina': 'Baby & Kantoor',
-      'redes-wifi': 'Wi-Fi & Netwerk'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `In ${country} verzendt AliExpress rechtstreeks in ${curr}. Gebruik je een US Locker / doorstuuradres? Kies dan Verenigde Staten (US Locker).`,
-    miamiBtn: 'Bekijk US Locker Codes (USD)',
-    dynamicsTitle: (country) => `Temu & AliExpress App Minigames & Zoekopdrachten (${country})`,
-    dynamicsSub: 'Typ deze zoekwoorden in de zoekbalk van de Temu-app of gebruik AliExpress Munten voor extra tegoed.',
-    guidesTitle: (country) => `30-Dagen Prijsaanpassing & Stapelkorting Gids (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Kocht je een artikel voor ${ex20} en daalt de prijs binnen 30 dagen naar ${ex15}? Claim direct ${ex5} terug.`
-  },
-  pl: {
-    navAll: 'Wszystkie',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'Minigry w Aplikacji',
-    navGuides: 'Wyrównanie Ceny',
-    disclosureShort: 'Informacja: Otrzymujemy prowizję od kwalifikujących się zakupów bez dodatkowych kosztów dla Ciebie.',
-    disclosureBadge: 'Afiliacja',
-    searchPlaceholder: (curr) => `Szukaj kodu: odzież, dom, uroda, narzędzia, zabawki, elektronika... (${curr})`,
-    storeBadgeTemu: 'KOD TEMU',
-    storeBadgeAli: 'KOD ALIEXPRESS',
-    checkoutBadge: 'Kod rabatowy do koszyka',
-    directDiscount: 'Rabat bezpośredni',
-    saveUpTo: (amt) => `Oszczędzasz do ${amt}`,
-    minSpendLabel: 'Min. zamówienie',
-    promoCodeLabel: 'KOD:',
-    backupCodeLabel: 'Kod zapasowy:',
-    copyShort: 'Kopiuj',
-    copiedShort: 'Skopiowano',
-    allCategoriesChip: 'Wszystkie',
-    catShort: {
-      'moda-ropa': 'Moda i Obuwie',
-      'smart-home': 'Dom i Kuchnia',
-      'belleza-cuidado': 'Uroda i Zdrowie',
-      'tech-gadgets': 'Elektronika i PC',
-      'accesorios-moviles': 'Telefony i Audio',
-      'perifericos-gaming': 'Gaming',
-      'herramientas-autos': 'Narzędzia i Auto',
-      'juguetes-hobbies': 'Zabawki i Drony',
-      'deportes-outdoor': 'Sport i Turystyka',
-      'mascotas': 'Zwierzęta',
-      'bebes-oficina': 'Dzieci i Biuro',
-      'redes-wifi': 'Wi-Fi i Sieci'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `W ${country} AliExpress wysyła bezpośrednio w ${curr}. Jeśli korzystasz ze skrzynki / Lockera w USA, wybierz region Stany Zjednoczone (Locker USA).`,
-    miamiBtn: 'Zobacz Kody USA (Locker USA)',
-    dynamicsTitle: (country) => `Minigry i Komendy Wyszukiwania Temu oraz AliExpress (${country})`,
-    dynamicsSub: 'Wpisz te hasła w pasku wyszukiwania aplikacji Temu lub otwórz zakładkę Monety w AliExpress, aby odebrać środki i kupony.',
-    guidesTitle: (country) => `Poradnik Wyrównania Ceny (30 Dni) i Łączenia Rabatów (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Jeśli kupisz produkt za ${ex20}, a w ciągu 30 dni jego cena spadnie do ${ex15}, odbierz ${ex5} zwrotu jednym kliknięciem.`
-  },
-  ja: {
-    navAll: 'すべて',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'アプリ内ミニゲーム',
-    navGuides: '価格調整・返金ガイド',
-    disclosureShort: '広告開示：当サイトは適格な購入に対して追加費用なしでアフィリエイト報酬を受け取る場合があります。',
-    disclosureBadge: '広告開示',
-    searchPlaceholder: (curr) => `クーポン検索: ファッション, 生活雑貨, 美容, 工具, おもちゃ, 家電... (${curr})`,
-    storeBadgeTemu: 'TEMU クーポン',
-    storeBadgeAli: 'ALIEXPRESS コード',
-    checkoutBadge: 'カート決済用コード',
-    directDiscount: '即時割引',
-    saveUpTo: (amt) => `最大 ${amt} お得`,
-    minSpendLabel: '最低注文額',
-    promoCodeLabel: 'コード:',
-    backupCodeLabel: '予備コード:',
-    copyShort: 'コピー',
-    copiedShort: '完了',
-    allCategoriesChip: 'すべて',
-    catShort: {
-      'moda-ropa': 'ファッション・靴',
-      'smart-home': 'ホーム・キッチン',
-      'belleza-cuidado': '美容・コスメ',
-      'tech-gadgets': '家電・PC',
-      'accesorios-moviles': 'スマホ・イヤホン',
-      'perifericos-gaming': 'ゲーム機器',
-      'herramientas-autos': '工具・カー用品',
-      'juguetes-hobbies': 'おもちゃ・ホビー',
-      'deportes-outdoor': 'スポーツ・アウトドア',
-      'mascotas': 'ペット用品',
-      'bebes-oficina': 'ベビー・文房具',
-      'redes-wifi': 'Wi-Fi・ルーター'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `${country}ではAliExpressが${curr}で直接配送します。米国転送ロッカー（US Locker）をご利用の場合は「アメリカ合衆国（米国ロッカー）」を選択してください。`,
-    miamiBtn: '米国ロッカー用クーポンを見る (USD)',
-    dynamicsTitle: (country) => `Temu & AliExpress アプリ検索コマンド・ミニゲーム (${country})`,
-    dynamicsSub: 'これらのキーワードはTemuアプリの検索バーに入力するか、AliExpressのコインセンターで利用してクレジットを獲得できます。',
-    guidesTitle: (country) => `30日間価格調整（差額返金）＆3重割引ガイド (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `${ex20}で購入した商品が30日以内に${ex15}に値下がりした場合、返品不要で差額の${ex5}を即時請求できます。`
-  },
-  ko: {
-    navAll: '전체',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: '앱 미니게임·이벤트',
-    navGuides: '가격 조정 환불 가이드',
-    disclosureShort: '파트너스 고지: 적격 구매 시 추가 비용 없이 제휴 수수료를 제공받을 수 있습니다.',
-    disclosureBadge: '제휴 고지',
-    searchPlaceholder: (curr) => `쿠폰 검색: 의류, 신발, 홈/키친, 뷰티, 공구, 완구, 전자기기... (${curr})`,
-    storeBadgeTemu: 'TEMU 쿠폰',
-    storeBadgeAli: 'ALIEXPRESS 코드',
-    checkoutBadge: '장바구니 결제 코드',
-    directDiscount: '즉시 할인',
-    saveUpTo: (amt) => `최대 ${amt} 할인`,
-    minSpendLabel: '최소 주문',
-    promoCodeLabel: '코드:',
-    backupCodeLabel: '예비 코드:',
-    copyShort: '복사',
-    copiedShort: '복사됨',
-    allCategoriesChip: '전체',
-    catShort: {
-      'moda-ropa': '패션·신발',
-      'smart-home': '홈·주방·리빙',
-      'belleza-cuidado': '뷰티·케어',
-      'tech-gadgets': '테크·컴퓨터',
-      'accesorios-moviles': '휴대폰·오디오',
-      'perifericos-gaming': '게이밍·콘솔',
-      'herramientas-autos': '공구·자동차',
-      'juguetes-hobbies': '완구·드론·취미',
-      'deportes-outdoor': '스포츠·캠핑',
-      'mascotas': '반려동물 용품',
-      'bebes-oficina': '유아·문구/오피스',
-      'redes-wifi': 'Wi-Fi·공유기'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `${country}에서는 AliExpress가 ${curr} 통화로 직배송합니다. 미국 배송대행지(배대지 / US Locker)를 이용하시는 경우 미국(US Locker) 지역을 선택하세요.`,
-    miamiBtn: '미국 배대지(US Locker) 전용 쿠폰 보기',
-    dynamicsTitle: (country) => `Temu & AliExpress 앱 검색창 미니게임 및 크레딧 코드 (${country})`,
-    dynamicsSub: '이 키워드는 결제창이 아닌 Temu 앱 상단 검색창에 입력하거나 AliExpress 코인 탭에서 사용하여 크레딧 보상을 받는 전용 코드입니다.',
-    guidesTitle: (country) => `30일 가격 조정(차액 환불) 및 3중 중복 할인 가이드 (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `오늘 ${ex20}에 구매한 상품이 30일 이내에 ${ex15}로 인하되면 반품 없이 차액 ${ex5}를 즉시 환불받을 수 있습니다.`
-  },
-  ar: {
-    navAll: 'الكل',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'ألعاب ومكافآت التطبيق',
-    navGuides: 'دليل تعديل السعر',
-    disclosureShort: 'إفصاح: قد نحصل على عمولة من عمليات الشراء المؤهلة دون أي تكلفة إضافية عليك.',
-    disclosureBadge: 'إفصاح الشراكة',
-    searchPlaceholder: (curr) => `ابحث عن كود: ملابس، أحذية، منزل، تجميل، أدوات، ألعاب، إلكترونيات... (${curr})`,
-    storeBadgeTemu: 'كوبون TEMU',
-    storeBadgeAli: 'كود ALIEXPRESS',
-    checkoutBadge: 'كود خصم مباشر للسلة',
-    directDiscount: 'خصم فوري',
-    saveUpTo: (amt) => `وفر حتى ${amt}`,
-    minSpendLabel: 'الحد الأدنى',
-    promoCodeLabel: 'الكود:',
-    backupCodeLabel: 'كود بديل:',
-    copyShort: 'نسخ',
-    copiedShort: 'تم النسخ',
-    allCategoriesChip: 'الكل',
-    catShort: {
-      'moda-ropa': 'أزياء وأحذية',
-      'smart-home': 'المنزل والمطبخ',
-      'belleza-cuidado': 'الجمال والعناية',
-      'tech-gadgets': 'إلكترونيات وحواسيب',
-      'accesorios-moviles': 'هواتف وسماعات',
-      'perifericos-gaming': 'ألعاب الفيديو',
-      'herramientas-autos': 'عدد ومستلزمات سيارات',
-      'juguetes-hobbies': 'دمى وهوايات',
-      'deportes-outdoor': 'رياضة وتخييم',
-      'mascotas': 'مستلزمات الحيوانات',
-      'bebes-oficina': 'أطفال وقرطاسية',
-      'redes-wifi': 'واي فاي وشبكات'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `في ${country}، يشحن AliExpress مباشرة بعملة ${curr}. إذا كنت تستخدم صندوق بريد أمريكي (US Locker)، اختر منطقة الولايات المتحدة (US Locker).`,
-    miamiBtn: 'عرض أكواد صندوق البريد الأمريكي (US Locker)',
-    dynamicsTitle: (country) => `أكواد البحث والألعاب المصغرة في تطبيق Temu وAliExpress (${country})`,
-    dynamicsSub: 'اكتب هذه الكلمات في شريط بحث تطبيق Temu أو افتح قسم العملات في AliExpress للحصول على رصيد ومكافآت يومية.',
-    guidesTitle: (country) => `دليل استرداد فرق السعر خلال 30 يوماً والخصم الثلاثي (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `إذا اشتريت منتجاً اليوم بسعر ${ex20} وانخفض سعره إلى ${ex15} خلال 30 يوماً، يمكنك استرداد فرق السعر (${ex5}) فوراً.`
-  },
-  zh: {
-    navAll: '全部优惠',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'App小游戏与口令',
-    navGuides: '30天保价与退差价指南',
-    disclosureShort: '联盟声明：通过本站链接购买符合条件的商品，我们可能会获得佣金，但不会增加您的任何费用。',
-    disclosureBadge: '联盟声明',
-    searchPlaceholder: (curr) => `搜索优惠券：服饰鞋包、家居厨房、美妆、工具、玩具、数码... (${curr})`,
-    storeBadgeTemu: 'TEMU 优惠码',
-    storeBadgeAli: '速卖通优惠码',
-    checkoutBadge: '购物车结账可用',
-    directDiscount: '立减折扣',
-    saveUpTo: (amt) => `最高立省 ${amt}`,
-    minSpendLabel: '最低消费',
-    promoCodeLabel: '优惠码:',
-    backupCodeLabel: '备用码:',
-    copyShort: '复制',
-    copiedShort: '已复制',
-    allCategoriesChip: '全部',
-    catShort: {
-      'moda-ropa': '服饰与鞋靴',
-      'smart-home': '家居与厨房',
-      'belleza-cuidado': '美妆与个护',
-      'tech-gadgets': '电脑与数码',
-      'accesorios-moviles': '手机与音频',
-      'perifericos-gaming': '电玩与手柄',
-      'herramientas-autos': '工具与汽配',
-      'juguetes-hobbies': '玩具与无人机',
-      'deportes-outdoor': '运动与户外',
-      'mascotas': '宠物用品',
-      'bebes-oficina': '母婴与办公文具',
-      'redes-wifi': 'Wi-Fi路由器'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `在 ${country}，速卖通支持 ${curr} 直邮。如果您使用美国转运仓（US Locker），请切换至“美国（US Locker）”地区。`,
-    miamiBtn: '查看美国转运仓 (US Locker) 优惠码',
-    dynamicsTitle: (country) => `Temu 与 AliExpress 搜索框隐藏口令及小游戏 (${country})`,
-    dynamicsSub: '这些口令无需在结账时粘贴，直接在 Temu App 顶部搜索框输入，或打开速卖通金币中心即可领取余额与叠加礼券。',
-    guidesTitle: (country) => `30天价格保护（一键退差价）与三重叠加省钱指南 (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `如果您今天以 ${ex20} 购买商品，30天内降价至 ${ex15}，无需退货即可一键申请退还 ${ex5} 差价。`
-  },
-  ru: {
-    navAll: 'Все',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'Мини-игры в App',
-    navGuides: 'Возврат разницы цены',
-    disclosureShort: 'Партнерское уведомление: мы получаем комиссию за покупки без доплат с вашей стороны.',
-    disclosureBadge: 'Партнерство',
-    searchPlaceholder: (curr) => `Поиск купонов: одежда, обувь, дом, красота, инструменты, игрушки... (${curr})`,
-    storeBadgeTemu: 'КУПОН TEMU',
-    storeBadgeAli: 'КОД ALIEXPRESS',
-    checkoutBadge: 'Промокод для корзины',
-    directDiscount: 'Прямая скидка',
-    saveUpTo: (amt) => `Экономия до ${amt}`,
-    minSpendLabel: 'Мин. заказ',
-    promoCodeLabel: 'КОД:',
-    backupCodeLabel: 'Запасной код:',
-    copyShort: 'Копировать',
-    copiedShort: 'Скопировано',
-    allCategoriesChip: 'Все',
-    catShort: {
-      'moda-ropa': 'Одежда и обувь',
-      'smart-home': 'Дом и кухня',
-      'belleza-cuidado': 'Красота и уход',
-      'tech-gadgets': 'Электроника и ПК',
-      'accesorios-moviles': 'Смартфоны и аудио',
-      'perifericos-gaming': 'Гейминг',
-      'herramientas-autos': 'Инструменты и авто',
-      'juguetes-hobbies': 'Игрушки и хобби',
-      'deportes-outdoor': 'Спорт и отдых',
-      'mascotas': 'Зоотовары',
-      'bebes-oficina': 'Детям и офис',
-      'redes-wifi': 'Wi-Fi и роутеры'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `В ${country} AliExpress доставляет напрямую в ${curr}. Если вы используете склад-посредник в США (US Locker), выберите регион США (US Locker).`,
-    miamiBtn: 'Промокоды для склада США (US Locker)',
-    dynamicsTitle: (country) => `Поисковые команды и мини-игры Temu & AliExpress (${country})`,
-    dynamicsSub: 'Введите эти команды в строку поиска приложения Temu или откройте раздел Монеты в AliExpress для получения бонусов и купонов.',
-    guidesTitle: (country) => `Гид по корректировке цены (30 дней) и тройным скидкам (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Если вы купили товар за ${ex20}, а в течение 30 дней цена снизилась до ${ex15}, верните разницу ${ex5} в один клик.`
-  },
-  tr: {
-    navAll: 'Tümü',
-    navTemu: 'Temu',
-    navAli: 'AliExpress',
-    navDynamics: 'Uygulama Oyunları',
-    navGuides: 'Fiyat Farkı İadesi',
-    disclosureShort: 'Açıklama: Sizin için ek maliyet olmadan uygun alışverişlerden satış ortaklığı komisyonu kazanabiliriz.',
-    disclosureBadge: 'Ortaklık Bildirimi',
-    searchPlaceholder: (curr) => `Kupon ara: giyim, ayakkabı, ev, güzellik, aletler, oyuncak, elektronik... (${curr})`,
-    storeBadgeTemu: 'TEMU KUPONU',
-    storeBadgeAli: 'ALIEXPRESS KODU',
-    checkoutBadge: 'Sepette geçerli kod',
-    directDiscount: 'Anında indirim',
-    saveUpTo: (amt) => `${amt}’ye varan indirim`,
-    minSpendLabel: 'Min. sepet',
-    promoCodeLabel: 'KOD:',
-    backupCodeLabel: 'Yedek kod:',
-    copyShort: 'Kopyala',
-    copiedShort: 'Kopyalandı',
-    allCategoriesChip: 'Tümü',
-    catShort: {
-      'moda-ropa': 'Giyim ve Ayakkabı',
-      'smart-home': 'Ev ve Mutfak',
-      'belleza-cuidado': 'Güzellik ve Bakım',
-      'tech-gadgets': 'Teknoloji ve PC',
-      'accesorios-moviles': 'Telefon ve Ses',
-      'perifericos-gaming': 'Oyun ve Konsol',
-      'herramientas-autos': 'Yapı Market ve Oto',
-      'juguetes-hobbies': 'Oyuncak ve Hobi',
-      'deportes-outdoor': 'Spor ve Kamp',
-      'mascotas': 'Evcil Hayvan',
-      'bebes-oficina': 'Bebek ve Kırtasiye',
-      'redes-wifi': 'Wi-Fi ve Ağ'
-    },
-    usLockerTarget: '/en-us/temu',
-    miamiNotice: (country, curr) =>
-      `${country} için AliExpress ${curr} para 세비예신데 doğrudan gönderim yapar. ABD posta kutusu / yönlendirme (US Locker) kullanıyorsanız ABD (US Locker) bölgesini seçin.`,
-    miamiBtn: 'ABD Locker Kuponlarını Gör (USD)',
-    dynamicsTitle: (country) => `Temu & AliExpress Uygulama Arama Kodları ve Mini Oyunlar (${country})`,
-    dynamicsSub: 'Bu komutları Temu uygulama arama çubuğuna yazın veya AliExpress Jetonlar sekmesini açarak ekstra kredi ve indirim kazanın.',
-    guidesTitle: (country) => `30 Günlük Fiyat Ayarlaması (Fark İadesi) ve 3’lü İndirim Rehberi (${country})`,
-    guidesSub: (ex20, ex15, ex5) => `Bugün ${ex20} ödeyerek aldığınız ürün 30 gün içinde ${ex15} seviyesine düşerse, ürünü iade etmeden ${ex5} farkı anında geri alabilirsiniz.`
-  }
+  ...EXTRA_LANG_SECTIONS,
+  ...NATIONAL_LANG_SECTIONS
 };
 
 export function getSectionText(lang = 'en') {
-  if (lang === 'es') return SECTION_I18N.es;
-  if (lang === 'en') return SECTION_I18N.en;
-  const extra = EXTRA_LANGS[lang];
-  if (!extra) return SECTION_I18N.en;
-
-  return {
-    ...SECTION_I18N.en,
-    ...extra,
-    dynamics: {
-      ...SECTION_I18N.en.dynamics,
-      title: extra.dynamicsTitle || SECTION_I18N.en.dynamics.title,
-      subtitle: extra.dynamicsSub || SECTION_I18N.en.dynamics.subtitle
-    },
-    guides: {
-      ...SECTION_I18N.en.guides,
-      ...(extra.guidesOverride || {}),
-      title: extra.guidesTitle || SECTION_I18N.en.guides.title,
-      subtitle: extra.guidesSub || SECTION_I18N.en.guides.subtitle
-    }
-  };
+  return SECTION_I18N[lang] || SECTION_I18N.en;
 }
 
 /**
- * LOCALIZED URL ROUTE SLUGS PER LANGUAGE
+ * LOCALIZED URL ROUTE SLUGS PER LANGUAGE (All 27 Languages)
  */
 export const ROUTE_SLUGS_BY_LANG = {
   es: {
@@ -991,7 +488,8 @@ export const ROUTE_SLUGS_BY_LANG = {
     privacy: 'privacidad',
     terms: 'terminos',
     about: 'nosotros',
-    contact: 'contacto'
+    contact: 'contacto',
+    category: 'categoria'
   },
   en: {
     dynamics: 'dynamics',
@@ -999,7 +497,8 @@ export const ROUTE_SLUGS_BY_LANG = {
     privacy: 'privacy',
     terms: 'terms',
     about: 'about',
-    contact: 'contact'
+    contact: 'contact',
+    category: 'category'
   },
   pt: {
     dynamics: 'dinamicas',
@@ -1007,7 +506,8 @@ export const ROUTE_SLUGS_BY_LANG = {
     privacy: 'privacidade',
     terms: 'termos',
     about: 'sobre',
-    contact: 'contato'
+    contact: 'contato',
+    category: 'categoria'
   },
   fr: {
     dynamics: 'dynamiques',
@@ -1015,7 +515,8 @@ export const ROUTE_SLUGS_BY_LANG = {
     privacy: 'confidentialite',
     terms: 'conditions',
     about: 'a-propos',
-    contact: 'contact'
+    contact: 'contact',
+    category: 'categorie'
   },
   de: {
     dynamics: 'minispiele',
@@ -1023,7 +524,8 @@ export const ROUTE_SLUGS_BY_LANG = {
     privacy: 'datenschutz',
     terms: 'bedingungen',
     about: 'ueber-uns',
-    contact: 'kontakt'
+    contact: 'kontakt',
+    category: 'kategorie'
   },
   it: {
     dynamics: 'dinamiche',
@@ -1031,12 +533,465 @@ export const ROUTE_SLUGS_BY_LANG = {
     privacy: 'privacy',
     terms: 'termini',
     about: 'chi-siamo',
-    contact: 'contatti'
+    contact: 'contatti',
+    category: 'categoria'
+  },
+  nl: {
+    dynamics: 'minigames',
+    guides: 'gidsen',
+    privacy: 'privacy',
+    terms: 'voorwaarden',
+    about: 'over-ons',
+    contact: 'contact',
+    category: 'categorie'
+  },
+  pl: {
+    dynamics: 'minigry',
+    guides: 'poradniki',
+    privacy: 'prywatnosc',
+    terms: 'regulamin',
+    about: 'o-nas',
+    contact: 'kontakt',
+    category: 'kategoria'
+  },
+  ja: {
+    dynamics: 'minigames',
+    guides: 'guides',
+    privacy: 'privacy',
+    terms: 'terms',
+    about: 'about',
+    contact: 'contact',
+    category: 'category'
+  },
+  ko: {
+    dynamics: 'minigames',
+    guides: 'guides',
+    privacy: 'privacy',
+    terms: 'terms',
+    about: 'about',
+    contact: 'contact',
+    category: 'category'
+  },
+  ar: {
+    dynamics: 'al-aab',
+    guides: 'dalil',
+    privacy: 'khususiya',
+    terms: 'shuroot',
+    about: 'man-nahnu',
+    contact: 'ittisal',
+    category: 'fia'
+  },
+  zh: {
+    dynamics: 'huodong',
+    guides: 'zhinan',
+    privacy: 'yinsi',
+    terms: 'tiaokuan',
+    about: 'guanyu',
+    contact: 'lianxi',
+    category: 'fenlei'
+  },
+  ru: {
+    dynamics: 'mini-igry',
+    guides: 'gaidy',
+    privacy: 'konfidentsialnost',
+    terms: 'usloviya',
+    about: 'o-nas',
+    contact: 'kontakty',
+    category: 'kategoriya'
+  },
+  tr: {
+    dynamics: 'mini-oyunlar',
+    guides: 'rehberler',
+    privacy: 'gizlilik',
+    terms: 'kosullar',
+    about: 'hakkimizda',
+    contact: 'iletisim',
+    category: 'kategori'
+  },
+  sv: {
+    dynamics: 'minispel',
+    guides: 'guider',
+    privacy: 'integritet',
+    terms: 'villkor',
+    about: 'om-oss',
+    contact: 'kontakt',
+    category: 'kategori'
+  },
+  no: {
+    dynamics: 'minispill',
+    guides: 'guider',
+    privacy: 'personvern',
+    terms: 'vilkar',
+    about: 'om-oss',
+    contact: 'kontakt',
+    category: 'kategori'
+  },
+  da: {
+    dynamics: 'minispil',
+    guides: 'guider',
+    privacy: 'privatliv',
+    terms: 'vilkaar',
+    about: 'om-os',
+    contact: 'kontakt',
+    category: 'kategori'
+  },
+  fi: {
+    dynamics: 'minipelit',
+    guides: 'oppaat',
+    privacy: 'tietosuoja',
+    terms: 'ehdot',
+    about: 'tietoja',
+    contact: 'yhteystiedot',
+    category: 'kategoria'
+  },
+  el: {
+    dynamics: 'mini-paichnidia',
+    guides: 'odigoi',
+    privacy: 'aporrito',
+    terms: 'oroi',
+    about: 'schetika',
+    contact: 'epikoinonia',
+    category: 'katigoria'
+  },
+  cs: {
+    dynamics: 'minihry',
+    guides: 'pruvodce',
+    privacy: 'soukromi',
+    terms: 'podminky',
+    about: 'o-nas',
+    contact: 'kontakt',
+    category: 'kategorie'
+  },
+  ro: {
+    dynamics: 'mini-jocuri',
+    guides: 'ghiduri',
+    privacy: 'confidentialitate',
+    terms: 'termeni',
+    about: 'despre-noi',
+    contact: 'contact',
+    category: 'categorie'
+  },
+  hu: {
+    dynamics: 'minijatekok',
+    guides: 'utmutatok',
+    privacy: 'adatvedelem',
+    terms: 'feltetelek',
+    about: 'rolunk',
+    contact: 'kapcsolat',
+    category: 'kategoria'
+  },
+  uk: {
+    dynamics: 'mini-ihry',
+    guides: 'poradnyky',
+    privacy: 'konfidentsiinist',
+    terms: 'umovy',
+    about: 'pro-nas',
+    contact: 'kontakty',
+    category: 'katehoriia'
+  },
+  th: {
+    dynamics: 'minigames',
+    guides: 'khumue',
+    privacy: 'privacy',
+    terms: 'terms',
+    about: 'about',
+    contact: 'contact',
+    category: 'muat-mu'
+  },
+  vi: {
+    dynamics: 'tro-choi',
+    guides: 'huong-dan',
+    privacy: 'bao-mat',
+    terms: 'dieu-khoan',
+    about: 'gioi-thieu',
+    contact: 'lien-he',
+    category: 'danh-muc'
+  },
+  he: {
+    dynamics: 'mishakim',
+    guides: 'madrikhim',
+    privacy: 'pratiyut',
+    terms: 'tnaim',
+    about: 'odot',
+    contact: 'kesher',
+    category: 'kategoriya'
+  },
+  ms: {
+    dynamics: 'permainan-mini',
+    guides: 'panduan',
+    privacy: 'privasi',
+    terms: 'terma',
+    about: 'tentang-kami',
+    contact: 'hubungi',
+    category: 'kategori'
+  }
+};
+
+/**
+ * LOCALIZED CATEGORY SLUGS PER LANGUAGE
+ * Maps canonical category keys ('moda-ropa', 'smart-home', etc.) to native URL-safe slugs.
+ */
+export const CATEGORY_SLUGS_BY_LANG = {
+  es: {
+    'moda-ropa': 'moda-ropa',
+    'smart-home': 'hogar-cocina',
+    'belleza-cuidado': 'belleza-cuidado',
+    'tech-gadgets': 'tech-gadgets',
+    'accesorios-moviles': 'accesorios-moviles',
+    'perifericos-gaming': 'perifericos-gaming',
+    'herramientas-autos': 'herramientas-autos',
+    'juguetes-hobbies': 'juguetes-hobbies',
+    'deportes-outdoor': 'deportes-outdoor',
+    'mascotas': 'mascotas',
+    'bebes-oficina': 'bebes-oficina',
+    'redes-wifi': 'redes-wifi'
+  },
+  en: {
+    'moda-ropa': 'fashion-shoes',
+    'smart-home': 'home-kitchen',
+    'belleza-cuidado': 'beauty-health',
+    'tech-gadgets': 'tech-gadgets',
+    'accesorios-moviles': 'phones-audio',
+    'perifericos-gaming': 'gaming-peripherals',
+    'herramientas-autos': 'tools-auto',
+    'juguetes-hobbies': 'toys-drones',
+    'deportes-outdoor': 'sports-outdoors',
+    'mascotas': 'pet-supplies',
+    'bebes-oficina': 'baby-stationery',
+    'redes-wifi': 'wifi-networking'
+  },
+  pt: {
+    'moda-ropa': 'moda-calcados',
+    'smart-home': 'casa-cozinha',
+    'belleza-cuidado': 'beleza-saude',
+    'tech-gadgets': 'tecnologia-pcs',
+    'accesorios-moviles': 'celulares-audio',
+    'perifericos-gaming': 'jogos-gaming',
+    'herramientas-autos': 'ferramentas-auto',
+    'juguetes-hobbies': 'brinquedos-drones',
+    'deportes-outdoor': 'esportes-outdoor',
+    'mascotas': 'pets',
+    'bebes-oficina': 'bebes-papelaria',
+    'redes-wifi': 'wifi-redes'
+  },
+  fr: {
+    'moda-ropa': 'mode-chaussures',
+    'smart-home': 'maison-cuisine',
+    'belleza-cuidado': 'beaute-sante',
+    'tech-gadgets': 'high-tech-pc',
+    'accesorios-moviles': 'telephones-audio',
+    'perifericos-gaming': 'gaming-manettes',
+    'herramientas-autos': 'outils-auto',
+    'juguetes-hobbies': 'jouets-drones',
+    'deportes-outdoor': 'sport-plein-air',
+    'mascotas': 'animaux',
+    'bebes-oficina': 'bebe-bureau',
+    'redes-wifi': 'wifi-reseaux'
+  },
+  de: {
+    'moda-ropa': 'mode-schuhe',
+    'smart-home': 'haus-kueche',
+    'belleza-cuidado': 'beauty-pflege',
+    'tech-gadgets': 'technik-pcs',
+    'accesorios-moviles': 'handys-audio',
+    'perifericos-gaming': 'gaming-zubehoer',
+    'herramientas-autos': 'werkzeug-auto',
+    'juguetes-hobbies': 'spielzeug-drohnen',
+    'deportes-outdoor': 'sport-outdoor',
+    'mascotas': 'haustiere',
+    'bebes-oficina': 'baby-buero',
+    'redes-wifi': 'wlan-netzwerk'
+  },
+  it: {
+    'moda-ropa': 'moda-scarpe',
+    'smart-home': 'casa-cucina',
+    'belleza-cuidado': 'bellezza-salute',
+    'tech-gadgets': 'tecnologia-pc',
+    'accesorios-moviles': 'smartphone-audio',
+    'perifericos-gaming': 'gaming-console',
+    'herramientas-autos': 'utensili-auto',
+    'juguetes-hobbies': 'giocattoli-droni',
+    'deportes-outdoor': 'sport-outdoor',
+    'mascotas': 'animali',
+    'bebes-oficina': 'neonati-ufficio',
+    'redes-wifi': 'wifi-reti'
+  },
+  nl: {
+    'moda-ropa': 'mode-schoenen',
+    'smart-home': 'huis-keuken',
+    'belleza-cuidado': 'beauty-verzorging',
+    'tech-gadgets': 'elektronica-pc',
+    'accesorios-moviles': 'telefoons-audio',
+    'perifericos-gaming': 'gaming-accessoires',
+    'herramientas-autos': 'gereedschap-auto',
+    'juguetes-hobbies': 'speelgoed-drones',
+    'deportes-outdoor': 'sport-outdoor',
+    'mascotas': 'huisdieren',
+    'bebes-oficina': 'baby-kantoor',
+    'redes-wifi': 'wifi-netwerk'
+  },
+  pl: {
+    'moda-ropa': 'moda-obuwie',
+    'smart-home': 'dom-kuchnia',
+    'belleza-cuidado': 'uroda-zdrowie',
+    'tech-gadgets': 'elektronika-pc',
+    'accesorios-moviles': 'telefony-audio',
+    'perifericos-gaming': 'gaming-gry',
+    'herramientas-autos': 'narzedzia-auto',
+    'juguetes-hobbies': 'zabawki-drony',
+    'deportes-outdoor': 'sport-turystyka',
+    'mascotas': 'zwierzeta',
+    'bebes-oficina': 'dzieci-biuro',
+    'redes-wifi': 'wifi-sieci'
+  },
+  tr: {
+    'moda-ropa': 'giyim-ayakkabi',
+    'smart-home': 'ev-mutfak',
+    'belleza-cuidado': 'guzellik-bakim',
+    'tech-gadgets': 'teknoloji-pc',
+    'accesorios-moviles': 'telefon-ses',
+    'perifericos-gaming': 'oyun-ekipmanlari',
+    'herramientas-autos': 'hirdavat-oto',
+    'juguetes-hobbies': 'oyuncak-drone',
+    'deportes-outdoor': 'spor-outdoor',
+    'mascotas': 'evcil-hayvan',
+    'bebes-oficina': 'bebek-ofis',
+    'redes-wifi': 'wifi-ag'
+  },
+  sv: {
+    'moda-ropa': 'mode-skor',
+    'smart-home': 'hem-kok',
+    'belleza-cuidado': 'skonhet-halsa',
+    'tech-gadgets': 'teknik-datorer',
+    'accesorios-moviles': 'mobiler-ljud',
+    'perifericos-gaming': 'gaming-spel',
+    'herramientas-autos': 'verktyg-bil',
+    'juguetes-hobbies': 'leksaker-dronare',
+    'deportes-outdoor': 'sport-fritid',
+    'mascotas': 'husdjur',
+    'bebes-oficina': 'baby-kontor',
+    'redes-wifi': 'wifi-natverk'
+  },
+  no: {
+    'moda-ropa': 'mote-sko',
+    'smart-home': 'hjem-kjokken',
+    'belleza-cuidado': 'skjonnhet-helse',
+    'tech-gadgets': 'teknologi-pc',
+    'accesorios-moviles': 'mobil-lyd',
+    'perifericos-gaming': 'gaming-spill',
+    'herramientas-autos': 'verktoy-bil',
+    'juguetes-hobbies': 'leker-droner',
+    'deportes-outdoor': 'sport-friluftsliv',
+    'mascotas': 'kjaeledyr',
+    'bebes-oficina': 'baby-kontor',
+    'redes-wifi': 'wifi-nettverk'
+  },
+  da: {
+    'moda-ropa': 'mode-sko',
+    'smart-home': 'hjem-kokken',
+    'belleza-cuidado': 'skonhed-pleje',
+    'tech-gadgets': 'teknologi-pc',
+    'accesorios-moviles': 'mobil-lyd',
+    'perifericos-gaming': 'gaming-spil',
+    'herramientas-autos': 'vaerktoj-bil',
+    'juguetes-hobbies': 'legetoj-droner',
+    'deportes-outdoor': 'sport-fritid',
+    'mascotas': 'kaeledyr',
+    'bebes-oficina': 'baby-kontor',
+    'redes-wifi': 'wifi-netvaerk'
+  },
+  fi: {
+    'moda-ropa': 'muoti-kengat',
+    'smart-home': 'koti-keittio',
+    'belleza-cuidado': 'kauneus-terveys',
+    'tech-gadgets': 'tekniikka-pc',
+    'accesorios-moviles': 'puhelimet-aani',
+    'perifericos-gaming': 'pelaaminen',
+    'herramientas-autos': 'tyokalut-auto',
+    'juguetes-hobbies': 'lelut-droonit',
+    'deportes-outdoor': 'urheilu-ulkoilu',
+    'mascotas': 'lemmikit',
+    'bebes-oficina': 'vauvat-toimisto',
+    'redes-wifi': 'wifi-verkko'
+  },
+  cs: {
+    'moda-ropa': 'moda-obuv',
+    'smart-home': 'dum-kuchyne',
+    'belleza-cuidado': 'krasa-zdravi',
+    'tech-gadgets': 'elektronika-pc',
+    'accesorios-moviles': 'mobily-audio',
+    'perifericos-gaming': 'gaming-hry',
+    'herramientas-autos': 'naradi-auto',
+    'juguetes-hobbies': 'hracky-drony',
+    'deportes-outdoor': 'sport-outdoor',
+    'mascotas': 'mazlicci',
+    'bebes-oficina': 'deti-kancelar',
+    'redes-wifi': 'wifi-site'
+  },
+  ro: {
+    'moda-ropa': 'moda-incaltaminte',
+    'smart-home': 'casa-bucatarie',
+    'belleza-cuidado': 'frumusete-sanatate',
+    'tech-gadgets': 'tehnologie-pc',
+    'accesorios-moviles': 'telefoane-audio',
+    'perifericos-gaming': 'gaming-jocuri',
+    'herramientas-autos': 'scule-auto',
+    'juguetes-hobbies': 'jucarii-drone',
+    'deportes-outdoor': 'sport-outdoor',
+    'mascotas': 'animale',
+    'bebes-oficina': 'bebelusi-birou',
+    'redes-wifi': 'wifi-retea'
+  },
+  hu: {
+    'moda-ropa': 'divat-cipok',
+    'smart-home': 'otthon-konyha',
+    'belleza-cuidado': 'szepseg-egeszseg',
+    'tech-gadgets': ' elektronika-pc'.trim(),
+    'accesorios-moviles': 'telefon-audio',
+    'perifericos-gaming': 'gaming-jatekok',
+    'herramientas-autos': 'szerszam-auto',
+    'juguetes-hobbies': 'jatekok-dronok',
+    'deportes-outdoor': 'sport-szabadido',
+    'mascotas': 'kisallat',
+    'bebes-oficina': 'baba-iroda',
+    'redes-wifi': 'wifi-halozat'
+  },
+  vi: {
+    'moda-ropa': 'thoi-trang-giay-dep',
+    'smart-home': 'nha-cua-nha-bep',
+    'belleza-cuidado': 'lam-dep-suc-khoe',
+    'tech-gadgets': 'cong-nghe-pc',
+    'accesorios-moviles': 'dien-thoai-am-thanh',
+    'perifericos-gaming': 'phu-kien-gaming',
+    'herramientas-autos': 'dung-cu-o-to',
+    'juguetes-hobbies': 'do-choi-flycam',
+    'deportes-outdoor': 'the-thao-da-ngoai',
+    'mascotas': 'thu-cung',
+    'bebes-oficina': 'me-be-van-phong',
+    'redes-wifi': 'wifi-mang'
+  },
+  ms: {
+    'moda-ropa': 'fesyen-kasut',
+    'smart-home': 'rumah-dapur',
+    'belleza-cuidado': 'kecantikan-kesihatan',
+    'tech-gadgets': 'teknologi-pc',
+    'accesorios-moviles': 'telefon-audio',
+    'perifericos-gaming': 'permainan-gaming',
+    'herramientas-autos': 'alatan-kereta',
+    'juguetes-hobbies': 'mainan-dron',
+    'deportes-outdoor': 'sukan-luar',
+    'mascotas': 'haiwan-peliharaan',
+    'bebes-oficina': 'bayi-pejabat',
+    'redes-wifi': 'wifi-rangkaian'
   }
 };
 
 export function getRouteSlugsForLang(lang = 'en') {
   return ROUTE_SLUGS_BY_LANG[lang] || ROUTE_SLUGS_BY_LANG.en;
+}
+
+export function getCategorySlugsForLang(lang = 'en') {
+  return CATEGORY_SLUGS_BY_LANG[lang] || CATEGORY_SLUGS_BY_LANG.en;
 }
 
 export function getLocalizedPath(localeConfig, pageKey) {
@@ -1045,26 +1000,76 @@ export function getLocalizedPath(localeConfig, pageKey) {
   return `/${localeConfig.code}/${slug}`;
 }
 
+export function getLocalizedCategoryPath(localeConfig, storeFilter, canonicalCategorySlug) {
+  const routeSlugs = getRouteSlugsForLang(localeConfig.lang);
+  const catWord = routeSlugs.category || 'category';
+  const catMap = getCategorySlugsForLang(localeConfig.lang);
+  const localizedCatSlug = catMap[canonicalCategorySlug] || canonicalCategorySlug;
+  if (storeFilter === 'temu' || storeFilter === 'aliexpress') {
+    return `/${localeConfig.code}/${storeFilter}/${catWord}/${localizedCatSlug}`;
+  }
+  return `/${localeConfig.code}/${catWord}/${localizedCatSlug}`;
+}
+
 export function resolvePageKeyFromSlug(rawSlug) {
   if (!rawSlug) return null;
   const clean = rawSlug.toLowerCase();
   for (const map of Object.values(ROUTE_SLUGS_BY_LANG)) {
     for (const [pageKey, val] of Object.entries(map)) {
-      if (val === clean) return pageKey;
+      if (pageKey !== 'category' && val === clean) return pageKey;
     }
   }
   return null;
+}
+
+export function isCategoryWordSlug(rawWord) {
+  if (!rawWord) return false;
+  const clean = rawWord.toLowerCase();
+  if (clean === 'categoria' || clean === 'category') return true;
+  for (const map of Object.values(ROUTE_SLUGS_BY_LANG)) {
+    if (map.category === clean) return true;
+  }
+  return false;
+}
+
+export function resolveCanonicalCategory(rawSlug) {
+  if (!rawSlug) return null;
+  const clean = rawSlug.toLowerCase();
+  // Direct canonical check first
+  if (CATEGORY_SLUGS_BY_LANG.es[clean]) return clean;
+  for (const map of Object.values(CATEGORY_SLUGS_BY_LANG)) {
+    for (const [canonicalKey, localizedSlug] of Object.entries(map)) {
+      if (localizedSlug === clean) return canonicalKey;
+    }
+  }
+  return clean;
 }
 
 export function translatePathToLocale(pathname, newLocaleConfig) {
   const parts = pathname.split('/').filter(Boolean);
   if (parts.length === 0) return `/${newLocaleConfig.code}`;
   parts[0] = newLocaleConfig.code;
+
+  // /:locale/:sectionSlug
   if (parts.length === 2) {
     const pageKey = resolvePageKeyFromSlug(parts[1]);
     if (pageKey) {
       parts[1] = getRouteSlugsForLang(newLocaleConfig.lang)[pageKey];
     }
+    return '/' + parts.join('/');
   }
+
+  // /:locale/:catWord/:catSlug
+  if (parts.length === 3 && isCategoryWordSlug(parts[1])) {
+    const canonicalCat = resolveCanonicalCategory(parts[2]);
+    return getLocalizedCategoryPath(newLocaleConfig, 'all', canonicalCat);
+  }
+
+  // /:locale/:store/:catWord/:catSlug
+  if (parts.length === 4 && (parts[1] === 'temu' || parts[1] === 'aliexpress') && isCategoryWordSlug(parts[2])) {
+    const canonicalCat = resolveCanonicalCategory(parts[3]);
+    return getLocalizedCategoryPath(newLocaleConfig, parts[1], canonicalCat);
+  }
+
   return '/' + parts.join('/');
 }

@@ -1,13 +1,17 @@
 import React from 'react';
 import { formatLocalPrice } from '../config/locales.js';
+import { getSectionText, getLocalizedCountryName } from '../data/multilingualSections.js';
 import { BookOpen, Truck, HelpCircle } from 'lucide-react';
 
 export default function NativeSEOGuide({ localeConfig }) {
   const { dict } = localeConfig;
+  const ui = getSectionText(localeConfig.lang);
+  const st = ui.shippingTable;
+  const localizedCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
   const hasTemu = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
   const freeTemu = hasTemu
     ? `${localeConfig.currency}${localeConfig.freeShipTemu.toLocaleString()}`
-    : 'Vía Casillero Miami (ES-US)';
+    : st.temuFreeLockerLabel;
   const freeAli = `${localeConfig.currency}${localeConfig.freeShipAli.toLocaleString()}`;
 
   return (
@@ -53,23 +57,23 @@ export default function NativeSEOGuide({ localeConfig }) {
               </thead>
               <tbody className="divide-y divide-[#E5DAC9] bg-[#FCF9F4]">
                 <tr>
-                  <td className="px-4 py-3 font-bold text-[#7A3B24]">AliExpress Direct / Choice</td>
-                  <td className="px-4 py-3">AliExpress Standard Air / Correo Nacional & Casillero</td>
-                  <td className="px-4 py-3 font-mono">6 - 14 Days</td>
+                  <td className="px-4 py-3 font-bold text-[#7A3B24]">{st.aliStore}</td>
+                  <td className="px-4 py-3">{st.aliMethod}</td>
+                  <td className="px-4 py-3 font-mono">{st.aliDays}</td>
                   <td className="px-4 py-3 font-mono font-bold text-[#3D6352]">{freeAli}</td>
                 </tr>
                 <tr className="bg-[#F6F2EA]/70">
-                  <td className="px-4 py-3 font-bold text-[#B85332]">Temu Oficial</td>
+                  <td className="px-4 py-3 font-bold text-[#B85332]">{st.temuStore}</td>
                   <td className="px-4 py-3">
-                    {hasTemu ? 'Envío Aéreo Directo a Domicilio' : 'Envío Gratis a Casillero en Miami (Florida 33166)'}
+                    {hasTemu ? st.temuMethodDirect : st.temuMethodLocker}
                   </td>
-                  <td className="px-4 py-3 font-mono">5 - 9 Days</td>
+                  <td className="px-4 py-3 font-mono">{st.temuDays}</td>
                   <td className="px-4 py-3 font-mono font-bold text-[#3D6352]">{freeTemu}</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3 font-bold text-[#574B40]">Express DHL / FedEx</td>
-                  <td className="px-4 py-3">Prioritario para Computadoras, Mini PCs y Monitores</td>
-                  <td className="px-4 py-3 font-mono">3 - 6 Days</td>
+                  <td className="px-4 py-3 font-bold text-[#574B40]">{st.expressStore}</td>
+                  <td className="px-4 py-3">{st.expressMethod}</td>
+                  <td className="px-4 py-3 font-mono">{st.expressDays}</td>
                   <td className="px-4 py-3 font-mono text-[#7A6B5E]">
                     {formatLocalPrice(65, localeConfig)}+
                   </td>
@@ -83,7 +87,7 @@ export default function NativeSEOGuide({ localeConfig }) {
         <div>
           <h3 className="mb-4 flex items-center gap-2 text-base font-extrabold text-[#B85332]">
             <HelpCircle className="h-4 w-4" />
-            <span>FAQ — {localeConfig.countryName} ({localeConfig.currencyCode})</span>
+            <span>FAQ — {localizedCountry} ({localeConfig.currencyCode})</span>
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
             {dict.faqs.map((faq, index) => (
