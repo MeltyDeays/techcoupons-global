@@ -20,17 +20,19 @@ function escapeHtml(str) {
 
 function getAllRouteDescriptors() {
   const routes = [
-    { suffix: '', type: 'home' },
-    { suffix: '/temu', type: 'temu' },
-    { suffix: '/aliexpress', type: 'aliexpress' },
-    { suffix: '/privacy', type: 'privacy' },
-    { suffix: '/terms', type: 'terms' },
-    { suffix: '/about', type: 'about' },
-    { suffix: '/contact', type: 'contact' }
+    { suffix: '', type: 'home', storeFilter: null },
+    { suffix: '/temu', type: 'temu', storeFilter: 'temu' },
+    { suffix: '/aliexpress', type: 'aliexpress', storeFilter: 'aliexpress' },
+    { suffix: '/privacy', type: 'privacy', storeFilter: null },
+    { suffix: '/terms', type: 'terms', storeFilter: null },
+    { suffix: '/about', type: 'about', storeFilter: null },
+    { suffix: '/contact', type: 'contact', storeFilter: null }
   ];
 
   CATEGORY_SLUGS.forEach((slug) => {
-    routes.push({ suffix: `/category/${slug}`, type: 'category', slug });
+    routes.push({ suffix: `/category/${slug}`, type: 'category', storeFilter: null, slug });
+    routes.push({ suffix: `/temu/category/${slug}`, type: 'category', storeFilter: 'temu', slug });
+    routes.push({ suffix: `/aliexpress/category/${slug}`, type: 'category', storeFilter: 'aliexpress', slug });
   });
 
   return routes;
@@ -127,7 +129,7 @@ function runPrerenderAndSitemap() {
 
   for (const localeConfig of LOCALES) {
     for (const route of routes) {
-      const storeFilter = route.type === 'temu' ? 'temu' : route.type === 'aliexpress' ? 'aliexpress' : null;
+      const storeFilter = route.storeFilter || null;
       const categoryFilter = route.type === 'category' ? route.slug : null;
       const coupons = getCouponsForLocale(localeConfig.code, { storeFilter, categoryFilter });
 

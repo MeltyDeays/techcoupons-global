@@ -12,10 +12,12 @@ export function AppRoutes() {
       <Route path="/" element={<RootRedirect />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/:locale/admin" element={<AdminDashboard />} />
-      <Route path="/:locale" element={<MarketCatalogPage mode="all" />} />
-      <Route path="/:locale/temu" element={<MarketCatalogPage mode="temu" />} />
-      <Route path="/:locale/aliexpress" element={<MarketCatalogPage mode="aliexpress" />} />
-      <Route path="/:locale/category/:slug" element={<MarketCatalogPage mode="category" />} />
+      <Route path="/:locale" element={<MarketCatalogPage storeFilter={null} />} />
+      <Route path="/:locale/temu" element={<MarketCatalogPage storeFilter="temu" />} />
+      <Route path="/:locale/temu/category/:slug" element={<MarketCatalogPage storeFilter="temu" />} />
+      <Route path="/:locale/aliexpress" element={<MarketCatalogPage storeFilter="aliexpress" />} />
+      <Route path="/:locale/aliexpress/category/:slug" element={<MarketCatalogPage storeFilter="aliexpress" />} />
+      <Route path="/:locale/category/:slug" element={<MarketCatalogPage storeFilter={null} />} />
       <Route path="/:locale/privacy" element={<LegalPage type="privacy" />} />
       <Route path="/:locale/terms" element={<LegalPage type="terms" />} />
       <Route path="/:locale/about" element={<LegalPage type="about" />} />
