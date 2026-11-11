@@ -76,30 +76,30 @@ export function MarketCatalogPage({ storeFilter = null }) {
       />
 
       {/* Hero Section */}
-      <section className="mb-8 rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 md:p-8 shadow-sm">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-lg border border-[#D8C8B4] bg-[#F0E9DF] px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[#8C3D22]">
+      <section className="mb-6 sm:mb-8 rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
+        <div className="mb-2.5 sm:mb-3 inline-flex flex-wrap items-center gap-1.5 sm:gap-2 rounded-lg border border-[#D8C8B4] bg-[#F0E9DF] px-2.5 sm:px-3 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-[#8C3D22]">
           <FlagImg iso={localeConfig.iso} className="h-3.5 w-5" />
-          <span>{localeConfig.countryName} • {localeConfig.currencyCode} • {dict.heroBadge}</span>
+          <span className="truncate">{localeConfig.countryName} • {localeConfig.currencyCode}</span>
         </div>
 
-        <h1 className="mb-2.5 text-2xl md:text-3xl font-extrabold tracking-tight text-[#1F1B18]">
+        <h1 className="mb-2 text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-[#1F1B18] leading-tight">
           {customHeading}
         </h1>
-        <p className="max-w-3xl text-sm md:text-base text-[#574B40] leading-relaxed">
+        <p className="max-w-3xl text-xs sm:text-sm md:text-base text-[#574B40] leading-relaxed">
           {dict.heroSubtitle}
         </p>
 
         {!hasTemuInCountry && (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#D4A359]/60 bg-[#F6F2EA] p-3.5 text-xs text-[#574B40]">
-            <div className="flex items-center gap-2.5">
-              <Info className="h-4 w-4 text-[#B85332] shrink-0" />
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-[#D4A359]/60 bg-[#F6F2EA] p-3.5 text-xs text-[#574B40]">
+            <div className="flex items-start sm:items-center gap-2.5">
+              <Info className="h-4 w-4 text-[#B85332] shrink-0 mt-0.5 sm:mt-0" />
               <span>
                 En <strong>{localeConfig.countryName}</strong>, <strong>AliExpress</strong> realiza envíos directos en {localeConfig.currencyCode}. Para comprar en <strong>Temu</strong> mediante casillero en Miami, selecciona <strong>Estados Unidos (Casilleros Miami)</strong>.
               </span>
             </div>
             <Link
               to="/es-us/temu"
-              className="shrink-0 rounded-lg bg-[#B85332] px-3 py-1.5 font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition"
+              className="w-full sm:w-auto text-center shrink-0 rounded-lg bg-[#B85332] px-3 py-2 sm:py-1.5 font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition"
             >
               Ver Cupones Temu (Casillero Miami)
             </Link>
@@ -107,7 +107,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
         )}
 
         {/* Filter & Search Bar */}
-        <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-5 border-t border-[#E5DAC9]">
+        <div className="mt-5 sm:mt-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-4 sm:pt-5 border-t border-[#E5DAC9]">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A6B5E]" />
             <input
@@ -116,18 +116,18 @@ export function MarketCatalogPage({ storeFilter = null }) {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={
                 isEs
-                  ? `Filtrar cupones de pago: Computadoras, Controles, Hogar, Wi-Fi... (${localeConfig.currencyCode})`
-                  : `Filter checkout coupons: Computers, Controllers, Smart Home, Wi-Fi... (${localeConfig.currencyCode})`
+                  ? `Filtrar cupones: Computadoras, Controles, Hogar, Wi-Fi... (${localeConfig.currencyCode})`
+                  : `Filter coupons: Computers, Controllers, Smart Home, Wi-Fi... (${localeConfig.currencyCode})`
               }
-              className="w-full rounded-xl border border-[#C7B6A2] bg-[#F6F2EA] pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#1F1B18] placeholder-[#8C7D70] focus:border-[#B85332] focus:outline-none"
+              className="w-full rounded-xl border border-[#C7B6A2] bg-[#F6F2EA] pl-10 pr-4 py-2.5 text-xs sm:text-sm text-[#1F1B18] placeholder-[#8C7D70] focus:border-[#B85332] focus:outline-none"
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
-            <Filter className="h-4 w-4 text-[#7A6B5E] hidden sm:block" />
+          <div className="grid grid-cols-3 sm:flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold">
+            <Filter className="h-4 w-4 text-[#7A6B5E] hidden md:block" />
             <Link
               to={categoryFilter ? `/${localeConfig.code}/category/${categoryFilter}` : `/${localeConfig.code}`}
-              className={`rounded-xl px-3.5 py-2 border transition ${
+              className={`text-center rounded-xl px-2.5 sm:px-3.5 py-2 border transition whitespace-nowrap ${
                 !storeFilter
                   ? 'border-[#1F1B18] bg-[#1F1B18] text-[#FCF9F4]'
                   : 'border-[#C7B6A2] bg-[#F6F2EA] text-[#574B40] hover:text-[#1F1B18]'
@@ -139,25 +139,25 @@ export function MarketCatalogPage({ storeFilter = null }) {
             {hasTemuInCountry && (
               <Link
                 to={categoryFilter ? `/${localeConfig.code}/temu/category/${categoryFilter}` : `/${localeConfig.code}/temu`}
-                className={`rounded-xl px-3.5 py-2 border transition ${
+                className={`text-center rounded-xl px-2.5 sm:px-3.5 py-2 border transition whitespace-nowrap ${
                   storeFilter === 'temu'
                     ? 'border-[#B85332] bg-[#B85332] text-[#FCF9F4]'
                     : 'border-[#C7B6A2] bg-[#F6F2EA] text-[#8C3D22] hover:bg-[#ECE5D8]'
                 }`}
               >
-                Solo Temu ({totalTemuCount})
+                Temu ({totalTemuCount})
               </Link>
             )}
 
             <Link
               to={categoryFilter ? `/${localeConfig.code}/aliexpress/category/${categoryFilter}` : `/${localeConfig.code}/aliexpress`}
-              className={`rounded-xl px-3.5 py-2 border transition ${
+              className={`text-center rounded-xl px-2.5 sm:px-3.5 py-2 border transition whitespace-nowrap ${
                 storeFilter === 'aliexpress'
                   ? 'border-[#7A3B24] bg-[#7A3B24] text-[#FCF9F4]'
                   : 'border-[#C7B6A2] bg-[#F6F2EA] text-[#7A3B24] hover:bg-[#ECE5D8]'
               }`}
             >
-              Solo AliExpress ({totalAliCount})
+              AliExpress ({totalAliCount})
             </Link>
           </div>
         </div>
