@@ -13,15 +13,29 @@ import {
   Wifi,
   Smartphone,
   ShoppingCart,
-  Eye
+  Eye,
+  Shirt,
+  Sparkles,
+  Wrench,
+  Puzzle,
+  Bike,
+  PawPrint,
+  Baby
 } from 'lucide-react';
 
 const CATEGORY_ICONS = {
-  'tech-gadgets': Monitor,
-  'perifericos-gaming': Gamepad2,
+  'moda-ropa': Shirt,
   'smart-home': Home,
-  'redes-wifi': Wifi,
-  'accesorios-moviles': Smartphone
+  'belleza-cuidado': Sparkles,
+  'tech-gadgets': Monitor,
+  'accesorios-moviles': Smartphone,
+  'perifericos-gaming': Gamepad2,
+  'herramientas-autos': Wrench,
+  'juguetes-hobbies': Puzzle,
+  'deportes-outdoor': Bike,
+  'mascotas': PawPrint,
+  'bebes-oficina': Baby,
+  'redes-wifi': Wifi
 };
 
 export default function CouponCard({ coupon, localeConfig }) {

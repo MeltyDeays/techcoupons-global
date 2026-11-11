@@ -3,11 +3,17 @@ import { AFFILIATE_CONFIG } from '../config/affiliateConfig.js';
 export const BASE_DOMAIN = AFFILIATE_CONFIG.siteDomain;
 
 export const CATEGORY_SLUGS = [
-  'tech-gadgets',
-  'perifericos-gaming',
+  'moda-ropa',
   'smart-home',
-  'redes-wifi',
-  'accesorios-moviles'
+  'belleza-cuidado',
+  'tech-gadgets',
+  'accesorios-moviles',
+  'perifericos-gaming',
+  'herramientas-autos',
+  'juguetes-hobbies',
+  'deportes-outdoor',
+  'mascotas',
+  'bebes-oficina'
 ];
 
 export const LANGUAGE_PACKS = {
@@ -17,9 +23,9 @@ export const LANGUAGE_PACKS = {
     navAli: 'AliExpress Deals',
     navCategories: 'Categories',
     disclosure: 'Affiliate Disclosure: We earn a commission on qualifying purchases via verified partner links (Admitad / AliExpress Portals) at no extra cost to you.',
-    heroBadge: 'VERIFIED HARDWARE & TECH COUPONS',
-    heroTitle: 'Official Promo Codes & Hidden Bundles for {country}',
-    heroSubtitle: 'Tested daily for GameSir controllers, Wi-Fi 6 routers, mechanical keyboards, and smart gadgets in {currency}.',
+    heroBadge: 'VERIFIED PROMO CODES FOR ALL CATEGORIES',
+    heroTitle: 'Official Promo Codes & Store Discounts for {country}',
+    heroSubtitle: 'Verified checkout coupons for clothing, shoes, home & kitchen, beauty, tools, toys, pets, and electronics in {currency}.',
     btnGetCode: 'Reveal & Copy Code',
     btnCopied: 'Code Copied!',
     btnGoStore: 'Go to Official Store',
@@ -31,17 +37,24 @@ export const LANGUAGE_PACKS = {
     modalTitle: 'Code Copied to Clipboard!',
     modalSteps: [
       'Your promo code has been copied automatically.',
-      'Paste it at checkout or directly in the Temu/AliExpress search bar if marked as a Secret Key.',
+      'Paste it in the Promo Code box at checkout before completing payment.',
       'Minimum order value applies in local currency ({currency}).'
     ],
-    sidebarTitle: 'Partner Hardware Picks',
+    sidebarTitle: 'Partner Picks',
     sidebarSponsor: 'Sponsored Direct Offer',
     categories: {
-      'tech-gadgets': 'Tech Gadgets & Mini PCs',
-      'perifericos-gaming': 'Gaming Peripherals & Controllers',
-      'smart-home': 'Smart Home & Automation',
-      'redes-wifi': 'Wi-Fi 6 & Mesh Networking',
-      'accesorios-moviles': 'GaN Chargers & Mobile Gear'
+      'moda-ropa': 'Clothing, Shoes & Fashion',
+      'smart-home': 'Home, Kitchen & Decor',
+      'belleza-cuidado': 'Beauty, Makeup & Care',
+      'tech-gadgets': 'Tech, Computers & Electronics',
+      'accesorios-moviles': 'Phones, Earbuds & Chargers',
+      'perifericos-gaming': 'Gaming & Consoles',
+      'herramientas-autos': 'Tools, Car & Moto',
+      'juguetes-hobbies': 'Toys, Drones & Hobbies',
+      'deportes-outdoor': 'Sports, Gym & Outdoors',
+      'mascotas': 'Pets (Dogs & Cats)',
+      'bebes-oficina': 'Baby, Kids & Stationery',
+      'redes-wifi': 'Wi-Fi & Networking'
     },
     seoGuideTitle: 'Complete Guide: How to Stack Temu & AliExpress Coupons in {country} (2026)',
     seoSection1Title: '1. How to Apply Hidden Search Codes & Stack Cart Discounts',
@@ -84,9 +97,9 @@ export const LANGUAGE_PACKS = {
     navAli: 'Ofertas AliExpress',
     navCategories: 'Categorías',
     disclosure: 'Aviso de Afiliados: Obtenemos una comisión por compras elegibles mediante enlaces verificados (Admitad / AliExpress Portals) sin costo adicional para ti.',
-    heroBadge: 'CUPONES DE HARDWARE Y TECNOLOGÍA VERIFICADOS',
-    heroTitle: 'Códigos Promocionales y Bundles Ocultos para {country}',
-    heroSubtitle: 'Probados a diario en controles GameSir, routers Wi-Fi 6, teclados mecánicos y gadgets en {currency}.',
+    heroBadge: 'CUPONES VERIFICADOS PARA TODAS LAS CATEGORÍAS',
+    heroTitle: 'Códigos Promocionales y Descuentos Oficiales para {country}',
+    heroSubtitle: 'Cupones verificados para ropa, calzado, hogar, belleza, herramientas, juguetes, mascotas y tecnología en {currency}.',
     btnGetCode: 'Ver y Copiar Código',
     btnCopied: '¡Código Copiado!',
     btnGoStore: 'Ir a la Tienda Oficial',
@@ -98,17 +111,24 @@ export const LANGUAGE_PACKS = {
     modalTitle: '¡Código Copiado al Portapapeles!',
     modalSteps: [
       'El código promocional se copió automáticamente.',
-      'Pégalo al finalizar la compra o directamente en la barra de búsqueda de Temu/AliExpress si es una Clave Secreta.',
-      'Aplica monto mínimo de compra en moneda local ({currency}).'
+      'Pégalo en la casilla de Código Promocional antes de pagar tu pedido.',
+      'Aplica el monto mínimo indicado en tu moneda local ({currency}).'
     ],
-    sidebarTitle: 'Hardware Recomendado',
+    sidebarTitle: 'Ofertas Destacadas',
     sidebarSponsor: 'Oferta Patrocinada Directa',
     categories: {
-      'tech-gadgets': 'Gadgets Tech y Mini PCs',
-      'perifericos-gaming': 'Periféricos Gaming y Controles',
-      'smart-home': 'Hogar Inteligente y Domótica',
-      'redes-wifi': 'Redes Wi-Fi 6 y Mesh',
-      'accesorios-moviles': 'Cargadores GaN y Accesorios Móviles'
+      'moda-ropa': 'Ropa, Calzado y Moda',
+      'smart-home': 'Hogar, Cocina y Muebles',
+      'belleza-cuidado': 'Belleza, Maquillaje y Salud',
+      'tech-gadgets': 'Tecnología y Computadoras',
+      'accesorios-moviles': 'Celulares, Audífonos y Carga',
+      'perifericos-gaming': 'Videojuegos y Consolas',
+      'herramientas-autos': 'Herramientas, Autos y Motos',
+      'juguetes-hobbies': 'Juguetes, Drones y Hobbies',
+      'deportes-outdoor': 'Deportes, Gym y Aire Libre',
+      'mascotas': 'Mascotas (Perros y Gatos)',
+      'bebes-oficina': 'Bebés, Niños y Papelería',
+      'redes-wifi': 'Wi-Fi y Redes'
     },
     seoGuideTitle: 'Guía Completa: Cómo Apilar Cupones de Temu y AliExpress en {country} (2026)',
     seoSection1Title: '1. Cómo Aplicar Códigos Ocultos de Búsqueda y Acumular Descuentos',
