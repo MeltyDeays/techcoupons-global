@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
-import { Copy, Check, ExternalLink, ShieldCheck, Tag, X, Monitor, Gamepad2, Home, Wifi, Smartphone, ShoppingCart } from 'lucide-react';
+import { getSectionText } from '../data/multilingualSections.js';
+import {
+  Copy,
+  Check,
+  ExternalLink,
+  ShieldCheck,
+  Tag,
+  X,
+  Monitor,
+  Gamepad2,
+  Home,
+  Wifi,
+  Smartphone,
+  ShoppingCart
+} from 'lucide-react';
 
 const CATEGORY_ICONS = {
   'tech-gadgets': Monitor,
@@ -14,7 +28,7 @@ export default function CouponCard({ coupon, localeConfig }) {
   const [copiedBackup, setCopiedBackup] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const { dict } = localeConfig;
-  const isEs = localeConfig.lang === 'es';
+  const ui = getSectionText(localeConfig.lang);
 
   const handleAction = async () => {
     try {
@@ -46,36 +60,35 @@ export default function CouponCard({ coupon, localeConfig }) {
 
   const isTemu = coupon.store === 'temu';
   const CategoryIcon = CATEGORY_ICONS[coupon.category] || Tag;
+  const shortCatLabel = ui.catShort?.[coupon.category] || coupon.categoryLabel;
 
   return (
     <>
-      <article className="group relative flex flex-col justify-between rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 shadow-[0_4px_20px_-6px_rgba(31,27,24,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#B85332]/60 hover:shadow-[0_12px_26px_-8px_rgba(184,83,50,0.14)] font-sans">
+      <article className="group relative flex flex-col justify-between rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-5 shadow-[0_4px_20px_-6px_rgba(31,27,24,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#B85332]/60 hover:shadow-[0_12px_26px_-8px_rgba(184,83,50,0.14)] font-sans">
         <div>
-          {/* Top bar: Store badge + Clear Category Pill */}
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
+          {/* Top bar: Localized Store Badge + Clean Category Pill */}
+          <div className="mb-2.5 flex items-center justify-between gap-2">
             <span
-              className={`inline-flex items-center gap-1 rounded-lg px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider border ${
+              className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider border ${
                 isTemu
                   ? 'bg-[#B85332]/12 text-[#9E4224] border-[#B85332]/30'
                   : 'bg-[#7A3B24]/12 text-[#6E331D] border-[#7A3B24]/30'
               }`}
             >
-              {isTemu ? 'TEMU CARRITO' : 'ALIEXPRESS CARRITO'}
+              {isTemu ? ui.storeBadgeTemu : ui.storeBadgeAli}
             </span>
 
-            <span className="inline-flex items-center gap-1 rounded-lg bg-[#F0E9DF] border border-[#D8C8B4] px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-bold text-[#574B40] max-w-full truncate">
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#F0E9DF] border border-[#D8C8B4] px-2.5 py-1 text-[10px] sm:text-[11px] font-bold text-[#574B40] max-w-[60%] truncate">
               <CategoryIcon className="h-3.5 w-3.5 text-[#B85332] shrink-0" />
-              <span className="truncate">{coupon.categoryLabel}</span>
+              <span className="truncate">{shortCatLabel}</span>
             </span>
           </div>
 
           {/* Direct Checkout Usage Tag + Eligibility Badge */}
           <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-[#3D6352]/12 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-[#3D6352] border border-[#3D6352]/25">
+            <span className="inline-flex items-center gap-1 rounded-md bg-[#3D6352]/12 px-2 py-0.5 text-[10px] font-bold text-[#3D6352] border border-[#3D6352]/25">
               <ShoppingCart className="h-3 w-3 shrink-0" />
-              <span className="truncate">
-                {isEs ? 'Cupón real de carrito' : 'Real Checkout Coupon'}
-              </span>
+              <span>{ui.checkoutBadge}</span>
             </span>
             {coupon.eligibilityText && (
               <span className="inline-flex items-center rounded-md bg-[#B85332]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#9E4224] border border-[#B85332]/25">
@@ -84,18 +97,16 @@ export default function CouponCard({ coupon, localeConfig }) {
             )}
           </div>
 
-          {/* Clean Sans-Serif High-Readability Title */}
-          <h3 className="mb-2.5 text-base sm:text-lg font-extrabold leading-snug text-[#1F1B18] group-hover:text-[#B85332] transition-colors">
+          {/* High-Readability Title */}
+          <h3 className="mb-2 text-base sm:text-lg font-extrabold leading-snug text-[#1F1B18] group-hover:text-[#B85332] transition-colors">
             {coupon.title}
           </h3>
 
-          {/* Explicit "What does this coupon cover?" + Regional Rule */}
+          {/* Explicit Coverage + Regional Note */}
           {(coupon.appliesToText || coupon.regionalNote) && (
-            <div className="mb-4 space-y-1.5 rounded-xl bg-[#F3ECE2] px-3 sm:px-3.5 py-2 sm:py-2.5 border border-[#E5DAC9]">
+            <div className="mb-3.5 space-y-1.5 rounded-xl bg-[#F3ECE2] px-3 py-2 border border-[#E5DAC9]">
               {coupon.appliesToText && (
-                <p className="text-xs leading-relaxed text-[#574B40]">
-                  {coupon.appliesToText}
-                </p>
+                <p className="text-xs leading-relaxed text-[#574B40]">{coupon.appliesToText}</p>
               )}
               {coupon.regionalNote && (
                 <p className="text-[11px] font-semibold leading-snug text-[#3D6352]">
@@ -105,26 +116,26 @@ export default function CouponCard({ coupon, localeConfig }) {
             </div>
           )}
 
-          {/* Two-Column Benefit Summary (Responsive wrap for narrow screens) */}
-          <div className="mb-4 sm:mb-5 rounded-xl bg-[#F0E9DF] p-3 sm:p-3.5 border border-[#DED4C6]">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#DED4C6] pb-2.5 mb-2.5">
+          {/* Benefit Summary Box */}
+          <div className="mb-4 rounded-xl bg-[#F0E9DF] p-3 border border-[#DED4C6]">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#DED4C6] pb-2 mb-2">
               <div>
-                <span className="text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-[#6E6055] block">
-                  {isEs ? 'Descuento Directo:' : 'Direct Discount:'}
+                <span className="text-[10px] uppercase tracking-wider font-bold text-[#6E6055] block">
+                  {ui.directDiscount}
                 </span>
-                <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2 mt-0.5">
+                <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
                   <span className="font-display text-xl sm:text-2xl font-bold text-[#B85332]">
                     -{coupon.discountPct}%
                   </span>
-                  <span className="font-mono text-[11px] sm:text-xs font-bold text-[#3D6352] bg-[#3D6352]/12 px-2 py-0.5 rounded border border-[#3D6352]/25">
-                    {isEs ? `Ahorras hasta ${coupon.localDiscountAmount}` : `Save up to ${coupon.localDiscountAmount}`}
+                  <span className="font-mono text-[11px] font-bold text-[#3D6352] bg-[#3D6352]/12 px-2 py-0.5 rounded border border-[#3D6352]/25">
+                    {ui.saveUpTo(coupon.localDiscountAmount)}
                   </span>
                 </div>
               </div>
 
-              <div className="text-left sm:text-right">
-                <span className="text-[10px] sm:text-[11px] font-bold text-[#6E6055] block">
-                  {isEs ? 'Compra mínima:' : `${dict.minSpend}:`}
+              <div className="text-right">
+                <span className="text-[10px] font-bold text-[#6E6055] block">
+                  {ui.minSpendLabel}:
                 </span>
                 <span className="font-mono text-xs sm:text-sm font-extrabold text-[#1F1B18]">
                   {coupon.localMinSpend}
@@ -132,7 +143,7 @@ export default function CouponCard({ coupon, localeConfig }) {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] sm:text-[11px] font-medium text-[#6E6055]">
+            <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] font-medium text-[#6E6055]">
               <span className="inline-flex items-center gap-1 font-bold text-[#3D6352]">
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
                 {dict.verifiedBadge}
@@ -143,10 +154,10 @@ export default function CouponCard({ coupon, localeConfig }) {
         </div>
 
         {/* Code Box & Action Button */}
-        <div className="mt-1 flex flex-col gap-2 sm:gap-2.5">
-          <div className="flex items-center justify-between gap-2 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] px-3 sm:px-3.5 py-2">
-            <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-[#6E6055] shrink-0">
-              {isEs ? 'CUPÓN DE PAGO:' : 'PROMO CODE:'}
+        <div className="mt-1 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] px-3 py-2">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6E6055] shrink-0">
+              {ui.promoCodeLabel}
             </span>
             <code className="font-mono text-sm sm:text-base font-extrabold tracking-wider text-[#B85332] select-all truncate">
               {coupon.code}
@@ -156,7 +167,7 @@ export default function CouponCard({ coupon, localeConfig }) {
           {coupon.backupCode && (
             <div className="flex items-center justify-between gap-2 rounded-lg border border-[#E5DAC9] bg-[#F3ECE2] px-2.5 py-1.5 text-[11px]">
               <span className="text-[#6E6055] font-semibold truncate">
-                {isEs ? 'Respaldo (si se agota):' : 'Backup code:'}{' '}
+                {ui.backupCodeLabel}{' '}
                 <code className="font-mono font-bold text-[#1F1B18] select-all">{coupon.backupCode}</code>
               </span>
               <button
@@ -167,12 +178,12 @@ export default function CouponCard({ coupon, localeConfig }) {
                 {copiedBackup ? (
                   <>
                     <Check className="h-3 w-3 text-[#3D6352]" />
-                    <span>{isEs ? 'Copiado' : 'Copied'}</span>
+                    <span>{ui.copiedShort}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="h-3 w-3" />
-                    <span>{isEs ? 'Copiar' : 'Copy'}</span>
+                    <span>{ui.copyShort}</span>
                   </>
                 )}
               </button>
@@ -182,7 +193,7 @@ export default function CouponCard({ coupon, localeConfig }) {
           <button
             type="button"
             onClick={handleAction}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#B85332] px-4 py-3 text-xs sm:text-sm font-bold text-[#FCF9F4] shadow-sm transition active:scale-[0.99] hover:bg-[#9E4224] focus:outline-none focus:ring-2 focus:ring-[#B85332] focus:ring-offset-2 focus:ring-offset-[#FCF9F4]"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#B85332] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#FCF9F4] shadow-sm transition active:scale-[0.99] hover:bg-[#9E4224]"
           >
             {copied ? (
               <>
@@ -201,7 +212,7 @@ export default function CouponCard({ coupon, localeConfig }) {
             href={coupon.affiliateLink}
             target="_blank"
             rel="noopener noreferrer sponsored"
-            className="inline-flex items-center justify-center gap-1 text-center text-xs font-bold text-[#6E6055] hover:text-[#1F1B18] py-1 transition"
+            className="inline-flex items-center justify-center gap-1 text-center text-xs font-bold text-[#6E6055] hover:text-[#1F1B18] py-0.5 transition"
           >
             <span>{dict.btnGoStore}</span>
             <ExternalLink className="h-3 w-3" />
