@@ -28,7 +28,10 @@ import {
   Monitor,
   Home,
   Wifi,
-  Smartphone
+  Smartphone,
+  ExternalLink,
+  ShieldCheck,
+  X
 } from 'lucide-react';
 
 const CATEGORY_ICONS = {
@@ -228,18 +231,21 @@ export function MarketCatalogPage({ storeFilter = null }) {
 export function DynamicsPage() {
   const { locale } = useParams();
   const [copiedId, setCopiedId] = useState(null);
+  const [selectedDynamic, setSelectedDynamic] = useState(null);
 
   if (!LOCALE_MAP[(locale || '').toLowerCase()]) {
     return <Navigate to={`/${DEFAULT_LOCALE}`} replace />;
   }
 
   const localeConfig = getLocaleConfig(locale);
+  const { dict } = localeConfig;
   const ui = getSectionText(localeConfig.lang);
   const dyn = ui.dynamics;
 
   const temuUrl = AFFILIATE_CONFIG.temuBaseTrackingUrl || 'https://www.temu.com';
   const aliUrl = AFFILIATE_CONFIG.aliexpressBaseTrackingUrl || 'https://www.aliexpress.com';
 
+  // Step 1: Copy command & open instruction modal FIRST (no immediate redirect)
   const handleCopyDynamic = async (item) => {
     try {
       if (navigator.clipboard) await navigator.clipboard.writeText(item.code);
@@ -247,9 +253,8 @@ export function DynamicsPage() {
       // ignore
     }
     setCopiedId(item.id);
-    const targetUrl = item.storeKey === 'aliexpress' ? aliUrl : temuUrl;
-    window.open(targetUrl, '_blank', 'noopener,noreferrer');
-    setTimeout(() => setCopiedId(null), 3500);
+    setSelectedDynamic(item);
+    setTimeout(() => setCopiedId(null), 4000);
   };
 
   return (
@@ -345,6 +350,66 @@ export function DynamicsPage() {
           );
         })}
       </div>
+
+      {selectedDynamic && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#1F1B18]/60 p-4 backdrop-blur-sm font-sans"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setSelectedDynamic(null)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-2xl border border-[#D8C8B4] bg-[#FCF9F4] p-5 sm:p-6 shadow-2xl text-[#1F1B18]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setSelectedDynamic(null)}
+              className="absolute right-4 top-4 rounded-lg p-1.5 text-[#7A6B5E] hover:bg-[#ECE5D8] hover:text-[#1F1B18]"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="mb-3 flex items-center gap-2 text-[#3D6352]">
+              <ShieldCheck className="h-6 w-6 shrink-0" />
+              <h4 className="text-base sm:text-lg font-extrabold text-[#1F1B18] pr-6">
+                {dyn.copiedBtn}
+              </h4>
+            </div>
+
+            <p className="mb-1.5 text-sm font-bold text-[#1F1B18]">{selectedDynamic.title}</p>
+            <p className="mb-4 text-xs leading-relaxed text-[#574B40]">
+              {selectedDynamic.howItWorks}
+            </p>
+
+            <div className="mb-5 flex items-center justify-between gap-2 rounded-xl border-2 border-dashed border-[#8F5B1D]/60 bg-[#F0E9DF] p-3.5">
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-[#6E6055]">
+                  {dyn.typeInSearch}
+                </span>
+                <code className="font-mono text-lg sm:text-xl font-extrabold tracking-wider text-[#8F5B1D] select-all">
+                  {selectedDynamic.code}
+                </code>
+              </div>
+              <span className="rounded-lg bg-[#3D6352]/15 px-2.5 py-1 text-xs font-bold text-[#3D6352]">
+                {ui.copiedShort} ✓
+              </span>
+            </div>
+
+            <a
+              href={selectedDynamic.storeKey === 'aliexpress' ? aliUrl : temuUrl}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              onClick={() => setSelectedDynamic(null)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3D6352] px-5 py-3.5 text-sm font-extrabold text-[#FCF9F4] shadow-md hover:bg-[#2E4D3F] transition"
+            >
+              <span>{dict.btnGoStore}</span>
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      )}
 
       <NativeSEOGuide localeConfig={localeConfig} />
     </Layout>

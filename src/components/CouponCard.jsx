@@ -12,7 +12,8 @@ import {
   Home,
   Wifi,
   Smartphone,
-  ShoppingCart
+  ShoppingCart,
+  Eye
 } from 'lucide-react';
 
 const CATEGORY_ICONS = {
@@ -25,12 +26,28 @@ const CATEGORY_ICONS = {
 
 export default function CouponCard({ coupon, localeConfig }) {
   const [copied, setCopied] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const [copiedBackup, setCopiedBackup] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const { dict } = localeConfig;
   const ui = getSectionText(localeConfig.lang);
 
-  const handleAction = async () => {
+  // Step 1: Copy code, reveal it on card, and open the instruction modal FIRST (no immediate redirect!)
+  const handleRevealAndCopy = async () => {
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(coupon.code);
+      }
+    } catch {
+      // Fallback silent
+    }
+    setRevealed(true);
+    setCopied(true);
+    setModalOpen(true);
+    setTimeout(() => setCopied(false), 4000);
+  };
+
+  const handleCopyPrimaryAgain = async () => {
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(coupon.code);
@@ -39,9 +56,7 @@ export default function CouponCard({ coupon, localeConfig }) {
       // Fallback silent
     }
     setCopied(true);
-    setModalOpen(true);
-    window.open(coupon.affiliateLink, '_blank', 'noopener,noreferrer');
-    setTimeout(() => setCopied(false), 3500);
+    setTimeout(() => setCopied(false), 3000);
   };
 
   const handleCopyBackup = async (e) => {
@@ -61,6 +76,8 @@ export default function CouponCard({ coupon, localeConfig }) {
   const isTemu = coupon.store === 'temu';
   const CategoryIcon = CATEGORY_ICONS[coupon.category] || Tag;
   const shortCatLabel = ui.catShort?.[coupon.category] || coupon.categoryLabel;
+  const maskedCode =
+    coupon.code.length > 4 ? `${coupon.code.slice(0, 4)}••••` : `${coupon.code.slice(0, 2)}•••`;
 
   return (
     <>
@@ -155,16 +172,22 @@ export default function CouponCard({ coupon, localeConfig }) {
 
         {/* Code Box & Action Button */}
         <div className="mt-1 flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] px-3 py-2">
+          <div
+            onClick={handleRevealAndCopy}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && handleRevealAndCopy()}
+            className="flex cursor-pointer items-center justify-between gap-2 rounded-xl border-2 border-dashed border-[#C7B6A2] bg-[#F6F2EA] hover:border-[#B85332] px-3 py-2 transition"
+          >
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6E6055] shrink-0">
               {ui.promoCodeLabel}
             </span>
             <code className="font-mono text-sm sm:text-base font-extrabold tracking-wider text-[#B85332] select-all truncate">
-              {coupon.code}
+              {revealed ? coupon.code : maskedCode}
             </code>
           </div>
 
-          {coupon.backupCode && (
+          {revealed && coupon.backupCode && (
             <div className="flex items-center justify-between gap-2 rounded-lg border border-[#E5DAC9] bg-[#F3ECE2] px-2.5 py-1.5 text-[11px]">
               <span className="text-[#6E6055] font-semibold truncate">
                 {ui.backupCodeLabel}{' '}
@@ -192,7 +215,7 @@ export default function CouponCard({ coupon, localeConfig }) {
 
           <button
             type="button"
-            onClick={handleAction}
+            onClick={handleRevealAndCopy}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#B85332] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#FCF9F4] shadow-sm transition active:scale-[0.99] hover:bg-[#9E4224]"
           >
             {copied ? (
@@ -202,7 +225,7 @@ export default function CouponCard({ coupon, localeConfig }) {
               </>
             ) : (
               <>
-                <Copy className="h-4 w-4 shrink-0" />
+                <Eye className="h-4 w-4 shrink-0" />
                 <span>{dict.btnGetCode}</span>
               </>
             )}
@@ -220,14 +243,18 @@ export default function CouponCard({ coupon, localeConfig }) {
         </div>
       </article>
 
-      {/* Modal */}
+      {/* Step 2 Modal: Shown FIRST so user sees the code, instructions, and clicks "Go to Official Store" when ready */}
       {modalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-[#1F1B18]/60 p-4 backdrop-blur-sm font-sans"
           role="dialog"
           aria-modal="true"
+          onClick={() => setModalOpen(false)}
         >
-          <div className="relative w-full max-w-md rounded-2xl border border-[#D8C8B4] bg-[#FCF9F4] p-6 shadow-2xl text-[#1F1B18]">
+          <div
+            className="relative w-full max-w-md rounded-2xl border border-[#D8C8B4] bg-[#FCF9F4] p-5 sm:p-6 shadow-2xl text-[#1F1B18]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
               onClick={() => setModalOpen(false)}
@@ -238,36 +265,78 @@ export default function CouponCard({ coupon, localeConfig }) {
             </button>
 
             <div className="mb-3 flex items-center gap-2 text-[#3D6352]">
-              <ShieldCheck className="h-6 w-6" />
-              <h4 className="text-lg font-extrabold text-[#1F1B18]">{dict.modalTitle}</h4>
+              <ShieldCheck className="h-6 w-6 shrink-0" />
+              <h4 className="text-base sm:text-lg font-extrabold text-[#1F1B18] pr-6">{dict.modalTitle}</h4>
             </div>
 
-            <p className="mb-2 text-sm font-bold text-[#1F1B18]">{coupon.title}</p>
+            <p className="mb-1.5 text-sm font-bold text-[#1F1B18]">{coupon.title}</p>
             {coupon.appliesToText && (
-              <p className="mb-4 text-xs text-[#574B40]">{coupon.appliesToText}</p>
+              <p className="mb-3.5 text-xs leading-relaxed text-[#574B40]">{coupon.appliesToText}</p>
             )}
 
-            <div className="mb-5 flex items-center justify-between rounded-xl border-2 border-dashed border-[#B85332]/50 bg-[#F0E9DF] p-3.5">
-              <code className="font-mono text-xl font-extrabold tracking-widest text-[#B85332]">
-                {coupon.code}
-              </code>
-              <span className="rounded-lg bg-[#B85332]/15 px-3 py-1 text-xs font-bold text-[#B85332]">
-                -{coupon.discountPct}% ({coupon.localDiscountAmount})
-              </span>
+            {/* Primary Revealed Code + Copy Button */}
+            <div className="mb-3 flex items-center justify-between gap-2 rounded-xl border-2 border-dashed border-[#B85332]/60 bg-[#F0E9DF] p-3.5">
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-[#6E6055]">
+                  {ui.promoCodeLabel}
+                </span>
+                <code className="font-mono text-xl sm:text-2xl font-extrabold tracking-widest text-[#B85332] select-all">
+                  {coupon.code}
+                </code>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleCopyPrimaryAgain}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#B85332] px-3 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition shrink-0"
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                <span>{copied ? ui.copiedShort : ui.copyShort}</span>
+              </button>
             </div>
 
-            <ol className="mb-6 space-y-2 text-xs leading-relaxed text-[#574B40] list-decimal list-inside">
+            {/* Backup Code Inside Modal */}
+            {coupon.backupCode && (
+              <div className="mb-4 flex items-center justify-between gap-2 rounded-xl border border-[#DED4C6] bg-[#F6F2EA] px-3.5 py-2.5 text-xs">
+                <div>
+                  <span className="text-[#6E6055] font-semibold">{ui.backupCodeLabel} </span>
+                  <code className="font-mono font-extrabold text-[#1F1B18] select-all">
+                    {coupon.backupCode}
+                  </code>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyBackup}
+                  className="inline-flex items-center gap-1 rounded-lg border border-[#C7B6A2] bg-[#FCF9F4] hover:bg-[#ECE5D8] px-2.5 py-1 text-[11px] font-bold text-[#1F1B18] transition shrink-0"
+                >
+                  {copiedBackup ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-[#3D6352]" />
+                      <span>{ui.copiedShort}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" />
+                      <span>{ui.copyShort}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            <ol className="mb-5 space-y-1.5 text-xs leading-relaxed text-[#574B40] list-decimal list-inside bg-[#F6F2EA] rounded-xl p-3 border border-[#E5DAC9]">
               {dict.modalSteps.map((step, i) => (
                 <li key={i}>{step}</li>
               ))}
             </ol>
 
+            {/* Step 2 CTA: Redirects ONLY when the user clicks here */}
             <a
               href={coupon.affiliateLink}
               target="_blank"
               rel="noopener noreferrer sponsored"
               onClick={() => setModalOpen(false)}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#B85332] px-5 py-3 text-sm font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3D6352] px-5 py-3.5 text-sm font-extrabold text-[#FCF9F4] shadow-md hover:bg-[#2E4D3F] transition"
             >
               <span>{dict.btnGoStore}</span>
               <ExternalLink className="h-4 w-4" />
