@@ -23,6 +23,8 @@ function getAllRouteDescriptors() {
     { suffix: '', type: 'home', storeFilter: null },
     { suffix: '/temu', type: 'temu', storeFilter: 'temu' },
     { suffix: '/aliexpress', type: 'aliexpress', storeFilter: 'aliexpress' },
+    { suffix: '/dinamicas', type: 'dynamics', storeFilter: null },
+    { suffix: '/guias', type: 'guides', storeFilter: null },
     { suffix: '/privacy', type: 'privacy', storeFilter: null },
     { suffix: '/terms', type: 'terms', storeFilter: null },
     { suffix: '/about', type: 'about', storeFilter: null },
@@ -134,12 +136,14 @@ function runPrerenderAndSitemap() {
       const coupons = getCouponsForLocale(localeConfig.code, { storeFilter, categoryFilter });
 
       const canonicalUrl = `${BASE_DOMAIN}/${localeConfig.code}${route.suffix}`;
-      let pageTitle = `${localeConfig.dict.heroTitle} | Temu & AliExpress`;
+      let pageTitle = `${localeConfig.dict.heroTitle} | CuponesTech`;
       if (route.type === 'temu') pageTitle = `Temu — ${localeConfig.dict.heroTitle}`;
       if (route.type === 'aliexpress') pageTitle = `AliExpress — ${localeConfig.dict.heroTitle}`;
+      if (route.type === 'dynamics') pageTitle = `Temu App Mini-Games & Search Codes (${localeConfig.countryName}) | CuponesTech`;
+      if (route.type === 'guides') pageTitle = `30-Day Price Adjustment & Refund Guide (${localeConfig.countryName}) | CuponesTech`;
       if (route.type === 'category') {
         const catName = localeConfig.dict.categories[route.slug] || route.slug;
-        pageTitle = `${catName} — ${localeConfig.countryName} (${localeConfig.currencyCode})`;
+        pageTitle = `${catName} — ${localeConfig.countryName} (${localeConfig.currencyCode}) | CuponesTech`;
       }
 
       const pageDesc = localeConfig.dict.heroSubtitle;

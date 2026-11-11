@@ -7,11 +7,11 @@
  * apuntando a las páginas oficiales sin IDs inventados.
  */
 export const AFFILIATE_CONFIG = {
-  // 1. Dominio real obtenido con GitHub Student Developer Pack (ej. "https://techdeals.tech")
-  siteDomain: 'https://TUDOMINIO.xyz',
+  // 1. Dominio real obtenido con GitHub Student Developer Pack (ej. "https://cuponestech.tech")
+  siteDomain: 'https://cuponestech.tech',
 
   // 2. Correo de contacto visible en páginas legales (/privacy, /contact)
-  contactEmail: 'contacto@TUDOMINIO.xyz',
+  contactEmail: 'contacto@cuponestech.tech',
 
   // 3. Red intermediaria CPA para Temu (ej. Admitad / Takeads / Partnerize)
   // Pega aquí tu enlace base de tracking cuando te aprueben el programa en Admitad.

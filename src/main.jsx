@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { RootRedirect, MarketCatalogPage, LegalPage } from './App.jsx';
+import { RootRedirect, MarketCatalogPage, DynamicsPage, GuidesPage, LegalPage } from './App.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
 import { DEFAULT_LOCALE } from './config/locales.js';
 import './index.css';
@@ -18,6 +18,8 @@ export function AppRoutes() {
       <Route path="/:locale/aliexpress" element={<MarketCatalogPage storeFilter="aliexpress" />} />
       <Route path="/:locale/aliexpress/category/:slug" element={<MarketCatalogPage storeFilter="aliexpress" />} />
       <Route path="/:locale/category/:slug" element={<MarketCatalogPage storeFilter={null} />} />
+      <Route path="/:locale/dinamicas" element={<DynamicsPage />} />
+      <Route path="/:locale/guias" element={<GuidesPage />} />
       <Route path="/:locale/privacy" element={<LegalPage type="privacy" />} />
       <Route path="/:locale/terms" element={<LegalPage type="terms" />} />
       <Route path="/:locale/about" element={<LegalPage type="about" />} />

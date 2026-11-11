@@ -682,70 +682,271 @@ export const LANGUAGE_PACKS = {
     }
   },
   ar: {
-    navHome: 'جميع العروض',
-    navTemu: 'أكواد Temu',
-    navAli: 'عروض AliExpress',
+    navHome: 'جميع الكوبونات',
+    navTemu: 'كوبونات Temu',
+    navAli: 'كوبونات AliExpress',
     navCategories: 'الفئات',
     disclosure: 'إفصاح التسويق بالعمولة: نحصل على عمولة من عمليات الشراء المؤهلة عبر روابط الشركاء المعتمدة (Admitad / AliExpress Portals) دون أي تكلفة إضافية عليك.',
-    heroBadge: 'كوبونات تقنية وأجهزة معتمدة',
-    heroTitle: 'أكواد خصم رسمية وحزم سرية مخصصة لـ {country}',
-    heroSubtitle: 'يتم اختبارها يومياً لأذرع تحكم GameSir وراوترات Wi-Fi 6 ولوحات المفاتيح الميكانيكية بعملة {currency}.',
+    heroBadge: 'كوبونات خصم مباشرة ومعتمدة للدفع',
+    heroTitle: 'أكواد خصم حقيقية للسلة ومخصصة لـ {country}',
+    heroSubtitle: 'أكواد خصم مباشرة عند الدفع لأذرع التحكم والحواسيب والشبكات والمنزل الذكي بعملة {currency}.',
     btnGetCode: 'إظهار ونسخ الكود',
     btnCopied: 'تم نسخ الكود!',
     btnGoStore: 'الذهاب إلى المتجر الرسمي',
     minSpend: 'الحد الأدنى للطلب',
     verifiedBadge: 'مؤكد: نوفمبر 2026',
     expiresLabel: 'صالح حتى ديسمبر 2026',
-    exclusiveTag: 'كود التطبيق والويب',
-    secretSearchTag: 'كلمة بحث سرية',
+    exclusiveTag: 'كود خصم مباشر بالسلة',
+    secretSearchTag: 'كود نشاط في شريط البحث',
     modalTitle: 'تم نسخ كود الخصم إلى الحافظة!',
     modalSteps: [
       'تم نسخ الكود الترويجي تلقائياً.',
-      'الصقه عند الدفع أو مباشرة في شريط بحث Temu/AliExpress.',
+      'الصقه في خانة كود الخصم عند إتمام الدفع في سلة التسوق.',
       'يطبق الحد الأدنى للطلب بالعملة المحلية ({currency}).'
     ],
-    sidebarTitle: 'أفضل عروض الأجهزة',
-    sidebarSponsor: 'عرض مباشر برعاية الشريك',
+    sidebarTitle: 'خطوات التوفير الذكي',
+    sidebarSponsor: 'دليل معتمد',
     categories: {
-      'tech-gadgets': 'أجهزة تقنية وحواسيب مصغرة',
-      'perifericos-gaming': 'ملحقات الألعاب وأذرع التحكم',
-      'smart-home': 'المنزل الذكي والأتمتة',
-      'redes-wifi': 'شبكات Wi-Fi 6 و Mesh',
-      'accesorios-moviles': 'شواحن GaN وملحقات الهواتف'
+      'tech-gadgets': 'أجهزة الكمبيوتر والتقنية',
+      'perifericos-gaming': 'أذرع التحكم وملحقات الألعاب',
+      'smart-home': 'المنزل الذكي والأجهزة المنزلية',
+      'redes-wifi': 'راوترات وشبكات Wi-Fi',
+      'accesorios-moviles': 'شواحن سريعة وملحقات الهواتف'
     },
-    seoGuideTitle: 'الدليل الشامل: كيفية دمج كوبونات Temu و AliExpress في {country} (2026)',
-    seoSection1Title: '1. طريقة تفعيل أكواد البحث السرية وجمع خصومات السلة',
-    seoSection1Body: 'يمكن للمتسوقين في {country} تحقيق أقصى توفير عند شراء ملحقات الألعاب والشبكات عبر دمج أكواد المنصة العامة مع قسائم البائعين. في تطبيق Temu، يؤدي إدخال كلمات البحث السرية مثل credit777 أو wincredit أو box777 مباشرة في شريط البحث إلى فتح حزم كوبونات حصرية بعملة {currency}. وفي AliExpress، اجمع دائماً بين أكواد Choice Day والخصم التلقائي في السلة.',
+    seoGuideTitle: 'الدليل الشامل: كيفية استخدام كوبونات Temu و AliExpress واسترداد فرق السعر في {country}',
+    seoSection1Title: '1. الفرق بين كوبونات الدفع المباشر وأكواد الأنشطة وميزة تعديل السعر (Price Adjustment)',
+    seoSection1Body: 'في {country} يمكنك التوفير بطريقتين: الأولى هي لصق كود الخصم المباشر في صفحة الدفع النهائية، والثانية هي ميزة تعديل السعر خلال 30 يوماً؛ فإذا اشتريت منتجاً بـ 20 وانخفض سعره غداً إلى 15، يمكنك الضغط على زر طلب تعديل السعر داخل صفحة طلباتك لاسترداد فرق الـ 5 فوراً بعملة {currency}.',
     seoSection2Title: '2. طرق الشحن المحلية، مدة التوصيل، وحد الشحن المجاني في {country}',
-    seoSection2Body: 'تستفيد الطلبات المتجهة إلى {country} من الشحن الجوي المباشر والتوصيل السريع حتى باب المنزل عبر شركات محلية معتمدة خلال 5 إلى 8 أيام عمل. يتم تفعيل الشحن المجاني تلقائياً عند وصول سلة التسوق إلى الحد الأدنى بالعملة المحلية ({currency}).',
+    seoSection2Body: 'تستفيد الطلبات المتجهة إلى {country} من الشحن الجوي المباشر والتوصيل السريع حتى باب المنزل خلال 5 إلى 9 أيام عمل مع تفعيل الشحن المجاني عند بلوغ الحد الأدنى بعملة {currency}.',
     tableHeaders: ['المتجر', 'طريقة الشحن', 'مدة التوصيل المتوقعة', 'حد الشحن المجاني'],
     faqs: [
       {
-        q: 'كيف تعمل أكواد البحث السرية في Temu داخل {country}؟',
-        a: 'اكتب الكلمة السرية مثل credit777 مباشرة في مربع البحث الرئيسي داخل تطبيق Temu لفتح حزمة المكافآت بعملة {currency}.'
+        q: 'كيف أسترجع فرق السعر إذا رخص المنتج بعد شرائي له؟',
+        a: 'ادخل إلى قسم طلباتك خلال 30 يوماً من الشراء واضغط على زر طلب تعديل السعر ليتم إرجاع الفرق فوراً بعملة {currency}.'
       },
       {
         q: 'هل تشمل الأسعار الضرائب والرسوم الجمركية في {country}؟',
-        a: 'نعم، يتم احتساب ضريبة القيمة المضافة المقررة مباشرة عند إتمام الطلب دون رسوم مخفية عند الاستلام.'
+        a: 'نعم، يتم احتساب الضرائب المقررة مباشرة عند الدفع دون رسوم مخفية.'
       },
       {
         q: 'هل يمكنني دمج كود خصم AliExpress مع قسيمة البائع؟',
-        a: 'بالتأكيد، يمكنك تفعيل كود منصة عام مع قسيمة المتجر وخصم العملات المعدنية في نفس الطلب.'
+        a: 'نعم، يمكنك تفعيل كود منصة عام مع قسيمة المتجر والعملات المعدنية في نفس الطلب.'
       },
       {
         q: 'كم مرة يتم التحقق من صلاحية هذه الأكواد؟',
-        a: 'يقوم نظامنا بفحص صلاحية جميع الكوبونات كل 6 ساعات لضمان فعاليتها.'
+        a: 'يتم فحص جميع الكوبونات كل 6 ساعات لضمان فعاليتها.'
       }
     ],
     legal: {
-      privacyTitle: 'سياسة الخصوصية وملفات تعريف الارتباط',
-      privacyBody: 'نلتزم بعدم استخدام أي برمجيات تتبع مزعجة أو تحويلات إجبارية. جميع روابط الشركاء تستخدم وسم rel="noopener noreferrer sponsored" الرسمي.',
+      privacyTitle: 'سياسة الخصوصية',
+      privacyBody: 'نلتزم بعدم استخدام أي برمجيات تتبع مزعجة. جميع روابط الشركاء تستخدم وسم rel="noopener noreferrer sponsored".',
       termsTitle: 'شروط الخدمة',
-      termsBody: 'تخضع جميع الكوبونات والعروض لشروط المتاجر والتوفر الإقليمي في {country}.',
+      termsBody: 'تخضع جميع الكوبونات لشروط المتاجر والتوفر الإقليمي في {country}.',
       aboutTitle: 'عن منصتنا العالمية',
-      aboutBody: 'دليل تقني مستقل متخصص في التحقق من كوبونات الأجهزة والإلكترونيات عبر 23 سوقاً دولياً.',
-      contactTitle: 'اتصل بنا والامتثال الإعلاني',
-      contactBody: 'للاستفسارات التجارية والتدقيق: compliance@tudominio.xyz'
+      aboutBody: 'دليل عالمي للتحقق من كوبونات التقنية والأجهزة عبر أكثر من 60 دولة.',
+      contactTitle: 'اتصل بنا',
+      contactBody: 'للاستفسارات: contacto@cuponestech.tech'
+    }
+  },
+  zh: {
+    navHome: '全部优惠券',
+    navTemu: 'Temu 结账券',
+    navAli: 'AliExpress 优惠码',
+    navCategories: '商品分类',
+    disclosure: '联盟披露：我们通过经认证的合作伙伴链接（Admitad / AliExpress Portals）从符合条件的购买中获取佣金，不会向您收取任何额外费用。',
+    heroBadge: '已验证的结账直减优惠码',
+    heroTitle: '{country} 专属官方折扣码与退差价指南',
+    heroSubtitle: '适用于电脑硬件、游戏手柄、智能家居、Wi-Fi 路由器及快充配件的购物车直减码（货币：{currency}）。',
+    btnGetCode: '显示并复制优惠码',
+    btnCopied: '已复制！',
+    btnGoStore: '前往官方商城',
+    minSpend: '最低消费',
+    verifiedBadge: '已验证：2026年11月',
+    expiresLabel: '有效期至 2026年12月',
+    exclusiveTag: '结账直减码',
+    secretSearchTag: '搜索框隐藏活动词',
+    modalTitle: '优惠码已复制到剪贴板！',
+    modalSteps: [
+      '您的专属优惠码已自动复制。',
+      '请在购物车结账页面的“促销代码 / Promo Code”栏中粘贴使用。',
+      '需满足当地货币（{currency}）最低订单金额。'
+    ],
+    sidebarTitle: '省钱与退差价指南',
+    sidebarSponsor: '官方攻略',
+    categories: {
+      'tech-gadgets': '电脑主机与迷你PC',
+      'perifericos-gaming': '游戏手柄与电竞外设',
+      'smart-home': '智能家居与小家电',
+      'redes-wifi': 'Wi-Fi 6 路由器与网络',
+      'accesorios-moviles': '氮化镓快充与手机配件'
+    },
+    seoGuideTitle: '完整攻略：如何在 {country} 叠加使用 Temu 与 AliExpress 优惠券及申请 30 天退差价',
+    seoSection1Title: '1. 结账直减券的使用方法与 30 天保价退差价（Price Adjustment）技巧',
+    seoSection1Body: '在 {country} 购买电子硬件时，您可以在结账页面直接粘贴本页提供的折扣码立减。此外，如果您今天以 20 购买了商品，明天卖家降价到 15，您可以在订单详情页点击“申请价格调整（Price Adjustment）”，系统将立即退还 5 的差价（{currency}），无需退货。',
+    seoSection2Title: '2. {country} 本地配送方式、时效及包邮门槛（{currency}）',
+    seoSection2Body: '发往 {country} 的订单均采用航空专线与本地快递派送，通常 4 至 8 个工作日即可送达。满规定金额（{currency}）即享自动免运费。',
+    tableHeaders: ['商城', '配送方式', '预计时效', '免运费门槛'],
+    faqs: [
+      {
+        q: '买完商品后降价了怎么申请退还差价？',
+        a: '在下单后 30 天内进入“我的订单”，点击“申请价格调整（Price Adjustment）”，差额将以 {currency} 立即退回。'
+      },
+      {
+        q: '搜索框隐藏词（如 credit777）和结账优惠码有什么区别？',
+        a: '结账优惠码是在付款时直接抵扣金额；而 credit777 等关键词是在 Temu 搜索栏输入以打开转盘或积分活动。'
+      },
+      {
+        q: 'AliExpress 平台码可以和店铺券叠加吗？',
+        a: '可以，您可以同时叠加平台促销码、卖家店铺券和金币抵扣。'
+      },
+      {
+        q: '这些优惠码多久更新一次？',
+        a: '我们的系统每 6 小时自动检测所有优惠码的可用余量。'
+      }
+    ],
+    legal: {
+      privacyTitle: '隐私政策',
+      privacyBody: '本站不使用任何侵入式追踪脚本或强制跳转，所有合作链接均遵循 rel="noopener noreferrer sponsored" 规范。',
+      termsTitle: '服务条款',
+      termsBody: '所有优惠券受限于 {country} 当地商城的库存与购物车规则。',
+      aboutTitle: '关于我们',
+      aboutBody: '覆盖全球 60 多个国家与地区的数码硬件优惠券验证平台。',
+      contactTitle: '联系我们',
+      contactBody: '合作与合规咨询：contacto@cuponestech.tech'
+    }
+  },
+  ru: {
+    navHome: 'Все Купоны',
+    navTemu: 'Промокоды Temu',
+    navAli: 'Купоны AliExpress',
+    navCategories: 'Категории',
+    disclosure: 'Партнерское уведомление: мы получаем комиссию за покупки по проверенным ссылкам (Admitad / AliExpress Portals) без доплат с вашей стороны.',
+    heroBadge: 'ПРОВЕРЕННЫЕ ПРОМОКОДЫ ДЛЯ КОРЗИНЫ',
+    heroTitle: 'Официальные купоны на скидку и возврат разницы цен для: {country}',
+    heroSubtitle: 'Прямые промокоды при оплате на компьютеры, геймпады, умный дом, роутеры Wi-Fi и зарядные устройства в {currency}.',
+    btnGetCode: 'Показать и скопировать код',
+    btnCopied: 'Код скопирован!',
+    btnGoStore: 'Перейти в магазин',
+    minSpend: 'Мин. заказ',
+    verifiedBadge: 'Проверено: Ноя 2026',
+    expiresLabel: 'Действует до Дек 2026',
+    exclusiveTag: 'ПРОМОКОД ДЛЯ ОПЛАТЫ',
+    secretSearchTag: 'КОД АКЦИИ В ПОИСКЕ',
+    modalTitle: 'Промокод скопирован в буфер обмена!',
+    modalSteps: [
+      'Промокод автоматически скопирован.',
+      'Вставьте его в поле «Промокод» на странице оформления заказа.',
+      'Действует при минимальной сумме заказа в {currency}.'
+    ],
+    sidebarTitle: 'Правила экономии',
+    sidebarSponsor: 'Инструкция',
+    categories: {
+      'tech-gadgets': 'Компьютеры и Мини-ПК',
+      'perifericos-gaming': 'Геймпады и Игровая периферия',
+      'smart-home': 'Умный дом и Техника для дома',
+      'redes-wifi': 'Роутеры Wi-Fi 6 и Сети',
+      'accesorios-moviles': 'Зарядки GaN и Аксессуары'
+    },
+    seoGuideTitle: 'Полное руководство: Как применять промокоды Temu и AliExpress в стране {country} и возвращать разницу в цене',
+    seoSection1Title: '1. Прямые купоны корзины и возврат разницы цены за 30 дней (Price Adjustment)',
+    seoSection1Body: 'Покупатели в стране {country} могут экономить при оплате корзины, комбинируя промокоды платформы с купонами продавцов. Кроме того, если вы купили товар за 20, а завтра продавец снизил цену до 15, нажмите кнопку «Запросить корректировку цены» в разделе заказов в течение 30 дней, и вам мгновенно вернут разницу 5 в {currency}.',
+    seoSection2Title: '2. Способы доставки, сроки и бесплатная доставка ({country})',
+    seoSection2Body: 'Заказы в страну {country} доставляются авиапочтой и местными курьерскими службами за 6–12 рабочих дней с бесплатной доставкой от минимального порога в {currency}.',
+    tableHeaders: ['Магазин', 'Способ доставки', 'Срок доставки', 'Бесплатно от'],
+    faqs: [
+      {
+        q: 'Как вернуть разницу, если товар подешевел после покупки?',
+        a: 'Откройте «Мои заказы» в течение 30 дней и нажмите «Корректировка цены (Price Adjustment)» — разница сразу вернется на баланс в {currency}.'
+      },
+      {
+        q: 'Чем отличаются коды поиска (credit777) от обычных купонов?',
+        a: 'Обычные промокоды вводятся при оплате корзины, а коды вроде credit777 вводятся в строку поиска приложения Temu для открытия мини-игр.'
+      },
+      {
+        q: 'Можно ли совмещать промокод AliExpress с купоном продавца?',
+        a: 'Да, при оформлении заказа можно применить общий промокод, купон магазина и монеты одновременно.'
+      },
+      {
+        q: 'Как часто проверяются промокоды?',
+        a: 'Все коды проверяются автоматически каждые 6 часов.'
+      }
+    ],
+    legal: {
+      privacyTitle: 'Политика конфиденциальности',
+      privacyBody: 'Мы не используем навязчивые скрипты. Все партнерские ссылки содержат атрибут rel="noopener noreferrer sponsored".',
+      termsTitle: 'Условия использования',
+      termsBody: 'Все купоны зависят от правил магазина в регионе {country}.',
+      aboutTitle: 'О платформе',
+      aboutBody: 'Международный каталог проверенных промокодов на электронику в более чем 60 странах.',
+      contactTitle: 'Контакты',
+      contactBody: 'Связь с нами: contacto@cuponestech.tech'
+    }
+  },
+  tr: {
+    navHome: 'Tüm Kuponlar',
+    navTemu: 'Temu Kuponları',
+    navAli: 'AliExpress İndirimleri',
+    navCategories: 'Kategoriler',
+    disclosure: 'Satış Ortaklığı Bildirimi: Doğrulanmış iş ortağı bağlantıları (Admitad / AliExpress Portals) üzerinden yapılan alışverişlerden size ek maliyet yansımadan komisyon kazanabiliriz.',
+    heroBadge: 'DOĞRULANMIŞ SEPET İNDİRİM KODLARI',
+    heroTitle: '{country} İçin Resmi İndirim Kuponları ve Fiyat Farkı İade Rehberi',
+    heroSubtitle: 'Bilgisayar, oyun kolları, akıllı ev ürünleri, Wi-Fi yönlendiriciler ve şarj cihazları için sepette geçerli kodlar ({currency}).',
+    btnGetCode: 'Kodu Göster ve Kopyala',
+    btnCopied: 'Kod Kopyalandı!',
+    btnGoStore: 'Resmi Mağazaya Git',
+    minSpend: 'Min. sepet',
+    verifiedBadge: 'Doğrulandı: Kas 2026',
+    expiresLabel: 'Ara 2026’ya kadar geçerli',
+    exclusiveTag: 'SEPETTE İNDİRİM KODU',
+    secretSearchTag: 'ARAMA ÇUBUĞU ETKİNLİK KODU',
+    modalTitle: 'İndirim Kodu Panoya Kopyalandı!',
+    modalSteps: [
+      'Promosyon kodunuz otomatik olarak kopyalandı.',
+      'Ödeme adımında "Promosyon Kodu" kutusuna yapıştırın.',
+      '{currency} cinsinden minimum sepet tutarı geçerlidir.'
+    ],
+    sidebarTitle: 'Tasarruf İpuçları',
+    sidebarSponsor: 'Resmi Rehber',
+    categories: {
+      'tech-gadgets': 'Bilgisayar ve Mini PC',
+      'perifericos-gaming': 'Oyun Kolları ve Oyuncu Ekipmanı',
+      'smart-home': 'Akıllı Ev ve Ev Aletleri',
+      'redes-wifi': 'Wi-Fi 6 Modem ve Ağ Ürünleri',
+      'accesorios-moviles': 'GaN Hızlı Şarj ve Telefon Aksesuarı'
+    },
+    seoGuideTitle: 'Kapsamlı Rehber: {country} İçin Temu & AliExpress Kupon Kullanımı ve Fiyat Farkı İadesi',
+    seoSection1Title: '1. Sepet Kuponları ve 30 Günlük Fiyat Farkı İadesi (Price Adjustment)',
+    seoSection1Body: '{country} içindeki kullanıcılar ödeme ekranında doğrudan indirim kodlarını kullanabilir. Ayrıca 20 birime aldığınız bir ürün ertesi gün 15 birime düşerse, "Siparişlerim" bölümünden "Fiyat Ayarlaması İste (Price Adjustment)" butonuna tıklayarak 5 birimlik farkı ({currency}) ürünü iade etmeden anında geri alabilirsiniz.',
+    seoSection2Title: '2. {country} Teslimat Süreleri ve Ücretsiz Kargo Limitleri ({currency})',
+    seoSection2Body: '{country} siparişleri hava kargo ve yerel kuryelerle 5-10 iş günü içinde teslim edilir. Minimum sepet tutarına ({currency}) ulaşıldığında standart kargo ücretsizdir.',
+    tableHeaders: ['Mağaza', 'Kargo Yöntemi', 'Tahmini Teslimat', 'Ücretsiz Kargo Limiti'],
+    faqs: [
+      {
+        q: 'Aldığım ürünün fiyatı düşerse aradaki farkı nasıl geri alırım?',
+        a: 'Siparişten sonraki 30 gün içinde "Siparişlerim" sayfasındaki "Fiyat Ayarlaması (Price Adjustment)" düğmesine basarak farkı {currency} olarak anında geri alabilirsiniz.'
+      },
+      {
+        q: 'credit777 gibi arama kodları ile normal kuponlar arasındaki fark nedir?',
+        a: 'Normal kuponlar ödeme ekranında sepette indirim sağlar; credit777 gibi kodlar ise Temu arama çubuğuna yazılarak ödül oyunlarını açar.'
+      },
+      {
+        q: 'AliExpress kuponları satıcı kuponlarıyla birleştirilebilir mi?',
+        a: 'Evet, aynı siparişte hem genel platform kodunu hem de mağaza kuponunu birlikte kullanabilirsiniz.'
+      },
+      {
+        q: 'Kuponlar ne sıklıkla kontrol ediliyor?',
+        a: 'Tüm kodlar her 6 saatte bir otomatik olarak test edilmektedir.'
+      }
+    ],
+    legal: {
+      privacyTitle: 'Gizlilik Politikası',
+      privacyBody: 'Zorunlu yönlendirme veya zararlı takip 스크립트가 없습니다. Tüm bağlantılar rel="noopener noreferrer sponsored" standardındadır.',
+      termsTitle: 'Kullanım Koşulları',
+      termsBody: 'Tüm kuponlar {country} mağaza koşullarına tabidir.',
+      aboutTitle: 'Hakkımızda',
+      aboutBody: '60’tan fazla ülkede doğrulanmış teknoloji ve ev ürünleri kupon platformu.',
+      contactTitle: 'İletişim',
+      contactBody: 'İletişim: contacto@cuponestech.tech'
     }
   }
 };

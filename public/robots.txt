@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://TUDOMINIO.xyz/sitemap.xml
+Sitemap: https://cuponestech.tech/sitemap.xml
