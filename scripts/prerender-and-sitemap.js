@@ -96,8 +96,9 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
       (c) => `
       <article class="coupon-static-card">
         <h3>${escapeHtml(c.title)}</h3>
-        <p>${escapeHtml(dict.minSpend)}: <strong>${escapeHtml(c.localMinSpend)}</strong> (-${c.discountPct}%)</p>
-        <p>${escapeHtml(ui.promoCodeLabel)} <code>${escapeHtml(c.code)}</code> (${escapeHtml(dict.verifiedBadge)})</p>
+        <p>${escapeHtml(c.discountLabel)} — ${escapeHtml(dict.minSpend)}: <strong>${escapeHtml(c.minSpendLabel)}</strong></p>
+        <ul>${c.requirements.map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
+        <p>${escapeHtml(ui.promoCodeLabel)} <code>${escapeHtml(c.code)}</code> (${escapeHtml(c.verifiedLabel)})</p>
         <a href="${escapeHtml(c.affiliateLink)}" rel="noopener noreferrer sponsored">${escapeHtml(dict.btnGoStore)}</a>
       </article>`
     )

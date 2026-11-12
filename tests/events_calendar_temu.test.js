@@ -5,7 +5,6 @@ import {
   getActiveOrNextEvent,
   getEventBannerText
 } from '../src/data/eventsCalendar.js';
-import { getCouponsForLocale } from '../src/data/couponsGenerator.js';
 
 describe('Differentiated Temu vs AliExpress Seasonal Calendar & Event Codes', () => {
   it('E1: Nov 1–18 event schedule provides store-specific tags for AliExpress (11.11) and Temu (Black Friday)', () => {
@@ -68,20 +67,5 @@ describe('Differentiated Temu vs AliExpress Seasonal Calendar & Event Codes', ()
     const choiceDay = ANNUAL_EVENTS_SCHEDULE.find((e) => e.id === 'choice-day-monthly');
     assert.equal(choiceDay.codeTagByStore.aliexpress, 'CHOICE DAY');
     assert.equal(choiceDay.codeTagByStore.temu, 'TEMU SUPER AHORRO');
-  });
-
-  it('E7: Generated coupons badge Temu event coupons with BLACK FRIDAY and AliExpress with 11.11', () => {
-    const coupons = getCouponsForLocale('es-es');
-    const temuEventCoupon = coupons.find((c) => c.store === 'temu' && c.isEvent1111);
-    const aliEventCoupon = coupons.find((c) => c.store === 'aliexpress' && c.isEvent1111);
-
-    assert.ok(temuEventCoupon, 'Temu event coupon must exist in es-es catalog');
-    assert.ok(aliEventCoupon, 'AliExpress event coupon must exist in es-es catalog');
-
-    assert.match(temuEventCoupon.title, /BLACK FRIDAY/i);
-    assert.match(temuEventCoupon.eligibilityText, /BLACK FRIDAY/i);
-
-    assert.match(aliEventCoupon.title, /11.11/i);
-    assert.match(aliEventCoupon.eligibilityText, /11.11/i);
   });
 });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useLocation, Link, Navigate } from 'react-router-dom';
 import {
   getLocaleConfig,
@@ -8,8 +8,7 @@ import {
   formatLocalPrice,
   CATEGORY_SLUGS
 } from './config/locales.js';
-import { getCouponsForLocale, autoPublishAiCoupons } from './data/couponsGenerator.js';
-import { syncAndPurgeStorage } from './data/couponLifecycle.js';
+import { getCouponsForLocale } from './data/couponsGenerator.js';
 import {
   getSectionText,
   getLocalizedPath,
@@ -76,37 +75,6 @@ export function MarketCatalogPage({ storeFilter = null }) {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyEvent1111, setOnlyEvent1111] = useState(false);
-  const [autoPublishedCount, setAutoPublishedCount] = useState(0);
-
-  // Autonomous background sync & startup storage purge: scans and auto-publishes discovered coupons every 7 days, purging expired codes
-  useEffect(() => {
-    try {
-      syncAndPurgeStorage();
-      const SYNC_STORAGE_KEY = 'cuponestech_ai_radar_sync_v1';
-      const lastSync = Number(localStorage.getItem(SYNC_STORAGE_KEY) || 0);
-      const now = Date.now();
-      const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-
-      if (now - lastSync >= SEVEN_DAYS_MS) {
-        fetch('/api/ai-radar', { method: 'POST' })
-          .then((res) => (res.ok ? res.json() : null))
-          .then((json) => {
-            if (json?.data?.discoveredCoupons) {
-              const added = autoPublishAiCoupons(json.data.discoveredCoupons);
-              syncAndPurgeStorage();
-              localStorage.setItem(SYNC_STORAGE_KEY, String(now));
-              if (added > 0) {
-                setAutoPublishedCount((c) => c + added);
-              }
-            } else if (json?.ok) {
-              syncAndPurgeStorage();
-              localStorage.setItem(SYNC_STORAGE_KEY, String(now));
-            }
-          })
-          .catch(() => {});
-      }
-    } catch {}
-  }, []);
 
   if (!LOCALE_MAP[(locale || '').toLowerCase()]) {
     return <Navigate to={`/${DEFAULT_LOCALE}`} replace />;
@@ -263,7 +231,11 @@ export function MarketCatalogPage({ storeFilter = null }) {
         {filteredCoupons.length === 0 ? (
           <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 sm:p-8 text-center">
             <p className="text-base sm:text-lg font-extrabold text-[#1F1B18] mb-2">
-              {ui.miamiNotice(displayCountry, localeConfig.currencyCode)}
+              {coupons.length === 0
+                ? (localeConfig.lang === 'es'
+                    ? `Ahora mismo no hay cupones verificados para ${displayCountry}. Solo publicamos códigos probados en la tienda real, con país, tipo de cuenta, compra mínima y fecha de vencimiento.`
+                    : `No verified coupons for ${displayCountry} right now. We only publish codes tested at real checkout, with country, account type, minimum spend and expiry date.`)
+                : ui.miamiNotice(displayCountry, localeConfig.currencyCode)}
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-3">
               <Link

@@ -372,7 +372,7 @@ export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageTyp
             priceCurrency: c.currencyCode,
             price: String(c.numericPrice),
             availability: 'https://schema.org/InStock',
-            priceValidUntil: '2026-12-31'
+            priceValidUntil: String(c.validUntil || '').slice(0, 10) || undefined
           }
         }
       }))

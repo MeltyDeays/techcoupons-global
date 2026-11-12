@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/sync-coupons",
+      "schedule": "0 0 * * 1"
+    }
+  ],
   "rewrites": [
     {
       "source": "/((?!api/|assets/|sitemap\\.xml|robots\\.txt).*)",

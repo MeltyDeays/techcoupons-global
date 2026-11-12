@@ -145,10 +145,12 @@ export default function CouponCard({ coupon, localeConfig }) {
               {isTemu ? ui.storeBadgeTemu : ui.storeBadgeAli}
             </span>
 
+            {shortCatLabel && (
             <span className="inline-flex min-w-0 max-w-full sm:max-w-[60%] items-center gap-1.5 rounded-lg bg-[#F0E9DF] border border-[#D8C8B4] px-2.5 py-1 text-[10px] sm:text-[11px] font-bold text-[#574B40] truncate">
               <CategoryIcon className="h-3.5 w-3.5 text-[#B85332] shrink-0" />
               <span className="truncate">{shortCatLabel}</span>
             </span>
+            )}
           </div>
 
           {/* Direct Checkout Usage Tag + Eligibility Badge */}
@@ -169,18 +171,19 @@ export default function CouponCard({ coupon, localeConfig }) {
             {coupon.title}
           </h3>
 
-          {/* Explicit Coverage + Regional Note */}
-          {(coupon.appliesToText || coupon.regionalNote) && (
-            <div className="mb-3.5 space-y-1.5 rounded-xl bg-[#F3ECE2] px-3 py-2 border border-[#E5DAC9]">
+          {/* Requisitos reales del cupón */}
+          {coupon.requirements?.length > 0 && (
+            <ul className="mb-3.5 space-y-1 rounded-xl bg-[#F3ECE2] px-3 py-2 border border-[#E5DAC9]">
+              {coupon.requirements.map((r) => (
+                <li key={r} className="flex items-start gap-1.5 text-[11px] leading-snug text-[#574B40] break-words">
+                  <Check className="h-3 w-3 mt-0.5 shrink-0 text-[#3D6352]" />
+                  <span>{r}</span>
+                </li>
+              ))}
               {coupon.appliesToText && (
-                <p className="text-xs leading-relaxed text-[#574B40] break-words">{coupon.appliesToText}</p>
+                <li className="text-[11px] font-semibold leading-snug text-[#9E4224] break-words">• {coupon.appliesToText}</li>
               )}
-              {coupon.regionalNote && (
-                <p className="text-[11px] font-semibold leading-snug text-[#3D6352] break-words">
-                  • {coupon.regionalNote}
-                </p>
-              )}
-            </div>
+            </ul>
           )}
 
           {/* Benefit Summary Box */}
@@ -190,14 +193,9 @@ export default function CouponCard({ coupon, localeConfig }) {
                 <span className="text-[10px] uppercase tracking-wider font-bold text-[#6E6055] block">
                   {ui.directDiscount}
                 </span>
-                <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
-                  <span className="font-display text-xl sm:text-2xl font-bold text-[#B85332]">
-                    -{coupon.discountPct}%
-                  </span>
-                  <span className="font-mono text-[11px] font-bold text-[#3D6352] bg-[#3D6352]/12 px-2 py-0.5 rounded border border-[#3D6352]/25">
-                    {ui.saveUpTo(coupon.localDiscountAmount)}
-                  </span>
-                </div>
+                <span className="font-display text-xl sm:text-2xl font-bold text-[#B85332]">
+                  {coupon.discountLabel}
+                </span>
               </div>
 
               <div className="text-right">
@@ -205,7 +203,7 @@ export default function CouponCard({ coupon, localeConfig }) {
                   {ui.minSpendLabel}:
                 </span>
                 <span className="font-mono text-xs sm:text-sm font-extrabold text-[#1F1B18]">
-                  {coupon.localMinSpend}
+                  {coupon.minSpendLabel}
                 </span>
               </div>
             </div>
@@ -213,7 +211,7 @@ export default function CouponCard({ coupon, localeConfig }) {
             <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] font-medium text-[#6E6055]">
               <span className="inline-flex items-center gap-1 font-bold text-[#3D6352]">
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
-                {dict.verifiedBadge}
+                {coupon.verifiedLabel || dict.verifiedBadge}
               </span>
               <span>{expirationBadge}</span>
             </div>
