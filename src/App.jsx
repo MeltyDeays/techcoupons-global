@@ -277,12 +277,6 @@ export function MarketCatalogPage({ storeFilter = null }) {
           </div>
         )}
       </section>
-
-      {/* Guías SEO de Apilamiento, Envío Directo vs Casillero y Preguntas Frecuentes */}
-      <CouponStackingGuide localeConfig={localeConfig} />
-      <div className="mt-8 sm:mt-10 w-full max-w-full min-w-0 rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
-        <CountryFAQ localeConfig={localeConfig} />
-      </div>
     </Layout>
   );
 }
