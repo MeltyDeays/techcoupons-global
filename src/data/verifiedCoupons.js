@@ -33,7 +33,260 @@
  *   notes: { es: '...', en: '...' }    // exclusiones / condiciones extra (opcional)
  * }
  */
-export const VERIFIED_COUPONS = [];
+export const VERIFIED_COUPONS = [
+  {
+    id: 'ali-1111-3off-global',
+    store: 'aliexpress',
+    code: 'IFPDAPWF',
+    backupCode: 'IFPIJJXZ',
+    countries: ['global'],
+    userType: 'all',
+    currency: 'USD',
+    discountType: 'fixed',
+    discountValue: 3,
+    maxDiscount: null,
+    minSpend: 18,
+    validFrom: '2026-11-01T00:00:00Z',
+    validUntil: '2026-11-18T23:59:59Z',
+    channel: 'both',
+    sourceUrl: 'https://portals.aliexpress.com',
+    lastVerifiedAt: '2026-11-14T22:00:00Z',
+    affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    category: null,
+    title: {
+      es: '$3 de descuento en pedidos desde $18',
+      en: '$3 off orders over $18'
+    },
+    notes: {
+      es: 'Válido en compras globales de AliExpress durante la extensión de 11.11. Aplicable directamente en el carrito.',
+      en: 'Valid on global AliExpress orders during 11.11 sale extension. Apply at checkout.'
+    }
+  },
+  {
+    id: 'ali-1111-8off-global',
+    store: 'aliexpress',
+    code: 'IFPUJYJQ',
+    backupCode: 'IFPZC8QZ',
+    countries: ['global'],
+    userType: 'all',
+    currency: 'USD',
+    discountType: 'fixed',
+    discountValue: 8,
+    maxDiscount: null,
+    minSpend: 45,
+    validFrom: '2026-11-01T00:00:00Z',
+    validUntil: '2026-11-18T23:59:59Z',
+    channel: 'both',
+    sourceUrl: 'https://portals.aliexpress.com',
+    lastVerifiedAt: '2026-11-14T22:00:00Z',
+    affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    category: null,
+    title: {
+      es: '$8 de descuento en pedidos desde $45',
+      en: '$8 off orders over $45'
+    },
+    notes: {
+      es: 'Válido en toda la tienda para pedidos globales durante 11.11.',
+      en: 'Valid storewide on global orders during 11.11.'
+    }
+  },
+  {
+    id: 'ali-1111-13off-global',
+    store: 'aliexpress',
+    code: 'IFPIWQBA',
+    backupCode: 'IFPB9GEY',
+    countries: ['global'],
+    userType: 'all',
+    currency: 'USD',
+    discountType: 'fixed',
+    discountValue: 13,
+    maxDiscount: null,
+    minSpend: 79,
+    validFrom: '2026-11-01T00:00:00Z',
+    validUntil: '2026-11-18T23:59:59Z',
+    channel: 'both',
+    sourceUrl: 'https://portals.aliexpress.com',
+    lastVerifiedAt: '2026-11-14T22:00:00Z',
+    affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    category: null,
+    title: {
+      es: '$13 de descuento en pedidos desde $79',
+      en: '$13 off orders over $79'
+    },
+    notes: {
+      es: 'Aplicable directamente en el checkout sobre el importe de productos.',
+      en: 'Apply directly at checkout on eligible basket value.'
+    }
+  },
+  {
+    id: 'ali-1111-24off-global',
+    store: 'aliexpress',
+    code: 'IFPLTR3B',
+    backupCode: 'IFPTZNDK',
+    countries: ['global'],
+    userType: 'all',
+    currency: 'USD',
+    discountType: 'fixed',
+    discountValue: 24,
+    maxDiscount: null,
+    minSpend: 139,
+    validFrom: '2026-11-01T00:00:00Z',
+    validUntil: '2026-11-18T23:59:59Z',
+    channel: 'both',
+    sourceUrl: 'https://portals.aliexpress.com',
+    lastVerifiedAt: '2026-11-14T22:00:00Z',
+    affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    category: null,
+    title: {
+      es: '$24 de descuento en pedidos desde $139',
+      en: '$24 off orders over $139'
+    },
+    notes: {
+      es: 'Código oficial de escala 11.11 en pedidos medianos/grandes.',
+      en: 'Official 11.11 promo code for mid-to-large carts.'
+    }
+  },
+  {
+    id: 'ali-1111-40off-global',
+    store: 'aliexpress',
+    code: 'IFPMJPWK',
+    backupCode: 'IFPS0C1I',
+    countries: ['global'],
+    userType: 'all',
+    currency: 'USD',
+    discountType: 'fixed',
+    discountValue: 40,
+    maxDiscount: null,
+    minSpend: 229,
+    validFrom: '2026-11-01T00:00:00Z',
+    validUntil: '2026-11-18T23:59:59Z',
+    channel: 'both',
+    sourceUrl: 'https://portals.aliexpress.com',
+    lastVerifiedAt: '2026-11-14T22:00:00Z',
+    affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    category: null,
+    title: {
+      es: '$40 de descuento en pedidos desde $229',
+      en: '$40 off orders over $229'
+    },
+    notes: {
+      es: 'Descuento directo en electrónica, moda, hogar y gadgets.',
+      en: 'Direct discount on electronics, fashion, home and gadgets.'
+    }
+  },
+  {
+    id: 'ali-1111-60off-global',
+    store: 'aliexpress',
+    code: 'IFPZBWVW',
+    backupCode: 'IFPYOYNU',
+    countries: ['global'],
+    userType: 'all',
+    currency: 'USD',
+    discountType: 'fixed',
+    discountValue: 60,
+    maxDiscount: null,
+    minSpend: 349,
+    validFrom: '2026-11-01T00:00:00Z',
+    validUntil: '2026-11-18T23:59:59Z',
+    channel: 'both',
+    sourceUrl: 'https://portals.aliexpress.com',
+    lastVerifiedAt: '2026-11-14T22:00:00Z',
+    affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    category: null,
+    title: {
+      es: '$60 de descuento en pedidos desde $349',
+      en: '$60 off orders over $349'
+    },
+    notes: {
+      es: 'Ahorro masivo en compras grandes durante el festival 11.11.',
+      en: 'Major discount on high-tier carts during 11.11 festival.'
+    }
+  },
+  {
+    id: 'ali-1111-80off-global',
+    store: 'aliexpress',
+    code: 'IFP6QDGG',
+    backupCode: 'IFPIMHP5',
+    countries: ['global'],
+    userType: 'all',
+    currency: 'USD',
+    discountType: 'fixed',
+    discountValue: 80,
+    maxDiscount: null,
+    minSpend: 469,
+    validFrom: '2026-11-01T00:00:00Z',
+    validUntil: '2026-11-18T23:59:59Z',
+    channel: 'both',
+    sourceUrl: 'https://portals.aliexpress.com',
+    lastVerifiedAt: '2026-11-14T22:00:00Z',
+    affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    category: null,
+    title: {
+      es: '$80 de descuento en pedidos desde $469',
+      en: '$80 off orders over $469'
+    },
+    notes: {
+      es: 'Nivel superior de cupón para pedidos tecnológicos y de volumen.',
+      en: 'High-tier discount code for premium technology and bulk carts.'
+    }
+  },
+  {
+    id: 'ali-us-1111-20off',
+    store: 'aliexpress',
+    code: 'IFPDNF3A',
+    backupCode: 'IFPTCHSG',
+    countries: ['us'],
+    userType: 'all',
+    currency: 'USD',
+    discountType: 'fixed',
+    discountValue: 20,
+    maxDiscount: null,
+    minSpend: 99,
+    validFrom: '2026-11-01T00:00:00Z',
+    validUntil: '2026-11-18T23:59:59Z',
+    channel: 'both',
+    sourceUrl: 'https://portals.aliexpress.com',
+    lastVerifiedAt: '2026-11-14T22:00:00Z',
+    affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    category: null,
+    title: {
+      es: '$20 de descuento en pedidos desde $99 (EE. UU.)',
+      en: '$20 off orders over $99 (USA)'
+    },
+    notes: {
+      es: 'Exclusivo para envíos a Estados Unidos durante 11.11.',
+      en: 'Exclusive for shipments to United States during 11.11.'
+    }
+  },
+  {
+    id: 'ali-us-1111-40off',
+    store: 'aliexpress',
+    code: 'IFP8PVFM',
+    backupCode: 'IFPHJCIM',
+    countries: ['us'],
+    userType: 'all',
+    currency: 'USD',
+    discountType: 'fixed',
+    discountValue: 40,
+    maxDiscount: null,
+    minSpend: 199,
+    validFrom: '2026-11-01T00:00:00Z',
+    validUntil: '2026-11-18T23:59:59Z',
+    channel: 'both',
+    sourceUrl: 'https://portals.aliexpress.com',
+    lastVerifiedAt: '2026-11-14T22:00:00Z',
+    affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    category: null,
+    title: {
+      es: '$40 de descuento en pedidos desde $199 (EE. UU.)',
+      en: '$40 off orders over $199 (USA)'
+    },
+    notes: {
+      es: 'Exclusivo para pedidos con entrega en Estados Unidos.',
+      en: 'Exclusive for orders shipping to the United States.'
+    }
+  }
+];
 
 export const MAX_VERIFIED_AGE_DAYS = 7;
 

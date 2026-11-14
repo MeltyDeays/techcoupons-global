@@ -82,8 +82,17 @@ export default function CouponCard({ coupon, localeConfig }) {
   const expirationInfo = resolveCouponExpiration(coupon);
   const expirationBadge = formatExpirationLabel(expirationInfo, localeConfig, dict);
 
-  // Step 1: Copy code, reveal it on card, and open the instruction modal FIRST (no immediate redirect!)
+  // Step 1: Copiar código al portapapeles, revelar en tarjeta, abrir tienda oficial en nueva pestaña (inyección de cookie) y mostrar modal explicativo
   const handleRevealAndCopy = async () => {
+    // Abrir inmediatamente la tienda oficial en nueva pestaña con tu tracking de afiliado (deposita la cookie de 30 días)
+    if (coupon.affiliateLink) {
+      try {
+        window.open(coupon.affiliateLink, '_blank', 'noopener,noreferrer');
+      } catch {
+        // Fallback en caso de bloqueo estricto de popups
+      }
+    }
+
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(coupon.code);
