@@ -216,21 +216,21 @@ export default function Layout({
               </button>
 
               {regionModalOpen && (
-                <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 rounded-2xl border border-[#C7B6A2] bg-[#FCF9F4] p-3 shadow-2xl z-50">
+                <div className={`fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto ${localeConfig.rtl ? 'sm:left-0' : 'sm:right-0'} sm:top-full sm:mt-2 sm:w-96 rounded-2xl border border-[#C7B6A2] bg-[#FCF9F4] p-3 shadow-2xl z-50`}>
                   <div className="mb-2">
                     <div className="relative">
-                      <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#7A6B5E]" />
+                      <Search className={`pointer-events-none absolute ${localeConfig.rtl ? 'right-3' : 'left-3'} top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#7A6B5E]`} />
                       <input
                         type="search"
                         value={countrySearch}
                         onChange={(e) => setCountrySearch(e.target.value)}
                         placeholder={`${activeCountryDisplay}, ${localeConfig.currencyCode}...`}
-                        className="w-full rounded-xl border border-[#D8C8B4] bg-[#F6F2EA] pl-8 pr-3 py-2 text-xs text-[#1F1B18] placeholder-[#8C7D70] focus:border-[#B85332] focus:outline-none"
+                        className={`w-full rounded-xl border border-[#D8C8B4] bg-[#F6F2EA] ${localeConfig.rtl ? 'pr-8 pl-3' : 'pl-8 pr-3'} py-2 text-xs text-[#1F1B18] placeholder-[#8C7D70] focus:border-[#B85332] focus:outline-none`}
                       />
                     </div>
                   </div>
 
-                  <div className="max-h-[60vh] sm:max-h-80 overflow-y-auto grid grid-cols-1 gap-1 pr-1">
+                  <div className={`max-h-[60vh] sm:max-h-80 overflow-y-auto grid grid-cols-1 gap-1 ${localeConfig.rtl ? 'pl-1' : 'pr-1'}`}>
                     {filteredLocales.map((loc) => {
                       const isSelected = loc.code === localeConfig.code;
                       const onlyAli = !loc.stores?.includes('temu');
@@ -240,7 +240,7 @@ export default function Layout({
                           key={loc.code}
                           type="button"
                           onClick={() => handleLocaleSelect(loc.code)}
-                          className={`flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-left text-xs transition ${
+                          className={`flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2 ${localeConfig.rtl ? 'text-right' : 'text-left'} text-xs transition ${
                             isSelected
                               ? 'bg-[#B85332]/15 font-bold text-[#9E472A] border border-[#B85332]/30'
                               : 'hover:bg-[#ECE5D8] text-[#1F1B18]'
