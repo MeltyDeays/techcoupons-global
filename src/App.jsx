@@ -47,7 +47,8 @@ import {
   Puzzle,
   Bike,
   PawPrint,
-  Baby
+  Baby,
+  TicketPercent
 } from 'lucide-react';
 
 const CATEGORY_ICONS = {
@@ -178,14 +179,31 @@ export function MarketCatalogPage({ storeFilter = null }) {
 
         {/* Integrated Clean Search Bar */}
         <div className="mt-4 relative w-full">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A6B5E]" />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-lg bg-[#B85332]/15 text-[#B85332] border border-[#B85332]/20"
+          >
+            <TicketPercent className="h-4 w-4" />
+          </span>
           <input
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={ui.searchPlaceholder(localeConfig.currencyCode)}
-            className="w-full rounded-xl border border-[#C7B6A2] bg-[#F6F2EA] pl-10 pr-4 py-2.5 text-xs sm:text-sm text-[#1F1B18] placeholder-[#8C7D70] focus:border-[#B85332] focus:outline-none"
+            className="w-full rounded-xl border border-[#C7B6A2] bg-[#F6F2EA] pl-12 pr-10 py-2.5 text-xs sm:text-sm text-[#1F1B18] placeholder-[#8C7D70] focus:border-[#B85332] focus:outline-none [&::-webkit-search-cancel-button]:hidden"
           />
+          {searchQuery ? (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#7A6B5E] hover:bg-[#E6DDD0] hover:text-[#1F1B18] transition"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          ) : (
+            <Search className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A6B5E]" />
+          )}
         </div>
       </section>
 
