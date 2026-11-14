@@ -23,14 +23,20 @@ export default async function handler(req, res) {
     const localeConfig = getLocaleConfig(locale);
     
     // 1. Consultar base de datos temporal (PostgreSQL / Supabase)
-    let coupons = await getActiveCouponsFromDB({
+    const rawCoupons = await getActiveCouponsFromDB({
       store: store || null,
       country: localeConfig.iso || 'global',
       category: category || null
     });
 
-    // 2. Si la base de datos aún no tiene registros, usar generador verificado
-    if (!coupons || coupons.length === 0) {
+    let coupons = [];
+    if (rawCoupons && rawCoupons.length > 0) {
+      coupons = getCouponsForLocale(
+        localeConfig.code,
+        { storeFilter: store || null, categoryFilter: category || null },
+        { coupons: rawCoupons }
+      );
+    } else {
       coupons = getCouponsForLocale(localeConfig.code, {
         storeFilter: store || null,
         categoryFilter: category || null

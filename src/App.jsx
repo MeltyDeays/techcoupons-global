@@ -103,11 +103,39 @@ export function MarketCatalogPage({ storeFilter = null }) {
   const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
   const hasTemuInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
 
-  const coupons = getCouponsForLocale(localeConfig.code, {
-    storeFilter,
-    categoryFilter,
-    onlyEvent1111
-  });
+  const [liveCoupons, setLiveCoupons] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    const params = new URLSearchParams({
+      locale: localeConfig.code,
+      ...(storeFilter ? { store: storeFilter } : {}),
+      ...(categoryFilter ? { category: categoryFilter } : {})
+    });
+    fetch(`/api/coupons?${params.toString()}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data && Array.isArray(data.coupons)) {
+          setLiveCoupons(data.coupons);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [localeConfig.code, storeFilter, categoryFilter]);
+
+  const baseCoupons = liveCoupons !== null
+    ? liveCoupons
+    : getCouponsForLocale(localeConfig.code, {
+        storeFilter,
+        categoryFilter,
+        onlyEvent1111
+      });
+
+  const coupons = onlyEvent1111
+    ? baseCoupons.filter((c) => c.eventId || c.code?.toLowerCase().includes('11') || c.id?.toLowerCase().includes('11'))
+    : baseCoupons;
 
   const filteredCoupons = coupons.filter((c) => {
     if (!searchQuery.trim()) return true;

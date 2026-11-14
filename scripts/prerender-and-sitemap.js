@@ -243,9 +243,34 @@ function buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonica
     .replace('<!--SSG_CONTENT_INJECT-->', staticBody);
 }
 
-function runPrerenderAndSitemap() {
+async function runPrerenderAndSitemap() {
   if (!fs.existsSync(DIST_DIR)) {
     throw new Error(`dist directory not found at ${DIST_DIR}. Run "vite build" first.`);
+  }
+
+  // Load .env if present
+  const envPath = path.join(ROOT_DIR, '.env');
+  if (fs.existsSync(envPath)) {
+    const envLines = fs.readFileSync(envPath, 'utf-8').split('\n');
+    for (const l of envLines) {
+      const parts = l.trim().split('=');
+      const k = parts[0];
+      const v = parts.slice(1).join('=');
+      if (k && !k.startsWith('#') && !process.env[k]) {
+        process.env[k] = v.replace(/^['"]|['"]$/g, '');
+      }
+    }
+  }
+
+  let dbCoupons = [];
+  if (process.env.DATABASE_URL) {
+    try {
+      const { getActiveCouponsFromDB } = await import('../src/data/dbClient.js');
+      dbCoupons = await getActiveCouponsFromDB({ limit: 1000 });
+      console.log(`[SSG] Conectado a Supabase: ${dbCoupons.length} cupones activos cargados para prerenderizado.`);
+    } catch (e) {
+      console.warn('[SSG] Fallo consultando Supabase, usando fallback local:', e.message);
+    }
   }
 
   const templateHtml = fs.readFileSync(path.join(DIST_DIR, 'index.html'), 'utf-8');
@@ -259,7 +284,11 @@ function runPrerenderAndSitemap() {
     for (const route of routes) {
       const storeFilter = route.storeFilter || null;
       const categoryFilter = route.type === 'category' ? route.slug : null;
-      const coupons = getCouponsForLocale(localeConfig.code, { storeFilter, categoryFilter });
+      const coupons = getCouponsForLocale(
+        localeConfig.code,
+        { storeFilter, categoryFilter },
+        { coupons: dbCoupons.length > 0 ? dbCoupons : undefined }
+      );
 
       const routeSuffix = getRouteSuffixForLocale(route, localeConfig);
       const canonicalUrl = `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`;
@@ -274,7 +303,11 @@ function runPrerenderAndSitemap() {
   }
 
   // Prerender root index.html so https://cuponestech.tech/ serves full static SEO links & schema
-  const rootCoupons = getCouponsForLocale(defaultLocObj.code, { storeFilter: null, categoryFilter: null });
+  const rootCoupons = getCouponsForLocale(
+    defaultLocObj.code,
+    { storeFilter: null, categoryFilter: null },
+    { coupons: dbCoupons.length > 0 ? dbCoupons : undefined }
+  );
   const rootHtml = buildLocalizedHtml(
     templateHtml,
     defaultLocObj,
