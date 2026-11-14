@@ -172,7 +172,21 @@ if (process.argv[1] && process.argv[1].endsWith('ingest-coupons.js')) {
   }
 
   if (valid.length > 0) {
-    console.log('\nEjemplo de salida para VERIFIED_COUPONS:');
+    console.log('\nEjemplo de salida de cupón normalizado:');
     console.log(JSON.stringify(valid.slice(0, 2), null, 2));
+
+    if (args.includes('--to-db')) {
+      const { upsertCouponToDB } = await import('../src/data/dbClient.js');
+      let count = 0;
+      for (const c of valid) {
+        try {
+          await upsertCouponToDB(c);
+          count++;
+        } catch (e) {
+          console.error(`Error guardando ${c.id}:`, e.message);
+        }
+      }
+      console.log(`\n[DB] ¡${count} cupones válidos insertados/actualizados en public.cuponestech_coupons!`);
+    }
   }
 }

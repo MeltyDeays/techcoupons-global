@@ -6,6 +6,7 @@
  */
 import { getCouponsForLocale } from '../src/data/couponsGenerator.js';
 import { getLocaleConfig, DEFAULT_LOCALE } from '../src/config/locales.js';
+import { getActiveCouponsFromDB } from '../src/data/dbClient.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,10 +21,21 @@ export default async function handler(req, res) {
 
   try {
     const localeConfig = getLocaleConfig(locale);
-    const coupons = getCouponsForLocale(localeConfig.code, {
-      storeFilter: store || null,
-      categoryFilter: category || null
+    
+    // 1. Consultar base de datos temporal (PostgreSQL / Supabase)
+    let coupons = await getActiveCouponsFromDB({
+      store: store || null,
+      country: localeConfig.iso || 'global',
+      category: category || null
     });
+
+    // 2. Si la base de datos aún no tiene registros, usar generador verificado
+    if (!coupons || coupons.length === 0) {
+      coupons = getCouponsForLocale(localeConfig.code, {
+        storeFilter: store || null,
+        categoryFilter: category || null
+      });
+    }
 
     return res.status(200).json({
       ok: true,

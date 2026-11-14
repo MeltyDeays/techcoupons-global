@@ -11,6 +11,7 @@ import {
   fetchAdmitadActiveCoupons,
   fetchAliExpressPromos
 } from '../src/data/affiliateClients.js';
+import { upsertCouponToDB } from '../src/data/dbClient.js';
 import { LOCALES, BASE_DOMAIN } from '../src/config/locales.js';
 import { submitIndexNow } from '../src/utils/indexnow.js';
 
@@ -83,6 +84,20 @@ export default async function handler(req, res) {
     }
   } else if (aliAppKey && !aliAppSecret) {
     results.aliexpress = { status: 'MISSING_SECRET', message: 'Falta ALI_APP_SECRET para firmar requests con HMAC-SHA256' };
+  }
+
+  // 4. Persistencia en Base de Datos Temporal (Supabase / PostgreSQL)
+  if (process.env.DATABASE_URL && results.syncedCoupons.length > 0) {
+    let savedToDb = 0;
+    for (const c of results.syncedCoupons) {
+      try {
+        await upsertCouponToDB(c);
+        savedToDb++;
+      } catch (err) {
+        console.error('Error guardando cupón en BD:', err.message);
+      }
+    }
+    results.savedToDb = savedToDb;
   }
 
   const isConfigured = results.admitad.status === 'CONNECTED' || results.aliexpress.status === 'CONNECTED';
