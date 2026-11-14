@@ -30,15 +30,33 @@ if (fs.existsSync(envPath)) {
   }
 }
 
-const XML_PATH = process.argv[2] || 'c:/Users/everd/Downloads/admitad_coupons.xml';
-if (!fs.existsSync(XML_PATH)) {
-  console.error(`Archivo XML no encontrado en: ${XML_PATH}`);
-  process.exit(1);
-}
+async function getXmlContent() {
+  const argTarget = process.argv[2];
+  const url = (argTarget && argTarget.startsWith('http')) ? argTarget : process.env.ADMITAD_COUPONS_XML_URL;
 
-const content = fs.readFileSync(XML_PATH, 'utf-8');
-const couponMatches = content.match(/<coupon id="(\d+)">([\s\S]*?)<\/coupon>/g) || [];
-console.log(`Leídos ${couponMatches.length} cupones totales desde XML.`);
+  if (url) {
+    try {
+      console.log('[Admitad Feed] Descargando feed XML en vivo desde Admitad...');
+      const res = await fetch(url);
+      if (res.ok) {
+        const text = await res.text();
+        console.log(`[Admitad Feed] Descarga exitosa (${text.length} bytes recibidos).`);
+        return text;
+      }
+      console.warn(`[Admitad Feed] HTTP ${res.status} al descargar feed, intentando archivo local...`);
+    } catch (e) {
+      console.warn('[Admitad Feed] Error en descarga HTTP, intentando archivo local:', e.message);
+    }
+  }
+
+  const localPath = (argTarget && !argTarget.startsWith('http')) ? argTarget : 'c:/Users/everd/Downloads/admitad_coupons.xml';
+  if (fs.existsSync(localPath)) {
+    console.log(`[Admitad Feed] Cargando archivo local: ${localPath}`);
+    return fs.readFileSync(localPath, 'utf-8');
+  }
+
+  throw new Error(`No se pudo obtener el feed XML (ni por URL ni en ${localPath})`);
+}
 
 function parseCouponFromXml(xmlChunk) {
   const idMatch = xmlChunk.match(/<coupon id="(\d+)">/);
@@ -182,21 +200,33 @@ function parseCouponFromXml(xmlChunk) {
   };
 }
 
-async function run() {
-  const validCoupons = [];
+export function parseAdmitadXml(xmlContent) {
+  const couponMatches = xmlContent.match(/<coupon id="(\d+)">([\s\S]*?)<\/coupon>/g) || [];
+  const valid = [];
+  const invalid = [];
+
   for (const chunk of couponMatches) {
     const c = parseCouponFromXml(chunk);
     if (!c) continue;
     const errors = validateCoupon(c);
     if (errors.length === 0) {
-      validCoupons.push(c);
+      valid.push(c);
+    } else {
+      invalid.push({ coupon: c, errors });
     }
   }
 
-  console.log(`Cupones parseados y validados: ${validCoupons.length}`);
+  return { total: couponMatches.length, valid, invalid };
+}
+
+export async function run() {
+  const content = await getXmlContent();
+  const parsed = parseAdmitadXml(content);
+  console.log(`Leídos ${parsed.total} cupones totales desde XML.`);
+  console.log(`Cupones parseados y validados: ${parsed.valid.length}`);
 
   let insertedCount = 0;
-  for (const c of validCoupons) {
+  for (const c of parsed.valid) {
     try {
       await upsertCouponToDB(c);
       insertedCount++;
@@ -206,10 +236,14 @@ async function run() {
   }
 
   console.log(`\n¡Éxito! ${insertedCount} cupones oficiales insertados en Supabase PostgreSQL.`);
-  process.exit(0);
+  return { total: parsed.total, inserted: insertedCount };
 }
 
-run().catch((err) => {
-  console.error('Error general de ejecución:', err);
-  process.exit(1);
-});
+if (process.argv[1] && process.argv[1].endsWith('ingest-admitad-xml.js')) {
+  run()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('Error general de ejecución:', err);
+      process.exit(1);
+    });
+}

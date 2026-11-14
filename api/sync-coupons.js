@@ -30,13 +30,35 @@ export default async function handler(req, res) {
     syncedCoupons: []
   };
 
-  // 2. Conexión Oficial Admitad
+  // 2. Conexión Oficial Admitad (Feed XML en vivo o API OAuth2)
+  const admitadXmlUrl = process.env.ADMITAD_COUPONS_XML_URL;
   const admitadToken = process.env.ADMITAD_API_TOKEN;
   const admitadClientId = process.env.ADMITAD_CLIENT_ID;
   const admitadClientSecret = process.env.ADMITAD_CLIENT_SECRET;
   const admitadWebsiteId = process.env.ADMITAD_WEBSITE_ID;
 
-  if (admitadToken || (admitadClientId && admitadClientSecret)) {
+  if (admitadXmlUrl) {
+    try {
+      const resp = await fetch(admitadXmlUrl);
+      if (resp.ok) {
+        const xmlText = await resp.text();
+        const { parseAdmitadXml } = await import('../scripts/ingest-admitad-xml.js');
+        const parsed = parseAdmitadXml(xmlText);
+        results.admitad = {
+          status: 'CONNECTED',
+          source: 'LIVE_XML_FEED',
+          fetched: parsed.total,
+          valid: parsed.valid.length,
+          rejected: parsed.invalid.length
+        };
+        results.syncedCoupons.push(...parsed.valid);
+      } else {
+        results.admitad = { status: 'ERROR', message: `HTTP ${resp.status} al leer feed XML` };
+      }
+    } catch (err) {
+      results.admitad = { status: 'ERROR', message: err.message };
+    }
+  } else if (admitadToken || (admitadClientId && admitadClientSecret)) {
     try {
       const rawCoupons = await fetchAdmitadActiveCoupons({
         token: admitadToken,
