@@ -139,9 +139,8 @@ export function MarketCatalogPage({ storeFilter = null }) {
     <Layout localeConfig={localeConfig} activeStore={storeFilter} activeCategory={categoryFilter} activeSection="coupons">
       <SEOHead
         localeConfig={localeConfig}
+        route={{ type: categoryFilter ? 'category' : (storeFilter || 'home'), storeFilter, slug: categoryFilter }}
         routeSuffix={routeSuffix}
-        pageTitle={`${customHeading} | CuponesTech`}
-        pageDescription={dict.heroSubtitle}
         coupons={coupons}
       />
 
@@ -278,6 +277,12 @@ export function MarketCatalogPage({ storeFilter = null }) {
           </div>
         )}
       </section>
+
+      {/* Guías SEO de Apilamiento, Envío Directo vs Casillero y Preguntas Frecuentes */}
+      <CouponStackingGuide localeConfig={localeConfig} />
+      <div className="mt-8 sm:mt-10 w-full max-w-full min-w-0 rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
+        <CountryFAQ localeConfig={localeConfig} />
+      </div>
     </Layout>
   );
 }
@@ -341,9 +346,8 @@ export function DynamicsPage() {
     <Layout localeConfig={localeConfig} activeSection="dynamics">
       <SEOHead
         localeConfig={localeConfig}
+        route={{ type: 'dynamics', storeFilter: null, slug: null }}
         routeSuffix={`/${routeSlugs.dynamics}`}
-        pageTitle={`${dynamicHeading} | CuponesTech`}
-        pageDescription={dyn.subtitle}
         coupons={[]}
       />
 
@@ -554,9 +558,8 @@ export function GuidesPage() {
     <Layout localeConfig={localeConfig} activeSection="guides">
       <SEOHead
         localeConfig={localeConfig}
+        route={{ type: 'guides', storeFilter: null, slug: null }}
         routeSuffix={`/${routeSlugs.guides}`}
-        pageTitle={`${g.title(displayCountry)} | CuponesTech`}
-        pageDescription={g.subtitle(ex20, ex15, ex5)}
         coupons={[]}
       />
 
@@ -655,6 +658,9 @@ export function GuidesPage() {
 
       {/* Guía Oficial Completa de Compra y Métodos de Envío para el País */}
       <CouponStackingGuide localeConfig={localeConfig} />
+      <div className="mt-8 sm:mt-10 w-full max-w-full min-w-0 rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-6 md:p-8 shadow-sm">
+        <CountryFAQ localeConfig={localeConfig} />
+      </div>
     </Layout>
   );
 }
@@ -696,9 +702,8 @@ export function LegalPage({ type }) {
     <Layout localeConfig={localeConfig} activeSection="legal">
       <SEOHead
         localeConfig={localeConfig}
+        route={{ type, storeFilter: null, slug: null }}
         routeSuffix={current.suffix}
-        pageTitle={`${current.title} — ${displayCountry}`}
-        pageDescription={current.body}
         coupons={[]}
       />
       <article className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 md:p-10 shadow-sm text-[#1F1B18] font-sans">

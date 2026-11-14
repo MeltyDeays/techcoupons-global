@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LOCALES, getLocaleConfig, formatLocalPrice } from '../config/locales.js';
+import { LOCALES, getLocaleConfig, formatLocalPrice, CATEGORY_SLUGS } from '../config/locales.js';
 import { AFFILIATE_CONFIG } from '../config/affiliateConfig.js';
 import {
   getSectionText,
@@ -612,6 +612,52 @@ export default function Layout({
                   <span className="truncate">{dict.legal.contactTitle}</span>
                   <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#7A6B5E]" />
                 </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Directorio SEO Compacto de Categorías y Regiones (Interlinking Global) */}
+          <div className="rounded-2xl border border-[#D8C8B4] bg-[#FCF9F4] p-4 sm:p-5 shadow-sm space-y-4">
+            <div>
+              <h4 className="mb-2 text-[11px] font-extrabold uppercase tracking-wider text-[#B85332]">
+                {ui.allCategoriesChip} ({activeCountryDisplay})
+              </h4>
+              <div className="flex flex-wrap gap-1.5">
+                {CATEGORY_SLUGS.map((catSlug) => (
+                  <Link
+                    key={catSlug}
+                    to={getLocalizedCategoryPath(localeConfig, activeStore || 'all', catSlug)}
+                    onClick={handleScrollTopClick}
+                    className="rounded-lg border border-[#E5DAC9] bg-[#F6F2EA] px-2.5 py-1 text-[11px] font-semibold text-[#574B40] hover:border-[#B85332] hover:text-[#1F1B18] transition"
+                  >
+                    {ui.catShort?.[catSlug] || dict.categories?.[catSlug] || catSlug}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-[#E5DAC9] pt-3">
+              <h4 className="mb-2 text-[11px] font-extrabold uppercase tracking-wider text-[#3D6352]">
+                {ui.regionsCountLabel ? ui.regionsCountLabel(LOCALES.length) : `${LOCALES.length} Regions`}
+              </h4>
+              <div className="flex flex-wrap gap-1.5">
+                {LOCALES.map((loc) => {
+                  const isCurrent = loc.code === localeConfig.code;
+                  return (
+                    <Link
+                      key={loc.code}
+                      to={`/${loc.code}`}
+                      onClick={handleScrollTopClick}
+                      className={`rounded-lg border px-2 py-0.5 text-[11px] font-semibold transition ${
+                        isCurrent
+                          ? 'border-[#B85332] bg-[#B85332]/15 text-[#9E472A] font-bold'
+                          : 'border-[#E5DAC9] bg-[#F6F2EA] text-[#574B40] hover:border-[#B85332] hover:text-[#1F1B18]'
+                      }`}
+                    >
+                      {getLocalizedCountryName(loc, localeConfig.lang)} ({loc.currencyCode})
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </div>

@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LOCALES, BASE_DOMAIN, DEFAULT_LOCALE, CATEGORY_SLUGS, buildStructuredData } from '../src/config/locales.js';
+import { LOCALES, BASE_DOMAIN, DEFAULT_LOCALE, CATEGORY_SLUGS, buildStructuredData, buildRouteSeoMeta } from '../src/config/locales.js';
+import { INDEXNOW_KEY } from '../src/utils/indexnow.js';
 import { getCouponsForLocale } from '../src/data/couponsGenerator.js';
 import {
   getRouteSlugsForLang,
@@ -114,9 +115,7 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
     )
     .join('\n');
 
-  let sectionContent = '';
-  if (route.type === 'guides') {
-    sectionContent = `
+  const guideBlock = `
         <section class="coupon-stacking-guide">
           <h2>${escapeHtml(dict.seoGuideTitle)}</h2>
           <h3>${escapeHtml(dict.seoSection1Title)}</h3>
@@ -124,14 +123,18 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
           <h3>${escapeHtml(dict.seoSection2Title)}</h3>
           <p>${escapeHtml(dict.seoSection2Body)}</p>
         </section>`;
-  } else if (route.type === 'faq') {
-    sectionContent = `
+
+  const faqBlock = `
         <section class="country-faq">
           <h2>FAQ — ${escapeHtml(displayCountry)}</h2>
           <div class="faqs">
             ${faqsHtml}
           </div>
         </section>`;
+
+  let sectionContent = '';
+  if (['home', 'temu', 'aliexpress', 'category', 'guides', 'faq'].includes(route.type)) {
+    sectionContent = `${guideBlock}\n${faqBlock}`;
   }
 
   const categoriesNavHtml = CATEGORY_SLUGS.map((catSlug) => {
@@ -193,46 +196,40 @@ function getRouteSeoMeta(routeType) {
 }
 
 function buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonicalUrl, defaultLocObj) {
-  const ui = getSectionText(localeConfig.lang);
-  const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
-
-  let pageTitle = `${localeConfig.dict.heroTitle} | CuponesTech`;
-  if (route.type === 'temu') pageTitle = `Temu — ${localeConfig.dict.heroTitle}`;
-  if (route.type === 'aliexpress') pageTitle = `AliExpress — ${localeConfig.dict.heroTitle}`;
-  if (route.type === 'dynamics') pageTitle = `${ui.dynamics.title(displayCountry)} | CuponesTech`;
-  if (route.type === 'guides') pageTitle = `${ui.guides.title(displayCountry)} | CuponesTech`;
-  if (route.type === 'category') {
-    const catName = localeConfig.dict.categories[route.slug] || route.slug;
-    pageTitle = `${catName} — ${displayCountry} (${localeConfig.currencyCode}) | CuponesTech`;
-  }
-  if (['privacy', 'terms', 'about', 'contact', 'faq'].includes(route.type)) {
-    const map = {
-      privacy: localeConfig.dict.legal.privacyTitle,
-      terms: localeConfig.dict.legal.termsTitle,
-      about: localeConfig.dict.legal.aboutTitle,
-      contact: localeConfig.dict.legal.contactTitle,
-      faq: `Preguntas Frecuentes (FAQ)`
-    };
-    pageTitle = `${map[route.type]} — ${displayCountry} | CuponesTech`;
-  }
-
-  const pageDesc = localeConfig.dict.heroSubtitle;
+  const seoMeta = buildRouteSeoMeta(localeConfig, route);
+  const pageTitle = seoMeta.title;
+  const pageDesc = seoMeta.description;
 
   const hreflangTags = LOCALES.map((loc) => {
     const altSuffix = getRouteSuffixForLocale(route, loc);
-    return `<link rel="alternate" hreflang="${loc.code}" href="${BASE_DOMAIN}/${loc.code}${altSuffix}" />`;
+    return `<link rel="alternate" hreflang="${loc.code}" href="${BASE_DOMAIN}/${loc.code}${altSuffix}" data-dynamic-hreflang="true" />`;
   }).join('\n    ');
 
   const xDefaultSuffix = getRouteSuffixForLocale(route, defaultLocObj);
-  const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${xDefaultSuffix}" />`;
+  const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${xDefaultSuffix}" data-dynamic-hreflang="true" />`;
   const canonicalTag = `<link rel="canonical" href="${canonicalUrl}" />`;
+  const keywordsTag = `<meta name="keywords" content="${escapeHtml(seoMeta.keywords)}" data-dynamic-meta="true" />`;
+  const robotsTag = `<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />`;
 
-  const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl, route.type);
+  const ogTags = [
+    `<meta property="og:type" content="website" data-dynamic-og="true" />`,
+    `<meta property="og:site_name" content="CuponesTech" data-dynamic-og="true" />`,
+    `<meta property="og:title" content="${escapeHtml(pageTitle)}" data-dynamic-og="true" />`,
+    `<meta property="og:description" content="${escapeHtml(pageDesc)}" data-dynamic-og="true" />`,
+    `<meta property="og:url" content="${canonicalUrl}" data-dynamic-og="true" />`,
+    `<meta property="og:image" content="${BASE_DOMAIN}/favicon-192x192.png" data-dynamic-og="true" />`,
+    `<meta property="og:locale" content="${escapeHtml(seoMeta.ogLocale)}" data-dynamic-og="true" />`,
+    `<meta name="twitter:card" content="summary" data-dynamic-og="true" />`,
+    `<meta name="twitter:title" content="${escapeHtml(pageTitle)}" data-dynamic-og="true" />`,
+    `<meta name="twitter:description" content="${escapeHtml(pageDesc)}" data-dynamic-og="true" />`
+  ].join('\n    ');
+
+  const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl, route);
   const schemaScripts = schemas
-    .map((s) => `<script type="application/ld+json">${JSON.stringify(s)}</script>`)
+    .map((s) => `<script type="application/ld+json" data-dynamic-schema="true">${JSON.stringify(s)}</script>`)
     .join('\n    ');
 
-  const headInjection = [canonicalTag, hreflangTags, xDefaultTag, schemaScripts].join('\n    ');
+  const headInjection = [canonicalTag, robotsTag, keywordsTag, ogTags, hreflangTags, xDefaultTag, schemaScripts].join('\n    ');
   const staticBody = buildStaticBodyMarkup(localeConfig, route, coupons);
 
   return templateHtml
@@ -333,16 +330,43 @@ ${urlEntries.join('\n')}
   fs.writeFileSync(path.join(PUBLIC_DIR, 'sitemap-index.xml'), sitemapXml, 'utf-8');
   fs.writeFileSync(path.join(DIST_DIR, 'sitemap-index.xml'), sitemapXml, 'utf-8');
 
-  const robotsTxt = `User-agent: *
-Allow: /
-
-Sitemap: ${BASE_DOMAIN}/sitemap.xml
-`;
+  const robotsTxt = [
+    'User-agent: Googlebot',
+    'Allow: /',
+    '',
+    'User-agent: Yandex',
+    'Allow: /',
+    '',
+    'User-agent: bingbot',
+    'Allow: /',
+    '',
+    'User-agent: DuckDuckBot',
+    'Allow: /',
+    '',
+    'User-agent: Slurp',
+    'Allow: /',
+    '',
+    'User-agent: Baiduspider',
+    'Allow: /',
+    '',
+    'User-agent: Applebot',
+    'Allow: /',
+    '',
+    'User-agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: ${BASE_DOMAIN}/sitemap.xml`,
+    `Sitemap: ${BASE_DOMAIN}/sitemap-index.xml`,
+    ''
+  ].join('\n');
 
   fs.writeFileSync(path.join(PUBLIC_DIR, 'robots.txt'), robotsTxt, 'utf-8');
   fs.writeFileSync(path.join(DIST_DIR, 'robots.txt'), robotsTxt, 'utf-8');
 
-  console.log(`[SSG + Sitemap] Generated ${generatedCount} static HTML pages across ${LOCALES.length} locales (${sitemapRecords.length} URLs in sitemap.xml).`);
+  fs.writeFileSync(path.join(PUBLIC_DIR, `${INDEXNOW_KEY}.txt`), INDEXNOW_KEY, 'utf-8');
+  fs.writeFileSync(path.join(DIST_DIR, `${INDEXNOW_KEY}.txt`), INDEXNOW_KEY, 'utf-8');
+
+  console.log(`[SSG + Sitemap] Generated ${generatedCount} static HTML pages across ${LOCALES.length} locales (${sitemapRecords.length} URLs in sitemap.xml + IndexNow key).`);
 }
 
 runPrerenderAndSitemap();

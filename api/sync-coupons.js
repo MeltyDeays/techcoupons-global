@@ -11,6 +11,8 @@ import {
   fetchAdmitadActiveCoupons,
   fetchAliExpressPromos
 } from '../src/data/affiliateClients.js';
+import { LOCALES, BASE_DOMAIN } from '../src/config/locales.js';
+import { submitIndexNow } from '../src/utils/indexnow.js';
 
 export default async function handler(req, res) {
   // 1. Verificación de seguridad (Bearer CRON_SECRET o llamada autorizada)
@@ -84,6 +86,18 @@ export default async function handler(req, res) {
   }
 
   const isConfigured = results.admitad.status === 'CONNECTED' || results.aliexpress.status === 'CONNECTED';
+
+  const indexNowUrls = [
+    `${BASE_DOMAIN}/`,
+    ...LOCALES.flatMap((loc) => [
+      `${BASE_DOMAIN}/${loc.code}`,
+      `${BASE_DOMAIN}/${loc.code}/temu`,
+      `${BASE_DOMAIN}/${loc.code}/aliexpress`
+    ])
+  ];
+  results.indexNow = process.env.NODE_TEST_CONTEXT
+    ? { ok: true, skipped: true, totalUrls: indexNowUrls.length }
+    : await submitIndexNow(indexNowUrls);
 
   return res.status(200).json({
     ok: true,

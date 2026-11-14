@@ -1,4 +1,5 @@
 import { LANGUAGE_PACKS, BASE_DOMAIN, CATEGORY_SLUGS } from '../data/i18nDictionaries.js';
+import { getSectionText, getLocalizedCountryName } from '../data/multilingualSections.js';
 
 const RAW_MARKETS = [
   // Norteamérica
@@ -344,7 +345,289 @@ export function formatLocalPrice(usdAmount, localeConfig) {
   return `${localeConfig.currency}${rounded.toLocaleString()}`;
 }
 
-export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageType = '') {
+const SEO_PATTERN_BY_LANG = {
+  es: {
+    storeAll: 'Temu y AliExpress',
+    verified: 'Códigos y Cupones Verificados 2026',
+    freeShip: (threshold, hasTemu, country) =>
+      hasTemu ? `envío gratis desde ${threshold}` : `envío a ${country} o casillero en Miami USD`,
+    catTitle: (cat, store, country, curr) => `${cat} en ${store} — Cupones ${country} (${curr}) 2026`,
+    catDesc: (cat, store, country, curr, ship, hasTemu) =>
+      `Cupones y códigos verificados 2026 en ${cat} para ${store} en ${country} (${curr}). Descuentos acumulables${hasTemu ? ', trucos credit777/wincredit' : ''}, Choice Day y ${ship}.`,
+    storeDesc: (storeName, country, curr, ship, isTemu) =>
+      `Códigos promocionales de ${storeName} en ${country} (${curr}) 2026: ${isTemu ? 'búsquedas credit777, wincredit, box777, paquetes de cupón' : 'cupones Choice Day, monedas de la app'} y ${ship}.`,
+    homeDesc: (store, country, curr, ship, hasTemu) =>
+      `Códigos verificados 2026 de ${store} en ${country} (${curr}). Ahorra con cupones reales${hasTemu ? ', comandos credit777 y wincredit' : ' y envíos internacionales'}, más ${ship}.`,
+    dynamicsDesc: (country, curr) =>
+      `Comandos secretos de búsqueda en ${country} (${curr}): credit777, claimcredit, wincredit, box777 en Temu y Centro de Monedas AliExpress 2026.`,
+    faqTitle: (country, curr) => `Preguntas Frecuentes (FAQ) Temu y AliExpress — ${country} (${curr})`,
+    faqDesc: (country, curr) =>
+      `Respuestas oficiales sobre cupones en ${country} (${curr}), compra mínima, acumulación de descuentos, envío directo y casillero Miami.`,
+    keywords: (country, curr, catName, storeName, hasTemu) => [
+      catName && `${catName} ${country}`,
+      catName && `cupones ${catName.toLowerCase()}`,
+      `cupones ${country} 2026`,
+      `codigo promocional aliexpress ${country}`,
+      ...(hasTemu ? [`cupones temu ${country}`, 'credit777', 'wincredit', 'box777'] : ['casillero miami', 'envios aliexpress']),
+      storeName && `ofertas ${storeName.toLowerCase()} ${country}`,
+      `descuentos ${curr}`,
+      'choice day aliexpress'
+    ]
+  },
+  en: {
+    storeAll: 'Temu & AliExpress',
+    verified: 'Verified Promo Codes & Coupons 2026',
+    freeShip: (threshold, hasTemu, country) =>
+      hasTemu ? `free shipping from ${threshold}` : `direct shipping to ${country} or Miami freight forwarder`,
+    catTitle: (cat, store, country, curr) => `${cat} on ${store} — ${country} Coupons (${curr}) 2026`,
+    catDesc: (cat, store, country, curr, ship, hasTemu) =>
+      `Verified 2026 ${cat} promo codes for ${store} in ${country} (${curr}). Stackable deals${hasTemu ? ', credit777 & wincredit triggers' : ''}, Choice Day & ${ship}.`,
+    storeDesc: (storeName, country, curr, ship, isTemu) =>
+      `Active ${storeName} coupons for ${country} (${curr}) 2026: ${isTemu ? 'credit777, wincredit, box777 app codes, bundle packs' : 'Choice Day codes, app Coins stacking'} and ${ship}.`,
+    homeDesc: (store, country, curr, ship, hasTemu) =>
+      `Verified 2026 ${store} discount codes in ${country} (${curr}). Real checkout savings${hasTemu ? ', credit777 & wincredit search tricks' : ''}, plus ${ship}.`,
+    dynamicsDesc: (country, curr) =>
+      `Hidden app search commands for ${country} (${curr}): credit777, claimcredit, wincredit, box777 rewards on Temu and AliExpress Coins 2026.`,
+    faqTitle: (country, curr) => `FAQ: Temu & AliExpress Coupons — ${country} (${curr})`,
+    faqDesc: (country, curr) =>
+      `Official answers on promo codes in ${country} (${curr}), minimum spend rules, coupon stacking and shipping methods.`,
+    keywords: (country, curr, catName, storeName, hasTemu) => [
+      catName && `${catName} ${country}`,
+      catName && `${catName.toLowerCase()} coupons`,
+      `verified coupons ${country} 2026`,
+      `aliexpress promo code ${country}`,
+      ...(hasTemu ? [`temu coupon code ${country}`, 'credit777', 'wincredit', 'box777'] : ['miami freight forwarder', 'aliexpress shipping']),
+      storeName && `${storeName.toLowerCase()} deals ${country}`,
+      `discounts ${curr}`,
+      'choice day promo'
+    ]
+  },
+  pt: {
+    storeAll: 'Temu e AliExpress',
+    verified: 'Cupons Verificados 2026',
+    freeShip: (threshold) => `frete grátis a partir de ${threshold}`,
+    catTitle: (cat, store, country, curr) => `${cat} na ${store} — Cupons ${country} (${curr}) 2026`,
+    catDesc: (cat, store, country, curr, ship) =>
+      `Cupons verificados 2026 de ${cat} na ${store} em ${country} (${curr}). Descontos acumuláveis, Choice Day, credit777 e ${ship}.`,
+    storeDesc: (storeName, country, curr, ship, isTemu) =>
+      `Códigos ativos ${storeName} em ${country} (${curr}) 2026: ${isTemu ? 'credit777, wincredit, box777 e pacotes de cupom' : 'Choice Day, moedas do app'} com ${ship}.`,
+    homeDesc: (store, country, curr, ship) =>
+      `Cupons verificados 2026 para ${store} em ${country} (${curr}). Economia real no carrinho, comandos credit777 e ${ship}.`,
+    dynamicsDesc: (country, curr) =>
+      `Códigos secretos de busca no app para ${country} (${curr}): credit777, claimcredit, wincredit, box777 e Moedas AliExpress.`,
+    faqTitle: (country, curr) => `Perguntas Frequentes (FAQ) — ${country} (${curr})`,
+    faqDesc: (country, curr) => `Dúvidas sobre cupons Temu e AliExpress em ${country} (${curr}), valor mínimo e frete.`,
+    keywords: (country, curr, catName, storeName) => [
+      catName && `cupons ${catName.toLowerCase()} ${country}`,
+      `cupons temu ${country} 2026`,
+      `cupom aliexpress ${country}`,
+      storeName && `ofertas ${storeName.toLowerCase()}`,
+      'credit777', 'wincredit', 'box777', curr
+    ]
+  },
+  fr: {
+    storeAll: 'Temu et AliExpress',
+    verified: 'Codes Promo Vérifiés 2026',
+    freeShip: (threshold) => `livraison gratuite dès ${threshold}`,
+    catTitle: (cat, store, country, curr) => `${cat} ${store} — Codes Promo ${country} (${curr}) 2026`,
+    catDesc: (cat, store, country, curr, ship) =>
+      `Codes promo vérifiés 2026 pour ${cat} sur ${store} en ${country} (${curr}). Remises cumulables, credit777 et ${ship}.`,
+    storeDesc: (storeName, country, curr, ship) =>
+      `Bons de réduction ${storeName} en ${country} (${curr}) 2026 : Choice Day, credit777, wincredit et ${ship}.`,
+    homeDesc: (store, country, curr, ship) =>
+      `Codes promo vérifiés 2026 pour ${store} (${country}, ${curr}). Réductions testées au panier et ${ship}.`,
+    dynamicsDesc: (country, curr) =>
+      `Codes secrets de recherche pour ${country} (${curr}) : credit777, claimcredit, wincredit, box777 et Pièces AliExpress.`,
+    faqTitle: (country, curr) => `Questions Fréquentes (FAQ) — ${country} (${curr})`,
+    faqDesc: (country, curr) => `Réponses sur les codes promo Temu et AliExpress en ${country} (${curr}), cumul et livraison.`,
+    keywords: (country, curr, catName, storeName) => [
+      catName && `code promo ${catName.toLowerCase()}`,
+      `code promo temu ${country}`,
+      `code promo aliexpress ${country}`,
+      storeName && `${storeName.toLowerCase()} ${country}`,
+      'credit777', 'wincredit', curr
+    ]
+  },
+  de: {
+    storeAll: 'Temu & AliExpress',
+    verified: 'Geprüfte Gutscheincodes 2026',
+    freeShip: (threshold) => `kostenloser Versand ab ${threshold}`,
+    catTitle: (cat, store, country, curr) => `${cat} bei ${store} — Gutscheine ${country} (${curr}) 2026`,
+    catDesc: (cat, store, country, curr, ship) =>
+      `Geprüfte Gutscheine 2026 für ${cat} bei ${store} in ${country} (${curr}). Kombinierbare Rabatte, credit777 und ${ship}.`,
+    storeDesc: (storeName, country, curr, ship) =>
+      `Aktuelle ${storeName} Rabattcodes für ${country} (${curr}) 2026: Choice Day, credit777, wincredit und ${ship}.`,
+    homeDesc: (store, country, curr, ship) =>
+      `Verifizierte ${store} Gutscheincodes für ${country} (${curr}) 2026. Echte Warenkorb-Rabatte und ${ship}.`,
+    dynamicsDesc: (country, curr) =>
+      `Geheime Suchbefehle für ${country} (${curr}): credit777, claimcredit, wincredit, box777 & AliExpress Münzen 2026.`,
+    faqTitle: (country, curr) => `Häufige Fragen (FAQ) — ${country} (${curr})`,
+    faqDesc: (country, curr) => `Antworten zu Temu & AliExpress Gutscheinen in ${country} (${curr}), Mindestbestellwert und Versand.`,
+    keywords: (country, curr, catName, storeName) => [
+      catName && `${catName} gutschein`,
+      `temu gutscheincode ${country}`,
+      `aliexpress gutschein ${country}`,
+      storeName && `${storeName.toLowerCase()} rabatt`,
+      'credit777', 'wincredit', curr
+    ]
+  },
+  it: {
+    storeAll: 'Temu e AliExpress',
+    verified: 'Codici Sconto Verificati 2026',
+    freeShip: (threshold) => `spedizione gratuita da ${threshold}`,
+    catTitle: (cat, store, country, curr) => `${cat} ${store} — Codici Sconto ${country} (${curr}) 2026`,
+    catDesc: (cat, store, country, curr, ship) =>
+      `Codici sconto verificati 2026 per ${cat} su ${store} in ${country} (${curr}). Offerte cumulabili, credit777 e ${ship}.`,
+    storeDesc: (storeName, country, curr, ship) =>
+      `Coupon attivi ${storeName} per ${country} (${curr}) 2026: Choice Day, credit777, wincredit e ${ship}.`,
+    homeDesc: (store, country, curr, ship) =>
+      `Codici promozionali verificati 2026 per ${store} in ${country} (${curr}) con ${ship}.`,
+    dynamicsDesc: (country, curr) =>
+      `Codici segreti di ricerca per ${country} (${curr}): credit777, claimcredit, wincredit, box777 e Monete AliExpress.`,
+    faqTitle: (country, curr) => `Domande Frequenti (FAQ) — ${country} (${curr})`,
+    faqDesc: (country, curr) => `Risposte su coupon Temu e AliExpress in ${country} (${curr}), spesa minima e spedizione.`,
+    keywords: (country, curr, catName, storeName) => [
+      catName && `codice sconto ${catName.toLowerCase()}`,
+      `codice sconto temu ${country}`,
+      `coupon aliexpress ${country}`,
+      storeName && `${storeName.toLowerCase()} ${country}`,
+      'credit777', 'wincredit', curr
+    ]
+  }
+};
+
+/**
+ * Construye título, meta descripción, palabras clave long-tail y locale OG únicos por ruta, país y categoría.
+ */
+export function buildRouteSeoMeta(localeConfig, route = { type: 'home', storeFilter: null, slug: null }) {
+  const normRoute = typeof route === 'string'
+    ? { type: route || 'home', storeFilter: null, slug: null }
+    : (route || { type: 'home', storeFilter: null, slug: null });
+
+  const { type = 'home', storeFilter = null, slug = null } = normRoute;
+  const { dict } = localeConfig;
+  const ui = getSectionText(localeConfig.lang);
+  const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
+  const hasTemu = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
+  const p = SEO_PATTERN_BY_LANG[localeConfig.lang] || SEO_PATTERN_BY_LANG.en;
+  const isCustomLangPack = Boolean(SEO_PATTERN_BY_LANG[localeConfig.lang]);
+
+  const storeName = storeFilter === 'temu' ? 'Temu' : storeFilter === 'aliexpress' ? 'AliExpress' : p.storeAll;
+  const minShipVal = storeFilter === 'temu'
+    ? localeConfig.freeShipTemu
+    : (hasTemu ? Math.min(localeConfig.freeShipTemu || localeConfig.freeShipAli, localeConfig.freeShipAli) : localeConfig.freeShipAli);
+  const shipLabel = p.freeShip(`${localeConfig.currency}${Number(minShipVal || 10).toLocaleString()}`, hasTemu, displayCountry);
+
+  const [langPart, regionPart] = String(localeConfig.code || 'en-us').split('-');
+  const ogLocale = regionPart ? `${langPart}_${regionPart.toUpperCase()}` : langPart;
+
+  const catName = slug ? (dict.categories?.[slug] || ui.catShort?.[slug] || slug) : '';
+  let title = `${dict.heroTitle} (${displayCountry} • ${localeConfig.currencyCode}) | CuponesTech`;
+  let description = isCustomLangPack
+    ? p.homeDesc(storeName, displayCountry, localeConfig.currencyCode, shipLabel, hasTemu)
+    : `${dict.heroTitle} — ${storeName} • ${displayCountry} (${localeConfig.currencyCode}). ${dict.heroSubtitle}`;
+
+  if (type === 'temu' || type === 'aliexpress') {
+    const labelStore = type === 'temu' ? 'Temu' : 'AliExpress';
+    title = `${labelStore} ${displayCountry} (${localeConfig.currencyCode}) — ${p.verified} | CuponesTech`;
+    description = isCustomLangPack
+      ? p.storeDesc(labelStore, displayCountry, localeConfig.currencyCode, shipLabel, type === 'temu')
+      : `${labelStore} — ${dict.heroTitle} (${displayCountry}, ${localeConfig.currencyCode}). ${dict.heroSubtitle}`;
+  } else if (type === 'category' && slug) {
+    title = isCustomLangPack
+      ? `${p.catTitle(catName, storeName, displayCountry, localeConfig.currencyCode)} | CuponesTech`
+      : `${catName} — ${storeName} • ${displayCountry} (${localeConfig.currencyCode}) | CuponesTech`;
+    description = isCustomLangPack
+      ? p.catDesc(catName, storeName, displayCountry, localeConfig.currencyCode, shipLabel, hasTemu)
+      : `${catName} — ${storeName} (${displayCountry}, ${localeConfig.currencyCode}). ${dict.heroSubtitle}`;
+  } else if (type === 'dynamics') {
+    title = `${ui.dynamics.title(displayCountry)} — credit777, wincredit, box777 | CuponesTech`;
+    description = isCustomLangPack
+      ? p.dynamicsDesc(displayCountry, localeConfig.currencyCode)
+      : `${ui.dynamics.title(displayCountry)}: credit777, claimcredit, wincredit, box777 — ${ui.dynamics.subtitle}`;
+  } else if (type === 'guides') {
+    title = `${ui.guides.title(displayCountry)} | CuponesTech`;
+    description = dict.seoGuideTitle || ui.guides.title(displayCountry);
+  } else if (type === 'faq') {
+    title = isCustomLangPack
+      ? `${p.faqTitle(displayCountry, localeConfig.currencyCode)} | CuponesTech`
+      : `FAQ — ${displayCountry} (${localeConfig.currencyCode}) | CuponesTech`;
+    description = isCustomLangPack
+      ? p.faqDesc(displayCountry, localeConfig.currencyCode)
+      : `FAQ — ${displayCountry} (${localeConfig.currencyCode}): ${dict.heroSubtitle}`;
+  } else if (['privacy', 'terms', 'about', 'contact'].includes(type)) {
+    const legalTitleMap = {
+      privacy: dict.legal?.privacyTitle,
+      terms: dict.legal?.termsTitle,
+      about: dict.legal?.aboutTitle,
+      contact: dict.legal?.contactTitle
+    };
+    const legalTitle = legalTitleMap[type] || 'Info';
+    title = `${legalTitle} — ${displayCountry} | CuponesTech`;
+    description = `${legalTitle} (${displayCountry}, ${localeConfig.currencyCode}) — CuponesTech.`;
+  }
+
+  const rawKeywords = p.keywords(displayCountry, localeConfig.currencyCode, catName, storeFilter ? storeName : '', hasTemu);
+  if (!isCustomLangPack) {
+    rawKeywords.unshift(dict.heroTitle, catName, displayCountry);
+  }
+  const keywords = [...new Set(rawKeywords.filter(Boolean).map((k) => String(k).trim()))].join(', ');
+
+  return {
+    title,
+    description,
+    keywords,
+    ogLocale
+  };
+}
+
+function buildAutoBreadcrumbs(localeConfig, canonicalUrl, route = {}) {
+  const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
+  const ui = getSectionText(localeConfig.lang);
+  const { type = 'home', storeFilter = null, slug = null } = typeof route === 'object' && route ? route : {};
+  const homeUrl = `${BASE_DOMAIN}/`;
+  const localeUrl = `${BASE_DOMAIN}/${localeConfig.code}`;
+
+  const items = [{ name: 'CuponesTech', item: homeUrl }];
+  if (canonicalUrl === homeUrl) return items;
+
+  items.push({ name: `${displayCountry} (${localeConfig.currencyCode})`, item: localeUrl });
+
+  if (storeFilter === 'temu' || storeFilter === 'aliexpress' || type === 'temu' || type === 'aliexpress') {
+    const sKey = storeFilter || type;
+    const sName = sKey === 'temu' ? 'Temu' : 'AliExpress';
+    items.push({ name: sName, item: `${localeUrl}/${sKey}` });
+  }
+
+  if (type === 'category' && slug) {
+    const catName = localeConfig.dict.categories?.[slug] || ui.catShort?.[slug] || slug;
+    items.push({ name: catName, item: canonicalUrl });
+  } else if (type === 'dynamics') {
+    items.push({ name: ui.navDynamics, item: canonicalUrl });
+  } else if (type === 'guides') {
+    items.push({ name: ui.navGuides, item: canonicalUrl });
+  } else if (type === 'faq') {
+    items.push({ name: ui.navFaq || 'FAQ', item: canonicalUrl });
+  } else if (['privacy', 'terms', 'about', 'contact'].includes(type)) {
+    const map = {
+      privacy: localeConfig.dict.legal?.privacyTitle,
+      terms: localeConfig.dict.legal?.termsTitle,
+      about: localeConfig.dict.legal?.aboutTitle,
+      contact: localeConfig.dict.legal?.contactTitle
+    };
+    items.push({ name: map[type] || type, item: canonicalUrl });
+  }
+
+  return items;
+}
+
+const FAQ_ENABLED_TYPES = new Set(['home', 'temu', 'aliexpress', 'category', 'guides', 'faq']);
+
+export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageTypeOrRoute = '', breadcrumbItems = []) {
+  const isObj = typeof pageTypeOrRoute === 'object' && pageTypeOrRoute !== null;
+  const pageType = isObj ? (pageTypeOrRoute.type || '') : String(pageTypeOrRoute || '');
+  const cleanType = pageType.replace(/^\//, '').toLowerCase();
+
   const schemas = [
     {
       '@context': 'https://schema.org',
@@ -360,6 +643,23 @@ export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageTyp
       url: BASE_DOMAIN
     }
   ];
+
+  const resolvedBreadcrumbs = breadcrumbItems && breadcrumbItems.length > 0
+    ? breadcrumbItems
+    : buildAutoBreadcrumbs(localeConfig, canonicalUrl, isObj ? pageTypeOrRoute : { type: cleanType || 'home' });
+
+  if (resolvedBreadcrumbs.length > 0) {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: resolvedBreadcrumbs.map((b, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: b.name,
+        item: b.item
+      }))
+    });
+  }
 
   if (coupons && coupons.length > 0) {
     schemas.push({
@@ -393,13 +693,18 @@ export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageTyp
     });
   }
 
-  // Only inject FAQPage schema on the dedicated FAQ page where FAQs are actually displayed
-  const isFaqPage =
-    (pageType || '').toLowerCase() === 'faq' ||
-    (pageType || '').toLowerCase().endsWith('/faq') ||
-    (pageType || '').toLowerCase() === 'faq/';
+  const isFaqEnabled =
+    FAQ_ENABLED_TYPES.has(cleanType) ||
+    cleanType === '' ||
+    cleanType.endsWith('faq') ||
+    cleanType.endsWith('temu') ||
+    cleanType.endsWith('aliexpress') ||
+    cleanType.includes('categoria/') ||
+    cleanType.includes('category/') ||
+    cleanType.includes('guias') ||
+    cleanType.includes('guides');
 
-  if (isFaqPage && localeConfig.dict.faqs && localeConfig.dict.faqs.length > 0) {
+  if (isFaqEnabled && localeConfig.dict.faqs && localeConfig.dict.faqs.length > 0) {
     schemas.push({
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
