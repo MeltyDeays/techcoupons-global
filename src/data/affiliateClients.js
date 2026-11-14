@@ -11,7 +11,11 @@ import crypto from 'crypto';
  * Soporta tanto token directo (Bearer) como flujo OAuth2 automático
  * (client_id + client_secret -> https://api.admitad.com/token/)
  */
-export async function getAdmitadAccessToken({ clientId, clientSecret, scope = 'coupons' }) {
+export async function getAdmitadAccessToken({
+  clientId,
+  clientSecret,
+  scope = 'coupons coupons_for_website advcampaigns advcampaigns_for_website'
+}) {
   if (!clientId || !clientSecret) return null;
   const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
   const params = new URLSearchParams({
