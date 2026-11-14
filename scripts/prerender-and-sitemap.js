@@ -134,6 +134,16 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
         </section>`;
   }
 
+  const categoriesNavHtml = CATEGORY_SLUGS.map((catSlug) => {
+    const catPath = getLocalizedCategoryPath(localeConfig, route.storeFilter || 'all', catSlug);
+    const catLabel = dict.categories?.[catSlug] || catSlug;
+    return `<a href="${escapeHtml(catPath)}">${escapeHtml(catLabel)}</a>`;
+  }).join(' |\n          ');
+
+  const regionsLinksHtml = LOCALES.map(
+    (loc) => `<a href="/${loc.code}">${escapeHtml(getLocalizedCountryName(loc, localeConfig.lang))} (${loc.currencyCode})</a>`
+  ).join(' |\n          ');
+
   return `
     <div class="ssg-prerendered-shell" dir="${localeConfig.rtl ? 'rtl' : 'ltr'}">
       <header>
@@ -144,6 +154,9 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
           <a href="/${localeConfig.code}/${slugs.dynamics}">${escapeHtml(ui.navDynamics)}</a> |
           <a href="/${localeConfig.code}/${slugs.guides}">${escapeHtml(ui.navGuides)}</a>
         </nav>
+        <nav class="categories-nav">
+          ${categoriesNavHtml}
+        </nav>
       </header>
       <main>
         <h1>${escapeHtml(heading)}</h1>
@@ -152,6 +165,12 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
           ${couponCardsHtml}
         </section>
         ${sectionContent}
+        <section class="regions-directory">
+          <h2>${escapeHtml(ui.regionsCountLabel ? ui.regionsCountLabel(LOCALES.length) : `${LOCALES.length} regions`)}</h2>
+          <nav>
+            ${regionsLinksHtml}
+          </nav>
+        </section>
       </main>
       <footer>
         <p>${escapeHtml(dict.disclosure)}</p>
@@ -163,6 +182,68 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
       </footer>
     </div>
   `;
+}
+
+function getRouteSeoMeta(routeType) {
+  if (routeType === 'home') return { rank: 1, priority: '1.0', changefreq: 'daily' };
+  if (routeType === 'temu' || routeType === 'aliexpress') return { rank: 2, priority: '0.9', changefreq: 'daily' };
+  if (routeType === 'category') return { rank: 3, priority: '0.8', changefreq: 'daily' };
+  if (['dynamics', 'guides', 'faq'].includes(routeType)) return { rank: 4, priority: '0.7', changefreq: 'weekly' };
+  return { rank: 5, priority: '0.3', changefreq: 'monthly' };
+}
+
+function buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonicalUrl, defaultLocObj) {
+  const ui = getSectionText(localeConfig.lang);
+  const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
+
+  let pageTitle = `${localeConfig.dict.heroTitle} | CuponesTech`;
+  if (route.type === 'temu') pageTitle = `Temu — ${localeConfig.dict.heroTitle}`;
+  if (route.type === 'aliexpress') pageTitle = `AliExpress — ${localeConfig.dict.heroTitle}`;
+  if (route.type === 'dynamics') pageTitle = `${ui.dynamics.title(displayCountry)} | CuponesTech`;
+  if (route.type === 'guides') pageTitle = `${ui.guides.title(displayCountry)} | CuponesTech`;
+  if (route.type === 'category') {
+    const catName = localeConfig.dict.categories[route.slug] || route.slug;
+    pageTitle = `${catName} — ${displayCountry} (${localeConfig.currencyCode}) | CuponesTech`;
+  }
+  if (['privacy', 'terms', 'about', 'contact', 'faq'].includes(route.type)) {
+    const map = {
+      privacy: localeConfig.dict.legal.privacyTitle,
+      terms: localeConfig.dict.legal.termsTitle,
+      about: localeConfig.dict.legal.aboutTitle,
+      contact: localeConfig.dict.legal.contactTitle,
+      faq: `Preguntas Frecuentes (FAQ)`
+    };
+    pageTitle = `${map[route.type]} — ${displayCountry} | CuponesTech`;
+  }
+
+  const pageDesc = localeConfig.dict.heroSubtitle;
+
+  const hreflangTags = LOCALES.map((loc) => {
+    const altSuffix = getRouteSuffixForLocale(route, loc);
+    return `<link rel="alternate" hreflang="${loc.code}" href="${BASE_DOMAIN}/${loc.code}${altSuffix}" />`;
+  }).join('\n    ');
+
+  const xDefaultSuffix = getRouteSuffixForLocale(route, defaultLocObj);
+  const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${xDefaultSuffix}" />`;
+  const canonicalTag = `<link rel="canonical" href="${canonicalUrl}" />`;
+
+  const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl, route.type);
+  const schemaScripts = schemas
+    .map((s) => `<script type="application/ld+json">${JSON.stringify(s)}</script>`)
+    .join('\n    ');
+
+  const headInjection = [canonicalTag, hreflangTags, xDefaultTag, schemaScripts].join('\n    ');
+  const staticBody = buildStaticBodyMarkup(localeConfig, route, coupons);
+
+  return templateHtml
+    .replace(/<html lang="[^"]*" dir="[^"]*">/, `<html lang="${localeConfig.code}" dir="${localeConfig.rtl ? 'rtl' : 'ltr'}">`)
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(pageTitle)}</title>`)
+    .replace(
+      /<meta name="description" content="[^"]*"\s*\/?>/,
+      `<meta name="description" content="${escapeHtml(pageDesc)}" />`
+    )
+    .replace('<!--SEO_HEAD_INJECT-->', headInjection)
+    .replace('<!--SSG_CONTENT_INJECT-->', staticBody);
 }
 
 function runPrerenderAndSitemap() {
@@ -185,58 +266,7 @@ function runPrerenderAndSitemap() {
 
       const routeSuffix = getRouteSuffixForLocale(route, localeConfig);
       const canonicalUrl = `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`;
-
-      const ui = getSectionText(localeConfig.lang);
-      const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
-
-      let pageTitle = `${localeConfig.dict.heroTitle} | CuponesTech`;
-      if (route.type === 'temu') pageTitle = `Temu — ${localeConfig.dict.heroTitle}`;
-      if (route.type === 'aliexpress') pageTitle = `AliExpress — ${localeConfig.dict.heroTitle}`;
-      if (route.type === 'dynamics') pageTitle = `${ui.dynamics.title(displayCountry)} | CuponesTech`;
-      if (route.type === 'guides') pageTitle = `${ui.guides.title(displayCountry)} | CuponesTech`;
-      if (route.type === 'category') {
-        const catName = localeConfig.dict.categories[route.slug] || route.slug;
-        pageTitle = `${catName} — ${displayCountry} (${localeConfig.currencyCode}) | CuponesTech`;
-      }
-      if (['privacy', 'terms', 'about', 'contact', 'faq'].includes(route.type)) {
-        const map = {
-          privacy: localeConfig.dict.legal.privacyTitle,
-          terms: localeConfig.dict.legal.termsTitle,
-          about: localeConfig.dict.legal.aboutTitle,
-          contact: localeConfig.dict.legal.contactTitle,
-          faq: `Preguntas Frecuentes (FAQ)`
-        };
-        pageTitle = `${map[route.type]} — ${displayCountry} | CuponesTech`;
-      }
-
-      const pageDesc = localeConfig.dict.heroSubtitle;
-
-      const hreflangTags = LOCALES.map((loc) => {
-        const altSuffix = getRouteSuffixForLocale(route, loc);
-        return `<link rel="alternate" hreflang="${loc.code}" href="${BASE_DOMAIN}/${loc.code}${altSuffix}" />`;
-      }).join('\n    ');
-
-      const xDefaultSuffix = getRouteSuffixForLocale(route, defaultLocObj);
-      const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${xDefaultSuffix}" />`;
-      const canonicalTag = `<link rel="canonical" href="${canonicalUrl}" />`;
-
-      const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl, route.type);
-      const schemaScripts = schemas
-        .map((s) => `<script type="application/ld+json">${JSON.stringify(s)}</script>`)
-        .join('\n    ');
-
-      const headInjection = [canonicalTag, hreflangTags, xDefaultTag, schemaScripts].join('\n    ');
-      const staticBody = buildStaticBodyMarkup(localeConfig, route, coupons);
-
-      const localizedHtml = templateHtml
-        .replace(/<html lang="[^"]*" dir="[^"]*">/, `<html lang="${localeConfig.code}" dir="${localeConfig.rtl ? 'rtl' : 'ltr'}">`)
-        .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(pageTitle)}</title>`)
-        .replace(
-          /<meta name="description" content="[^"]*"\s*\/?>/,
-          `<meta name="description" content="${escapeHtml(pageDesc)}" />`
-        )
-        .replace('<!--SEO_HEAD_INJECT-->', headInjection)
-        .replace('<!--SSG_CONTENT_INJECT-->', staticBody);
+      const localizedHtml = buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonicalUrl, defaultLocObj);
 
       const relativeFolder = path.join(localeConfig.code, routeSuffix.replace(/^\//, ''));
       const targetFolder = path.join(DIST_DIR, relativeFolder);
@@ -246,33 +276,53 @@ function runPrerenderAndSitemap() {
     }
   }
 
-  // Generate Multilingual Sitemap XML with localized hreflang cross-references
-  const urlEntries = [];
-  for (const route of routes) {
-    const xhtmlLinks = [
-      ...LOCALES.map((altLoc) => {
-        const altSuffix = getRouteSuffixForLocale(route, altLoc);
-        return `    <xhtml:link rel="alternate" hreflang="${altLoc.code}" href="${BASE_DOMAIN}/${altLoc.code}${altSuffix}" />`;
-      }),
-      `    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${getRouteSuffixForLocale(route, defaultLocObj)}" />`
-    ].join('\n');
+  // Prerender root index.html so https://cuponestech.tech/ serves full static SEO links & schema
+  const rootCoupons = getCouponsForLocale(defaultLocObj.code, { storeFilter: null, categoryFilter: null });
+  const rootHtml = buildLocalizedHtml(
+    templateHtml,
+    defaultLocObj,
+    { type: 'home', storeFilter: null },
+    rootCoupons,
+    `${BASE_DOMAIN}/`,
+    defaultLocObj
+  );
+  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), rootHtml, 'utf-8');
+  generatedCount++;
 
+  // Generate compact, priority-ordered Sitemap XML (hreflang links live in HTML <head>)
+  const sitemapRecords = [
+    {
+      loc: `${BASE_DOMAIN}/`,
+      rank: 0,
+      priority: '1.0',
+      changefreq: 'daily'
+    }
+  ];
+
+  for (const route of routes) {
+    const seoMeta = getRouteSeoMeta(route.type);
     for (const localeConfig of LOCALES) {
       const routeSuffix = getRouteSuffixForLocale(route, localeConfig);
-      const locUrl = `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`;
-      urlEntries.push(`  <url>
-    <loc>${locUrl}</loc>
-    <lastmod>${todayIso}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>${routeSuffix === '' ? '1.0' : '0.8'}</priority>
-${xhtmlLinks}
-  </url>`);
+      sitemapRecords.push({
+        loc: `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`,
+        ...seoMeta
+      });
     }
   }
 
+  sitemapRecords.sort((a, b) => a.rank - b.rank);
+
+  const urlEntries = sitemapRecords.map(
+    (entry) => `  <url>
+    <loc>${entry.loc}</loc>
+    <lastmod>${todayIso}</lastmod>
+    <changefreq>${entry.changefreq}</changefreq>
+    <priority>${entry.priority}</priority>
+  </url>`
+  );
+
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urlEntries.join('\n')}
 </urlset>
 `;
@@ -280,6 +330,8 @@ ${urlEntries.join('\n')}
   fs.mkdirSync(PUBLIC_DIR, { recursive: true });
   fs.writeFileSync(path.join(PUBLIC_DIR, 'sitemap.xml'), sitemapXml, 'utf-8');
   fs.writeFileSync(path.join(DIST_DIR, 'sitemap.xml'), sitemapXml, 'utf-8');
+  fs.writeFileSync(path.join(PUBLIC_DIR, 'sitemap-index.xml'), sitemapXml, 'utf-8');
+  fs.writeFileSync(path.join(DIST_DIR, 'sitemap-index.xml'), sitemapXml, 'utf-8');
 
   const robotsTxt = `User-agent: *
 Allow: /
@@ -290,7 +342,7 @@ Sitemap: ${BASE_DOMAIN}/sitemap.xml
   fs.writeFileSync(path.join(PUBLIC_DIR, 'robots.txt'), robotsTxt, 'utf-8');
   fs.writeFileSync(path.join(DIST_DIR, 'robots.txt'), robotsTxt, 'utf-8');
 
-  console.log(`[SSG + Sitemap] Generated ${generatedCount} static HTML pages across ${LOCALES.length} locales.`);
+  console.log(`[SSG + Sitemap] Generated ${generatedCount} static HTML pages across ${LOCALES.length} locales (${sitemapRecords.length} URLs in sitemap.xml).`);
 }
 
 runPrerenderAndSitemap();

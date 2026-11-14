@@ -345,7 +345,21 @@ export function formatLocalPrice(usdAmount, localeConfig) {
 }
 
 export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageType = '') {
-  const schemas = [];
+  const schemas = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'CuponesTech',
+      url: BASE_DOMAIN,
+      logo: `${BASE_DOMAIN}/favicon-192x192.png`
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'CuponesTech',
+      url: BASE_DOMAIN
+    }
+  ];
 
   if (coupons && coupons.length > 0) {
     schemas.push({
