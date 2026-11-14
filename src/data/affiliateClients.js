@@ -74,16 +74,37 @@ export async function fetchAdmitadActiveCoupons({ token, clientId, clientSecret,
  * Firma HMAC-SHA256 estándar del protocolo TOP / IOP de AliExpress.
  * Gateway oficial: https://api-sg.aliexpress.com/sync
  */
-export function signAliExpressRequest(apiName, params, appSecret, signMethod = 'sha256') {
-  const sortedKeys = Object.keys(params).sort();
-  let baseString = apiName;
+export function signAliExpressRequest(arg1, arg2, arg3, arg4 = 'sha256') {
+  let apiName = '';
+  let params = {};
+  let appSecret = '';
+  let signMethod = 'sha256';
+
+  if (typeof arg1 === 'string' && typeof arg2 === 'object') {
+    apiName = arg1;
+    params = arg2;
+    appSecret = arg3;
+    signMethod = arg4 || 'sha256';
+  } else if (typeof arg1 === 'object') {
+    params = arg1;
+    appSecret = arg2;
+    signMethod = arg3 || 'sha256';
+  }
+
+  const allParams = { ...params };
+  if (apiName && !allParams.method) {
+    allParams.method = apiName.replace(/^\//, '').replace(/\//g, '.');
+  }
+
+  const sortedKeys = Object.keys(allParams).sort();
+  let baseString = '';
   for (const k of sortedKeys) {
-    baseString += `${k}${params[k]}`;
+    baseString += `${k}${allParams[k]}`;
   }
 
   return crypto
     .createHmac(signMethod, appSecret)
-    .update(baseString)
+    .update(baseString, 'utf-8')
     .digest('hex')
     .toUpperCase();
 }
@@ -96,8 +117,10 @@ export async function callAliExpressOpenPlatform(apiName, businessParams, { appK
   const gatewayUrl = 'https://api-sg.aliexpress.com/sync';
   const timestamp = Date.now();
   const signMethod = 'sha256';
+  const normalizedMethod = apiName.replace(/^\//, '').replace(/\//g, '.');
 
   const allParams = {
+    method: normalizedMethod,
     app_key: String(appKey),
     timestamp: String(timestamp),
     sign_method: signMethod,
@@ -107,17 +130,15 @@ export async function callAliExpressOpenPlatform(apiName, businessParams, { appK
     ...businessParams
   };
 
-  const signature = signAliExpressRequest(apiName, allParams, appSecret, signMethod);
+  const signature = signAliExpressRequest(allParams, appSecret, signMethod);
   allParams.sign = signature;
 
-  const url = new URL(gatewayUrl);
-  for (const [k, v] of Object.entries(allParams)) {
-    url.searchParams.append(k, String(v));
-  }
+  const formBody = new URLSearchParams(allParams).toString();
 
-  const res = await fetch(url.toString(), {
+  const res = await fetch(gatewayUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
+    body: formBody
   });
 
   if (!res.ok) {
@@ -132,9 +153,23 @@ export async function callAliExpressOpenPlatform(apiName, businessParams, { appK
  * Consulta de promociones destacadas en AliExpress Portals
  */
 export async function fetchAliExpressPromos({ appKey, appSecret, trackingId }) {
-  const apiName = '/aliexpress/affiliate/featuredpromo/get';
+  const apiName = 'aliexpress.affiliate.featuredpromo.get';
   const data = await callAliExpressOpenPlatform(apiName, {}, { appKey, appSecret, trackingId });
 
   const promos = data?.aliexpress_affiliate_featuredpromo_get_response?.resp_result?.result?.promos?.promo || [];
   return Array.isArray(promos) ? promos : [promos].filter(Boolean);
+}
+
+/**
+ * Convierte una URL estándar en enlace de afiliado oficial (s.click.aliexpress.com)
+ */
+export async function generateAliExpressTrackingLink({ targetUrl = 'https://www.aliexpress.com', appKey, appSecret, trackingId = 'default' }) {
+  const data = await callAliExpressOpenPlatform('aliexpress.affiliate.link.generate', {
+    promotion_link_type: '0',
+    source_values: targetUrl,
+    tracking_id: trackingId
+  }, { appKey, appSecret, trackingId });
+
+  const link = data?.aliexpress_affiliate_link_generate_response?.resp_result?.result?.promotion_links?.promotion_link?.[0]?.promotion_link;
+  return link || targetUrl;
 }

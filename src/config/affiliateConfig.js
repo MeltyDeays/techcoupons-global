@@ -18,8 +18,8 @@ export const AFFILIATE_CONFIG = {
   temuBaseTrackingUrl: '',
 
   // 4. AliExpress Portals / Admitad AliExpress
-  // Pega aquí tu enlace base de tracking o link de campaña de AliExpress Portals.
-  aliexpressBaseTrackingUrl: '',
+  // Enlace oficial generado y firmado vía AliExpress Open Platform API (Tracking ID: default)
+  aliexpressBaseTrackingUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
 
   // 5. Banners laterales (<aside>) — Si active: false, se ocultan automáticamente
   sidebarBanners: {
