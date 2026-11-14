@@ -1,4 +1,4 @@
-export const INDEXNOW_KEY = 'd84f91a2c3e54b768901f2a3c4d5e6f7';
+export const INDEXNOW_KEY = 'a94e7c21b8034f569d12e3c4b5a6f789';
 export const INDEXNOW_HOST = 'cuponestech.tech';
 export const INDEXNOW_KEY_LOCATION = `https://${INDEXNOW_HOST}/${INDEXNOW_KEY}.txt`;
 const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/indexnow';
