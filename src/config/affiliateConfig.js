@@ -21,10 +21,14 @@ export const AFFILIATE_CONFIG = {
   // Enlace oficial generado y firmado vía AliExpress Open Platform API (Tracking ID: default)
   aliexpressBaseTrackingUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
 
-  // 5. Banners laterales (<aside>) — Si active: false, se ocultan automáticamente
+  // 5. Banner Oficial AliExpress 11.11 USA / Global (300x250)
+  aliexpress1111BannerUrl: 'https://s.click.aliexpress.com/e/_c324e7rz?bz=300*250',
+  aliexpress1111BannerImg: 'https://ae-pic-a1.aliexpress-media.com/kf/Sf58b797f023146b3b1fbe2b9f9f486470.png',
+
+  // 6. Banners laterales (<aside>) — Si active: false, se ocultan automáticamente
   sidebarBanners: {
-    active: false,
+    active: true,
     temuBannerUrl: '',
-    aliexpressBannerUrl: ''
+    aliexpressBannerUrl: 'https://s.click.aliexpress.com/e/_c324e7rz?bz=300*250'
   }
 };

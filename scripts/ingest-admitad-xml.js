@@ -146,8 +146,13 @@ function parseCouponFromXml(xmlChunk) {
   } else if (lowerName.includes('us new user') || lowerName.includes('newus')) {
     countries = ['us'];
     currency = 'USD';
+  } else if (lowerName.includes('oeud') || lowerDesc.includes('bg, hr, cy, ee, gr, lv, lt, lu, mt, ro, sk, si')) {
+    countries = ['bg', 'hr', 'cy', 'ee', 'gr', 'lv', 'lt', 'lu', 'mt', 'ro', 'sk', 'si'];
+    currency = 'USD';
   } else if (lowerName.includes(' sale ww ') || lowerName.includes('otd')) {
-    countries = ['global'];
+    // Los códigos OTD son "Rest of the World (Others)" y en su descripción excluyen explícitamente a 121 países (incluyendo US, NI, MX, ES, CL, AR, CO, etc.).
+    // Solo aplican a países no excluidos (PA, EC, NZ, ZA, MA, etc.) y NUNCA a 'global' ni a los excluidos.
+    countries = ['pa', 'ec', 'nz', 'za', 'ma'];
     currency = 'USD';
   }
 
@@ -194,8 +199,8 @@ function parseCouponFromXml(xmlChunk) {
       en: `${symbol}${discountValue} off orders over ${symbol}${minSpend} — Code ${code}`
     },
     notes: {
-      es: `Promoción oficial 11.11 Global de AliExpress. Válido en checkout para cuentas con país de envío: ${countries.join(', ').toUpperCase()}.`,
-      en: `Official AliExpress 11.11 Global promo. Valid at checkout for accounts shipping to: ${countries.join(', ').toUpperCase()}.`
+      es: `Promoción oficial 11.11 de AliExpress. Válido en checkout para cuentas con país de envío: ${countries.join(', ').toUpperCase()}.`,
+      en: `Official AliExpress 11.11 promo. Valid at checkout for accounts shipping to: ${countries.join(', ').toUpperCase()}.`
     }
   };
 }

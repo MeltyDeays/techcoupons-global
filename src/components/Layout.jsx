@@ -381,20 +381,40 @@ export default function Layout({
                 )}
 
                 {AFFILIATE_CONFIG.sidebarBanners.aliexpressBannerUrl && (
-                  <div className="rounded-xl border border-[#7A3B24]/40 bg-[#F6F2EA] p-4">
-                    <div className="mb-1 flex items-center gap-1.5 text-xs font-bold text-[#7A3B24]">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      <span>ALIEXPRESS</span>
-                    </div>
-                    <a
-                      href={AFFILIATE_CONFIG.sidebarBanners.aliexpressBannerUrl}
-                      target="_blank"
-                      rel="noopener noreferrer sponsored"
-                      className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#7A3B24] px-3 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#5E2C1A] transition"
-                    >
-                      <span>{dict.btnGoStore}</span>
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
+                  <div className="overflow-hidden rounded-xl border border-[#7A3B24]/40 bg-[#F6F2EA] shadow-sm">
+                    {AFFILIATE_CONFIG.aliexpress1111BannerImg ? (
+                      <a
+                        href={AFFILIATE_CONFIG.sidebarBanners.aliexpressBannerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer sponsored"
+                        className="block group overflow-hidden"
+                        title="AliExpress 11.11 Sale - Up to 90% Off"
+                      >
+                        <img
+                          src={AFFILIATE_CONFIG.aliexpress1111BannerImg}
+                          alt="AliExpress 11.11 Sale - Up to 90% Off"
+                          className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
+                          width="300"
+                          height="250"
+                        />
+                      </a>
+                    ) : (
+                      <div className="p-4">
+                        <div className="mb-1 flex items-center gap-1.5 text-xs font-bold text-[#7A3B24]">
+                          <Sparkles className="h-3.5 w-3.5" />
+                          <span>ALIEXPRESS</span>
+                        </div>
+                        <a
+                          href={AFFILIATE_CONFIG.sidebarBanners.aliexpressBannerUrl}
+                          target="_blank"
+                          rel="noopener noreferrer sponsored"
+                          className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#7A3B24] px-3 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#5E2C1A] transition"
+                        >
+                          <span>{dict.btnGoStore}</span>
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
