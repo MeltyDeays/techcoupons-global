@@ -100,14 +100,14 @@ export default async function handler(req, res) {
       });
 
       const { valid, invalid } = parseAndValidateFeed(rawCouponItems, 'aliexpress');
+      // Cupones vinculados a un producto específico permanecen en el catálogo de deals, no en cuponestech_coupons
       results.aliexpress = {
         status: 'CONNECTED',
         fetched: deals.length,
-        couponCandidates: rawCouponItems.length,
-        valid: valid.length,
-        rejected: invalid.length
+        productCoupons: valid.length,
+        rejected: invalid.length,
+        scope: 'product-catalog-only'
       };
-      results.syncedCoupons.push(...valid);
     } catch (err) {
       results.aliexpress = { status: 'ERROR', message: err.message };
     }
