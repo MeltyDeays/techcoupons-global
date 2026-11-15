@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { getSectionText } from '../data/multilingualSections.js';
-import { resolveCouponExpiration } from '../data/couponLifecycle.js';
+import { resolveCouponExpiration, isNewUserCoupon } from '../data/couponLifecycle.js';
 import {
   Copy,
   Check,
@@ -21,7 +21,9 @@ import {
   Puzzle,
   Bike,
   PawPrint,
-  Baby
+  Baby,
+  Users,
+  UserCheck
 } from 'lucide-react';
 
 const CATEGORY_ICONS = {
@@ -133,6 +135,8 @@ export default function CouponCard({ coupon, localeConfig }) {
   };
 
   const isTemu = coupon.store === 'temu';
+  const isEs = localeConfig.lang === 'es';
+  const isNewUser = isNewUserCoupon(coupon);
   const CategoryIcon = CATEGORY_ICONS[coupon.category] || Tag;
   const shortCatLabel = ui.catShort?.[coupon.category] || coupon.categoryLabel;
   const maskedCode =
@@ -140,8 +144,41 @@ export default function CouponCard({ coupon, localeConfig }) {
 
   return (
     <>
-      <article className="group relative flex w-full max-w-full min-w-0 overflow-hidden flex-col justify-between rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-4 sm:p-5 shadow-[0_4px_20px_-6px_rgba(31,27,24,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#B85332]/60 hover:shadow-[0_12px_26px_-8px_rgba(184,83,50,0.14)] font-sans">
+      <article
+        className={`group relative flex w-full max-w-full min-w-0 overflow-hidden flex-col justify-between rounded-2xl font-sans transition-all duration-200 hover:-translate-y-0.5 p-4 sm:p-5 ${
+          isNewUser
+            ? 'border-2 border-[#E0A838] bg-gradient-to-b from-[#FFFDF7] to-[#FCF9F4] shadow-[0_4px_20px_-6px_rgba(217,119,6,0.14)] hover:border-[#D97706] hover:shadow-[0_12px_26px_-8px_rgba(217,119,6,0.22)] border-l-4 border-l-[#D97706]'
+            : 'border border-[#DED4C6] bg-[#FCF9F4] shadow-[0_4px_20px_-6px_rgba(31,27,24,0.06)] hover:border-[#3D6352]/60 hover:shadow-[0_12px_26px_-8px_rgba(61,99,82,0.14)] border-l-4 border-l-[#3D6352]'
+        }`}
+      >
         <div className="min-w-0">
+          {/* Prominent Eligibility Banner: New Accounts vs All Users */}
+          {isNewUser ? (
+            <div className="mb-2.5 flex items-center justify-between gap-1.5 rounded-lg bg-gradient-to-r from-[#FEF3C7] via-[#FDE68A]/70 to-[#FEF3C7] border border-[#F59E0B]/50 px-2.5 py-1 text-[11px] font-black text-[#92400E] shadow-2xs">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Sparkles className="h-3.5 w-3.5 text-[#D97706] shrink-0" />
+                <span className="uppercase tracking-wider truncate">
+                  {isEs ? '🌟 Solo Nuevos Usuarios (1ª Compra)' : '🌟 New Accounts Only (First Order)'}
+                </span>
+              </div>
+              <span className="text-[10px] font-extrabold uppercase rounded bg-[#F59E0B]/25 text-[#78350F] px-1.5 py-0.5 shrink-0 border border-[#F59E0B]/30">
+                {isEs ? 'Cuenta Nueva' : 'New User'}
+              </span>
+            </div>
+          ) : (
+            <div className="mb-2.5 flex items-center justify-between gap-1.5 rounded-lg bg-[#3D6352]/10 border border-[#3D6352]/25 px-2.5 py-1 text-[11px] font-bold text-[#2A573F]">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Users className="h-3.5 w-3.5 text-[#2A573F] shrink-0" />
+                <span className="uppercase tracking-wider truncate">
+                  {isEs ? '👥 Válido para Todos los Usuarios' : '👥 Valid for All Shoppers'}
+                </span>
+              </div>
+              <span className="text-[10px] font-bold rounded bg-[#3D6352]/15 text-[#1F4431] px-1.5 py-0.5 shrink-0 border border-[#3D6352]/20">
+                {isEs ? 'Sin Restricción' : 'All Accounts'}
+              </span>
+            </div>
+          )}
+
           {/* Top bar: Localized Store Badge + Clean Category Pill */}
           <div className="mb-2.5 flex flex-wrap items-center justify-between gap-1.5">
             <span
@@ -183,14 +220,33 @@ export default function CouponCard({ coupon, localeConfig }) {
           {/* Requisitos reales del cupón */}
           {coupon.requirements?.length > 0 && (
             <ul className="mb-3.5 space-y-1 rounded-xl bg-[#F3ECE2] px-3 py-2 border border-[#E5DAC9]">
-              {coupon.requirements.map((r) => (
-                <li key={r} className="flex items-start gap-1.5 text-[11px] leading-snug text-[#574B40] break-words">
-                  <Check className="h-3 w-3 mt-0.5 shrink-0 text-[#3D6352]" />
-                  <span>{r}</span>
-                </li>
-              ))}
+              {coupon.requirements.map((r) => {
+                const isReqNewUser = /new accounts?|solo cuentas nuevas|primera compra|first order/i.test(r);
+                const isReqAllUsers = /todos los usuarios|all users|valid for all/i.test(r);
+                return (
+                  <li
+                    key={r}
+                    className={`flex items-start gap-1.5 text-[11px] leading-snug rounded px-1.5 py-0.5 break-words ${
+                      isReqNewUser
+                        ? 'font-bold text-[#92400E] bg-[#FEF3C7] border border-[#F59E0B]/35 shadow-2xs'
+                        : isReqAllUsers
+                        ? 'font-semibold text-[#2A573F] bg-[#3D6352]/8'
+                        : 'text-[#574B40]'
+                    }`}
+                  >
+                    {isReqNewUser ? (
+                      <Sparkles className="h-3.5 w-3.5 mt-0.5 shrink-0 text-[#D97706]" />
+                    ) : isReqAllUsers ? (
+                      <Users className="h-3.5 w-3.5 mt-0.5 shrink-0 text-[#2A573F]" />
+                    ) : (
+                      <Check className="h-3 w-3 mt-0.5 shrink-0 text-[#3D6352]" />
+                    )}
+                    <span>{r}</span>
+                  </li>
+                );
+              })}
               {coupon.appliesToText && (
-                <li className="text-[11px] font-semibold leading-snug text-[#9E4224] break-words">• {coupon.appliesToText}</li>
+                <li className="text-[11px] font-semibold leading-snug text-[#9E4224] px-1.5 py-0.5 break-words">• {coupon.appliesToText}</li>
               )}
             </ul>
           )}
@@ -202,9 +258,22 @@ export default function CouponCard({ coupon, localeConfig }) {
                 <span className="text-[10px] uppercase tracking-wider font-bold text-[#6E6055] block">
                   {ui.directDiscount}
                 </span>
-                <span className="font-display text-xl sm:text-2xl font-bold text-[#B85332]">
-                  {coupon.discountLabel}
-                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-display text-xl sm:text-2xl font-bold text-[#B85332]">
+                    {coupon.discountLabel}
+                  </span>
+                  {isNewUser ? (
+                    <span className="inline-flex items-center gap-1 rounded bg-[#FEF3C7] border border-[#F59E0B]/40 px-1.5 py-0.5 text-[10px] font-black text-[#92400E]">
+                      <Sparkles className="h-3 w-3 text-[#D97706]" />
+                      {isEs ? 'Bienvenida' : 'Welcome'}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded bg-[#3D6352]/12 border border-[#3D6352]/25 px-1.5 py-0.5 text-[10px] font-bold text-[#2A573F]">
+                      <Users className="h-3 w-3 text-[#2A573F]" />
+                      {isEs ? 'Universal' : 'Universal'}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="text-right">
@@ -329,6 +398,33 @@ export default function CouponCard({ coupon, localeConfig }) {
             <p className="mb-1.5 text-sm font-bold text-[#1F1B18]">{coupon.title}</p>
             {coupon.appliesToText && (
               <p className="mb-3.5 text-xs leading-relaxed text-[#574B40]">{coupon.appliesToText}</p>
+            )}
+
+            {/* Clear Account Eligibility Callout Inside Modal */}
+            {isNewUser ? (
+              <div className="mb-3.5 rounded-xl border border-[#F59E0B]/50 bg-[#FEF3C7] p-3 text-xs text-[#92400E]">
+                <div className="flex items-center gap-1.5 font-black text-[#92400E] mb-1">
+                  <Sparkles className="h-4 w-4 text-[#D97706] shrink-0" />
+                  <span>{isEs ? '⚠️ ATENCIÓN: Cupón Exclusivo para Cuentas Nuevas' : '⚠️ NOTICE: Exclusive for New Accounts'}</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-[#78350F]">
+                  {isEs
+                    ? 'Este código solo se aplica si es tu primera compra con la cuenta. Si ya has comprado antes, el sistema de la tienda lo rechazará como no elegible.'
+                    : 'This coupon is strictly restricted to your first order. If you previously made a purchase on this account, the store checkout will reject it.'}
+                </p>
+              </div>
+            ) : (
+              <div className="mb-3.5 rounded-xl border border-[#3D6352]/30 bg-[#F0F6F2] p-3 text-xs text-[#2A573F]">
+                <div className="flex items-center gap-1.5 font-bold text-[#2A573F] mb-1">
+                  <Users className="h-4 w-4 text-[#2A573F] shrink-0" />
+                  <span>{isEs ? '✓ Cupón Universal (Cuentas Nuevas y Existentes)' : '✓ Universal Coupon (New & Existing Accounts)'}</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-[#1F4431]">
+                  {isEs
+                    ? 'Puedes aplicar este cupón directamente en el carrito sin restricción de ser nuevo usuario.'
+                    : 'You can apply this coupon at checkout whether you are a new or returning customer.'}
+                </p>
+              </div>
             )}
 
             {/* Primary Revealed Code + Copy Button */}

@@ -24,6 +24,7 @@ import CouponCard from './components/CouponCard.jsx';
 import HotDealsGrid from './components/HotDealsGrid.jsx';
 import { CouponStackingGuide, CountryFAQ } from './components/NativeSEOGuide.jsx';
 import EventCountdownBanner from './components/EventCountdownBanner.jsx';
+import { isNewUserCoupon } from './data/couponLifecycle.js';
 import {
   Search,
   Info,
@@ -49,7 +50,8 @@ import {
   Bike,
   PawPrint,
   Baby,
-  TicketPercent
+  TicketPercent,
+  Users
 } from 'lucide-react';
 
 const CATEGORY_ICONS = {
@@ -77,6 +79,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyEvent1111, setOnlyEvent1111] = useState(false);
+  const [userTypeFilter, setUserTypeFilter] = useState('all'); // 'all' | 'regular' | 'new'
 
   if (!LOCALE_MAP[(locale || '').toLowerCase()]) {
     return <Navigate to={`/${DEFAULT_LOCALE}`} replace />;
@@ -138,7 +141,12 @@ export function MarketCatalogPage({ storeFilter = null }) {
     ? baseCoupons.filter((c) => c.eventId || c.code?.toLowerCase().includes('11') || c.id?.toLowerCase().includes('11'))
     : baseCoupons;
 
+  const newUserCount = coupons.filter(isNewUserCoupon).length;
+  const regularUserCount = coupons.length - newUserCount;
+
   const filteredCoupons = coupons.filter((c) => {
+    if (userTypeFilter === 'new' && !isNewUserCoupon(c)) return false;
+    if (userTypeFilter === 'regular' && isNewUserCoupon(c)) return false;
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -286,6 +294,58 @@ export function MarketCatalogPage({ storeFilter = null }) {
 
       {/* Coupon Grid */}
       <section aria-label="Verified Checkout Coupons" className="w-full max-w-full min-w-0">
+        {/* Audience / User Type Filter Bar */}
+        {coupons.length > 0 && (
+          <div className="mb-4 sm:mb-5 flex flex-wrap items-center justify-between gap-2.5 rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-3 sm:p-3.5 shadow-xs">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#574B40]">
+              <Users className="h-4 w-4 text-[#B85332]" />
+              <span>{localeConfig.lang === 'es' ? 'Filtrar por tipo de cuenta:' : 'Filter by account type:'}</span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setUserTypeFilter('all')}
+                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                  userTypeFilter === 'all'
+                    ? 'bg-[#1F1B18] text-[#FCF9F4] shadow-xs'
+                    : 'bg-[#F0E9DF] text-[#574B40] hover:bg-[#E5DAC9] hover:text-[#1F1B18]'
+                }`}
+              >
+                {localeConfig.lang === 'es' ? 'Todos' : 'All'} ({coupons.length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setUserTypeFilter('regular')}
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition border ${
+                  userTypeFilter === 'regular'
+                    ? 'bg-[#3D6352] text-[#FCF9F4] border-[#3D6352] shadow-xs'
+                    : 'bg-[#F0F6F2] text-[#2A573F] border-[#BBDBC6] hover:bg-[#E2EFE6]'
+                }`}
+              >
+                <Users className="h-3.5 w-3.5" />
+                <span>{localeConfig.lang === 'es' ? '👥 Para Todos' : '👥 All Shoppers'}</span>
+                <span className="text-[10px] font-bold opacity-80">({regularUserCount})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setUserTypeFilter('new')}
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black transition border ${
+                  userTypeFilter === 'new'
+                    ? 'bg-[#D97706] text-[#FCF9F4] border-[#D97706] shadow-xs'
+                    : 'bg-[#FEF3C7] text-[#92400E] border-[#F59E0B]/50 hover:bg-[#FDE68A]'
+                }`}
+              >
+                <Sparkles className="h-3.5 w-3.5 text-[#D97706]" />
+                <span>{localeConfig.lang === 'es' ? '🌟 Nuevos Usuarios' : '🌟 New Users Only'}</span>
+                <span className="text-[10px] font-bold opacity-80">({newUserCount})</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {filteredCoupons.length === 0 ? (
           <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 sm:p-8 text-center">
             <p className="text-base sm:text-lg font-extrabold text-[#1F1B18] mb-2">

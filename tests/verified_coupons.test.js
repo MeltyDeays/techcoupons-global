@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { validateCoupon, VERIFIED_COUPONS } from '../src/data/verifiedCoupons.js';
 import { getCouponsForLocale } from '../src/data/couponsGenerator.js';
 import { parseAndValidateFeed } from '../scripts/ingest-coupons.js';
+import { isNewUserCoupon } from '../src/data/couponLifecycle.js';
 
 const NOW = new Date('2026-11-12T12:00:00Z');
 const base = {
@@ -115,5 +116,15 @@ describe('Cupones verificados', () => {
     assert.equal(valid.length, 2);
     assert.deepEqual(valid[0].countries, ['global']);
     assert.deepEqual(valid[1].countries, ['es']);
+  });
+
+  it('V11: isNewUserCoupon detecta correctamente cupones para cuentas nuevas vs universales', () => {
+    assert.equal(isNewUserCoupon({ userType: 'new' }), true);
+    assert.equal(isNewUserCoupon({ userType: 'all', code: '12NEWUSOFF' }), true);
+    assert.equal(isNewUserCoupon({ userType: 'all', title: 'Solo cuentas nuevas' }), true);
+    assert.equal(isNewUserCoupon({ userType: 'all', requirements: ['New accounts only (first order)'] }), true);
+    assert.equal(isNewUserCoupon({ userType: 'all', code: 'SAVE10', title: 'Descuento general' }), false);
+    assert.equal(isNewUserCoupon({ userType: 'existing', code: 'VIPBACK' }), false);
+    assert.equal(isNewUserCoupon(null), false);
   });
 });

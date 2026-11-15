@@ -299,3 +299,22 @@ export function addCouponTombstone(couponIdOrCode) {
     } catch {}
   }
 }
+
+/**
+ * Determina si un cupón está diseñado exclusivamente para usuarios nuevos / 1ª compra.
+ */
+export function isNewUserCoupon(coupon) {
+  if (!coupon || typeof coupon !== 'object') return false;
+  if (coupon.userType === 'new') return true;
+  const raw = `${coupon.code || ''} ${coupon.title || ''} ${coupon.appliesToText || ''} ${(coupon.requirements || []).join(' ')}`.toLowerCase();
+  return (
+    raw.includes('new accounts only') ||
+    raw.includes('solo cuentas nuevas') ||
+    raw.includes('primera compra') ||
+    raw.includes('first order') ||
+    raw.includes('new user') ||
+    raw.includes('usuarios nuevos') ||
+    /newusoff|newoff|newuser/i.test(coupon.code || '')
+  );
+}
+
