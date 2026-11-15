@@ -21,6 +21,7 @@ import { AFFILIATE_CONFIG } from './config/affiliateConfig.js';
 import Layout from './components/Layout.jsx';
 import SEOHead from './components/SEOHead.jsx';
 import CouponCard from './components/CouponCard.jsx';
+import HotDealsGrid from './components/HotDealsGrid.jsx';
 import { CouponStackingGuide, CountryFAQ } from './components/NativeSEOGuide.jsx';
 import EventCountdownBanner from './components/EventCountdownBanner.jsx';
 import {
@@ -305,6 +306,13 @@ export function MarketCatalogPage({ storeFilter = null }) {
           </div>
         )}
       </section>
+
+      {/* Featured Products & Hot Deals Catalog from AliExpress Portals */}
+      <HotDealsGrid
+        localeConfig={localeConfig}
+        storeFilter={storeFilter}
+        categoryFilter={categoryFilter}
+      />
     </Layout>
   );
 }
