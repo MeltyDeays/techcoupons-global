@@ -15,6 +15,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { validateCoupon } from '../src/data/verifiedCoupons.js';
+import { parseAliExpressPromoCodeInfo } from '../src/data/affiliateClients.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -67,8 +68,9 @@ function normalizeAdmitad(item) {
 
 function normalizeAliExpressPortals(item) {
   // Mapeo estándar de promo_code_info de AliExpress Affiliate API
-  const promoCode = item.promo_code || item.code || item.coupon_code || '';
-  const countryField = item.country || item.country_code || item.regions || '';
+  const parsed = parseAliExpressPromoCodeInfo(item, item.currency || 'USD');
+  const promoCode = parsed?.code || item.promo_code || item.code || item.coupon_code || '';
+  const countryField = item.countries || item.country || item.country_code || item.regions || '';
 
   let countries = ['global'];
   if (countryField) {
@@ -78,7 +80,7 @@ function normalizeAliExpressPortals(item) {
     } else if (Array.isArray(countryField) && countryField.length > 0) {
       countries = countryField.some(isGlobalRegion)
         ? ['global']
-        : countryField.map((c) => String(c).toLowerCase().trim()).filter(Boolean);
+        : [...new Set(countryField.map((c) => String(c).toLowerCase().trim()).filter(Boolean))];
     }
   }
 
@@ -89,28 +91,46 @@ function normalizeAliExpressPortals(item) {
     ? new Date(item.code_availabletime_end).toISOString()
     : '';
 
+  const discountVal = parsed?.numericValue > 0
+    ? parsed.numericValue
+    : Number(item.code_amount || item.discount || 0);
+  const minSpendVal = parsed?.numericMinSpend >= 0
+    ? parsed.numericMinSpend
+    : Number(item.code_mini_spend || item.min_spend || 0);
+  const currency = parsed?.currency || item.currency || 'USD';
+  const productTitle = String(item.product_title || '').trim();
+  const productSuffix = productTitle ? ` — ${productTitle.slice(0, 70)}` : '';
+
   return {
-    id: `ali-${promoCode}`,
+    id: `ali-${item.product_id || promoCode}-${promoCode}`.toLowerCase(),
     store: 'aliexpress',
     code: String(promoCode).trim(),
     countries: countries.length ? countries : ['global'],
     userType: item.is_new_user ? 'new' : 'all',
-    currency: item.currency || 'USD',
+    currency,
     discountType: 'fixed',
-    discountValue: Number(item.code_value || item.code_amount || item.discount || 0),
+    discountValue: discountVal,
     maxDiscount: null,
-    minSpend: Number(item.code_mini_spend || item.min_spend || 0),
+    minSpend: minSpendVal,
     validFrom,
     validUntil,
     channel: item.channel === 'app' ? 'app' : 'both',
     sourceUrl: item.code_promotionurl || 'https://portals.aliexpress.com',
     lastVerifiedAt: new Date().toISOString(),
     affiliateUrl: item.code_promotionurl || '',
-    category: null,
+    category: item.category || null,
     title: {
-      es: `Descuento de $${item.code_value || item.discount} en pedidos desde $${item.code_mini_spend || 0}`,
-      en: `$${item.code_value || item.discount} off orders over $${item.code_mini_spend || 0}`
-    }
+      es: `Descuento de ${currency} ${discountVal} en pedido mín. ${currency} ${minSpendVal}${productSuffix}`,
+      en: `${currency} ${discountVal} off orders over ${currency} ${minSpendVal}${productSuffix}`
+    },
+    ...(productTitle
+      ? {
+          notes: {
+            es: `Cupón específico de vendedor/producto aplicable al artículo: ${productTitle}`,
+            en: `Seller/product-specific promo code valid for item: ${productTitle}`
+          }
+        }
+      : {})
   };
 }
 

@@ -57,23 +57,46 @@ export default function HotDealsGrid({
   const isEs = localeConfig.lang === 'es';
   const { dict } = localeConfig;
   const ui = getSectionText(localeConfig.lang);
+  const countryIso = String(localeConfig.iso || '').toLowerCase();
+
+  // Filtrar ofertas aplicables al país actual (locales + campañas globales)
+  const countryDeals = useMemo(() => {
+    const matching = ALL_DEALS.filter((d) => {
+      const c = d.countries;
+      if (!Array.isArray(c) || c.length === 0) return true;
+      return c.includes(countryIso) || c.includes('global');
+    });
+
+    return [...matching].sort((a, b) => {
+      const aReg = Array.isArray(a.countries) && a.countries.includes(countryIso) && !a.countries.includes('global') ? 2 : 0;
+      const bReg = Array.isArray(b.countries) && b.countries.includes(countryIso) && !b.countries.includes('global') ? 2 : 0;
+      const aCode = a['Code Name'] ? 1 : 0;
+      const bCode = b['Code Name'] ? 1 : 0;
+      return (bReg + bCode) - (aReg + aCode);
+    });
+  }, [countryIso]);
+
+  const regionalCount = useMemo(
+    () => countryDeals.filter((d) => Array.isArray(d.countries) && d.countries.includes(countryIso) && !d.countries.includes('global')).length,
+    [countryDeals, countryIso]
+  );
 
   // Filtrado de productos según la categoría seleccionada
   const filteredDeals = useMemo(() => {
-    if (activeCategory === 'all') return ALL_DEALS;
-    return ALL_DEALS.filter((d) => d.category === activeCategory);
-  }, [activeCategory]);
+    if (activeCategory === 'all') return countryDeals;
+    return countryDeals.filter((d) => d.category === activeCategory);
+  }, [activeCategory, countryDeals]);
 
   const displayedDeals = filteredDeals.slice(0, visibleCount);
 
   // Conteo de productos por categoría canónica del sitio
   const categoryCounts = useMemo(() => {
     const counts = {};
-    ALL_DEALS.forEach((d) => {
+    countryDeals.forEach((d) => {
       counts[d.category] = (counts[d.category] || 0) + 1;
     });
     return counts;
-  }, []);
+  }, [countryDeals]);
 
   const handleCopyCode = (e, code) => {
     e.preventDefault();
@@ -91,7 +114,7 @@ export default function HotDealsGrid({
     setVisibleCount(20);
   };
 
-  if (ALL_DEALS.length === 0) return null;
+  if (countryDeals.length === 0) return null;
 
   return (
     <section aria-label="AliExpress Deals" className="w-full max-w-full min-w-0">
@@ -99,7 +122,7 @@ export default function HotDealsGrid({
       <div className="mb-4 sm:mb-6 rounded-2xl border border-[#B85332]/30 bg-gradient-to-r from-[#FCF9F4] via-[#F8F2E8] to-[#FCF9F4] p-4 sm:p-5 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="space-y-1 min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#B85332] px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-[#FCF9F4]">
                 <Flame className="h-3.5 w-3.5" />
                 <span>{isEs ? 'Catálogo de Ofertas AliExpress' : 'AliExpress Deals Catalog'}</span>
@@ -107,16 +130,23 @@ export default function HotDealsGrid({
               <span className="rounded-lg border border-[#D8C8B4] bg-[#FCF9F4] px-2 py-0.5 text-[10px] font-bold text-[#6E6055]">
                 {filteredDeals.length} {isEs ? 'productos' : 'products'}
               </span>
+              {regionalCount > 0 && (
+                <span className="rounded-lg border border-[#3D6352]/30 bg-[#3D6352]/10 px-2 py-0.5 text-[10px] font-bold text-[#3D6352]">
+                  {isEs
+                    ? `${regionalCount} locales (${countryIso.toUpperCase()}) + globales`
+                    : `${regionalCount} local (${countryIso.toUpperCase()}) + global`}
+                </span>
+              )}
             </div>
             <h3 className="text-base sm:text-lg md:text-xl font-extrabold text-[#1F1B18]">
               {isEs
-                ? 'Ofertas Oficiales Clasificadas por Categoría'
-                : 'Official Deals Categorized by Department'}
+                ? `Ofertas Oficiales para ${localeConfig.countryName} por Categoría`
+                : `Official Deals for ${localeConfig.countryName} by Department`}
             </h3>
             <p className="text-xs sm:text-sm text-[#574B40]">
               {isEs
-                ? 'Navega los 381 productos organizados exactamente con las mismas categorías del filtro superior de nuestra página.'
-                : 'Browse all 381 products organized with the exact same categories as our store top filter.'}
+                ? `Explora ${countryDeals.length} productos sincronizados (${regionalCount > 0 ? 'campañas locales + respaldo global' : 'ofertas globales válidas en tu país'}) en las 11 categorías oficiales.`
+                : `Browse ${countryDeals.length} live deals (${regionalCount > 0 ? 'regional + global campaigns' : 'global offers valid in your country'}) across our 11 official categories.`}
             </p>
           </div>
         </div>
@@ -150,7 +180,7 @@ export default function HotDealsGrid({
               <Layers className="h-3.5 w-3.5" />
               <span>{isEs ? 'Todas las ofertas' : 'All Deals'}</span>
               <span className={`text-[10px] ${activeCategory === 'all' ? 'opacity-90' : 'text-[#8A7B70]'}`}>
-                ({ALL_DEALS.length})
+                ({countryDeals.length})
               </span>
             </button>
 
@@ -212,7 +242,9 @@ export default function HotDealsGrid({
             const discountPrice = deal['Discount Price'];
             const discountPct = deal['Discount'];
             const promoUrl = deal['Promotion Url'] || `https://s.click.aliexpress.com/e/_c3mBZjPN`;
-            const code = deal['Code Name'];
+            const rawCode = deal['Code Name'];
+            const codeEndMs = deal['Code End Time'] ? new Date(deal['Code End Time']).getTime() : NaN;
+            const code = rawCode && (!codeEndMs || Number.isNaN(codeEndMs) || codeEndMs >= Date.now()) ? rawCode : '';
             const codeVal = deal['Code Value'];
             const codeMin = deal['Code Minimum Spend'];
             const sales = deal['Sales180Day'];
@@ -220,6 +252,8 @@ export default function HotDealsGrid({
             const catSlug = deal.category;
             const CatIcon = SITE_CATEGORY_ICONS[catSlug] || Tag;
             const catLabel = ui.catShort?.[catSlug] || dict.categories?.[catSlug] || catSlug;
+            const isRegional = Array.isArray(deal.countries) && deal.countries.includes(countryIso) && !deal.countries.includes('global');
+            const isMiamiLockerProxy = isRegional && deal.countries.includes('us') && countryIso !== 'us';
 
             const isCopied = copiedCode === code;
 
@@ -259,10 +293,27 @@ export default function HotDealsGrid({
 
                   {/* Ventas y valoración */}
                   {sales && (
-                    <span className="absolute bottom-2 left-2 rounded-md bg-[#1F1B18]/75 backdrop-blur-sm px-1.5 py-0.5 text-[9px] font-bold text-[#FCF9F4]">
+                    <span className="absolute bottom-2 left-2 rounded-md bg-[#1F1B18]/75 backdrop-blur-sm px-1.5 py-0.5 text-[9px] font-bold text-[#FCF9F4] max-w-[54%] truncate">
                       ★ {feedback || '96%'} • {sales}+ {isEs ? 'ventas' : 'sold'}
                     </span>
                   )}
+
+                  {/* Alcance regional o global de la oferta */}
+                  <span
+                    className={`absolute bottom-2 right-2 rounded-md px-1.5 py-0.5 text-[9px] font-bold backdrop-blur-sm max-w-[42%] truncate shadow-xs ${
+                      isRegional
+                        ? isMiamiLockerProxy
+                          ? 'bg-[#B85332]/90 text-[#FCF9F4]'
+                          : 'bg-[#3D6352]/90 text-[#FCF9F4]'
+                        : 'bg-[#1F1B18]/75 text-[#E5DAC9]'
+                    }`}
+                  >
+                    {isRegional
+                      ? isMiamiLockerProxy
+                        ? `📦 US / ${countryIso.toUpperCase()}`
+                        : `📍 ${countryIso.toUpperCase()}`
+                      : '🌍 Global'}
+                  </span>
                 </div>
 
                 {/* Información del producto */}

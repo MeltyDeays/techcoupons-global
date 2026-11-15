@@ -9,7 +9,7 @@ import { validateCoupon } from '../src/data/verifiedCoupons.js';
 import { parseAndValidateFeed } from '../scripts/ingest-coupons.js';
 import {
   fetchAdmitadActiveCoupons,
-  fetchAliExpressPromos
+  fetchAliExpressMultiCountryDeals
 } from '../src/data/affiliateClients.js';
 import { upsertCouponToDB } from '../src/data/dbClient.js';
 import { LOCALES, BASE_DOMAIN } from '../src/config/locales.js';
@@ -87,16 +87,23 @@ export default async function handler(req, res) {
 
   if (aliAppKey && aliAppSecret) {
     try {
-      const rawPromos = await fetchAliExpressPromos({
+      const { deals, rawCouponItems } = await fetchAliExpressMultiCountryDeals({
         appKey: aliAppKey,
         appSecret: aliAppSecret,
-        trackingId: aliTrackingId
+        trackingId: aliTrackingId || 'default',
+        globalPages: 1,
+        regionalPages: 1,
+        pageSize: 40,
+        maxPerGlobalFeed: 20,
+        maxPerRegionalFeed: 15,
+        concurrency: 6
       });
 
-      const { valid, invalid } = parseAndValidateFeed(rawPromos, 'aliexpress');
+      const { valid, invalid } = parseAndValidateFeed(rawCouponItems, 'aliexpress');
       results.aliexpress = {
         status: 'CONNECTED',
-        fetched: rawPromos.length,
+        fetched: deals.length,
+        couponCandidates: rawCouponItems.length,
         valid: valid.length,
         rejected: invalid.length
       };

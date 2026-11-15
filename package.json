@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build && node scripts/prerender-and-sitemap.js",
     "preview": "vite preview",
-    "test": "node --test tests/**/*.test.js"
+    "test": "node --test tests/**/*.test.js",
+    "sync:aliexpress": "node --env-file=.env scripts/sync-aliexpress-api.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
