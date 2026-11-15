@@ -42,7 +42,8 @@ export default function Layout({
   activeStore = null,
   activeCategory = null,
   activeSection = 'coupons',
-  children
+  children,
+  bottomContent = null
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -471,6 +472,12 @@ export default function Layout({
           </div>
         </aside>
       </div>
+
+      {bottomContent && (
+        <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 pb-8 overflow-hidden">
+          {bottomContent}
+        </div>
+      )}
 
       {/* Redesigned Structured Footer (Auto-scrolls to top & uses localized URLs per language) */}
       <footer className="mt-12 border-t border-[#D8C8B4] bg-[#ECE5D8] px-3 sm:px-4 py-8 sm:py-10 text-xs text-[#574B40]">

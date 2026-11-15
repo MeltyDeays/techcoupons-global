@@ -165,7 +165,19 @@ export function MarketCatalogPage({ storeFilter = null }) {
   }
 
   return (
-    <Layout localeConfig={localeConfig} activeStore={storeFilter} activeCategory={categoryFilter} activeSection="coupons">
+    <Layout
+      localeConfig={localeConfig}
+      activeStore={storeFilter}
+      activeCategory={categoryFilter}
+      activeSection="coupons"
+      bottomContent={
+        <HotDealsGrid
+          localeConfig={localeConfig}
+          storeFilter={storeFilter}
+          categoryFilter={categoryFilter}
+        />
+      }
+    >
       <SEOHead
         localeConfig={localeConfig}
         route={{ type: categoryFilter ? 'category' : (storeFilter || 'home'), storeFilter, slug: categoryFilter }}
@@ -306,13 +318,6 @@ export function MarketCatalogPage({ storeFilter = null }) {
           </div>
         )}
       </section>
-
-      {/* Featured Products & Hot Deals Catalog from AliExpress Portals */}
-      <HotDealsGrid
-        localeConfig={localeConfig}
-        storeFilter={storeFilter}
-        categoryFilter={categoryFilter}
-      />
     </Layout>
   );
 }

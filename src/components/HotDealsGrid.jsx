@@ -16,7 +16,7 @@ export default function HotDealsGrid({
   storeFilter = null,
   categoryFilter = null
 }) {
-  const [visibleCount, setVisibleCount] = useState(16);
+  const [visibleCount, setVisibleCount] = useState(20);
   const [copiedCode, setCopiedCode] = useState(null);
 
   // If user is specifically on Temu, don't show AliExpress products
@@ -52,7 +52,7 @@ export default function HotDealsGrid({
   if (filteredDeals.length === 0) return null;
 
   return (
-    <section aria-label="AliExpress Hot Deals" className="mt-8 sm:mt-10 w-full max-w-full min-w-0">
+    <section aria-label="AliExpress Hot Deals" className="w-full max-w-full min-w-0">
       {/* Section Header */}
       <div className="mb-4 sm:mb-6 rounded-2xl border border-[#B85332]/30 bg-gradient-to-r from-[#FCF9F4] via-[#F8F2E8] to-[#FCF9F4] p-4 sm:p-5 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -81,7 +81,7 @@ export default function HotDealsGrid({
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 w-full">
         {displayedDeals.map((deal) => {
           const pid = deal.ProductId;
           const img = deal['Image Url'];
@@ -228,14 +228,14 @@ export default function HotDealsGrid({
         <div className="mt-6 sm:mt-8 flex flex-col items-center gap-2">
           <button
             type="button"
-            onClick={() => setVisibleCount((prev) => Math.min(prev + 24, filteredDeals.length))}
+            onClick={() => setVisibleCount((prev) => Math.min(prev + 20, filteredDeals.length))}
             className="inline-flex items-center gap-2 rounded-xl bg-[#1F1B18] px-6 py-3 text-xs sm:text-sm font-extrabold text-[#FCF9F4] hover:bg-[#38312B] transition shadow-md"
           >
             <Sparkles className="h-4 w-4 text-[#FFE000]" />
             <span>
               {isEs
-                ? `Cargar más productos (+${Math.min(24, filteredDeals.length - visibleCount)})`
-                : `Load more products (+${Math.min(24, filteredDeals.length - visibleCount)})`}
+                ? `Cargar más productos (+${Math.min(20, filteredDeals.length - visibleCount)})`
+                : `Load more products (+${Math.min(20, filteredDeals.length - visibleCount)})`}
             </span>
           </button>
           <p className="text-xs text-[#6E6055]">
