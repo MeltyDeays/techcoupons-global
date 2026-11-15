@@ -23,7 +23,7 @@ export const AFFILIATE_CONFIG = {
 
   // 5. Banner Oficial AliExpress 11.11 USA / Global (300x250)
   aliexpress1111BannerUrl: 'https://s.click.aliexpress.com/e/_c324e7rz?bz=300*250',
-  aliexpress1111BannerImg: 'https://ae-pic-a1.aliexpress-media.com/kf/Sf58b797f023146b3b1fbe2b9f9f486470.png',
+  aliexpress1111BannerImg: 'https://ae-pic-a1.aliexpress-media.com/kf/Sf58b797f023146b3b1fbe2b9f9f48647O.png',
 
   // 6. Banners laterales (<aside>) — Si active: false, se ocultan automáticamente
   sidebarBanners: {
