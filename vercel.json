@@ -5,6 +5,34 @@
       "schedule": "0 0 * * 1"
     }
   ],
+  "redirects": [
+    { "source": "/en-se", "destination": "/sv-se", "permanent": true },
+    { "source": "/en-se/:path+", "destination": "/sv-se/:path+", "permanent": true },
+    { "source": "/en-no", "destination": "/no-no", "permanent": true },
+    { "source": "/en-no/:path+", "destination": "/no-no/:path+", "permanent": true },
+    { "source": "/en-dk", "destination": "/da-dk", "permanent": true },
+    { "source": "/en-dk/:path+", "destination": "/da-dk/:path+", "permanent": true },
+    { "source": "/en-fi", "destination": "/fi-fi", "permanent": true },
+    { "source": "/en-fi/:path+", "destination": "/fi-fi/:path+", "permanent": true },
+    { "source": "/en-gr", "destination": "/el-gr", "permanent": true },
+    { "source": "/en-gr/:path+", "destination": "/el-gr/:path+", "permanent": true },
+    { "source": "/en-cz", "destination": "/cs-cz", "permanent": true },
+    { "source": "/en-cz/:path+", "destination": "/cs-cz/:path+", "permanent": true },
+    { "source": "/en-ro", "destination": "/ro-ro", "permanent": true },
+    { "source": "/en-ro/:path+", "destination": "/ro-ro/:path+", "permanent": true },
+    { "source": "/en-hu", "destination": "/hu-hu", "permanent": true },
+    { "source": "/en-hu/:path+", "destination": "/hu-hu/:path+", "permanent": true },
+    { "source": "/ru-ua", "destination": "/uk-ua", "permanent": true },
+    { "source": "/ru-ua/:path+", "destination": "/uk-ua/:path+", "permanent": true },
+    { "source": "/en-my", "destination": "/ms-my", "permanent": true },
+    { "source": "/en-my/:path+", "destination": "/ms-my/:path+", "permanent": true },
+    { "source": "/en-th", "destination": "/th-th", "permanent": true },
+    { "source": "/en-th/:path+", "destination": "/th-th/:path+", "permanent": true },
+    { "source": "/en-vn", "destination": "/vi-vn", "permanent": true },
+    { "source": "/en-vn/:path+", "destination": "/vi-vn/:path+", "permanent": true },
+    { "source": "/en-il", "destination": "/he-il", "permanent": true },
+    { "source": "/en-il/:path+", "destination": "/he-il/:path+", "permanent": true }
+  ],
   "rewrites": [
     {
       "source": "/((?!api/|assets/|favicon\\.ico|favicon\\.svg|favicon-.*\\.png|apple-touch-icon\\.png|site\\.webmanifest|sitemap.*\\.xml|robots\\.txt|google.*\\.html|yandex.*\\.html|BingSiteAuth\\.xml|[a-f0-9]{32}\\.txt).*)",

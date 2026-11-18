@@ -1,7 +1,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LOCALES, BASE_DOMAIN, DEFAULT_LOCALE, CATEGORY_SLUGS, buildStructuredData, buildRouteSeoMeta } from '../src/config/locales.js';
+import {
+  LOCALES,
+  BASE_DOMAIN,
+  DEFAULT_LOCALE,
+  CATEGORY_SLUGS,
+  buildStructuredData,
+  buildRouteSeoMeta,
+  formatLocalPrice,
+  getCatalogDealsForMarket
+} from '../src/config/locales.js';
 import { INDEXNOW_KEY } from '../src/utils/indexnow.js';
 import { getCouponsForLocale } from '../src/data/couponsGenerator.js';
 import {
@@ -72,11 +81,25 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
   const ui = getSectionText(localeConfig.lang);
   const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
   const slugs = getRouteSlugsForLang(localeConfig.lang);
+  const isCatalogRoute = ['home', 'temu', 'aliexpress', 'category'].includes(route.type);
+  const faqMeta = buildRouteSeoMeta(localeConfig, { type: 'faq' });
+  const faqHeading = faqMeta.title.replace(/\s*\|\s*CuponesTech$/, '');
+
   let heading = dict.heroTitle;
+  let subtitle = dict.heroSubtitle;
   if (route.type === 'temu') heading = `Temu — ${dict.heroTitle}`;
   if (route.type === 'aliexpress') heading = `AliExpress — ${dict.heroTitle}`;
-  if (route.type === 'dynamics') heading = ui.dynamics.title(displayCountry);
-  if (route.type === 'guides') heading = ui.guides.title(displayCountry);
+  if (route.type === 'dynamics') {
+    heading = ui.dynamics.title(displayCountry);
+    subtitle = ui.dynamics.subtitle;
+  }
+  if (route.type === 'guides') {
+    const ex20 = formatLocalPrice(20, localeConfig);
+    const ex15 = formatLocalPrice(15, localeConfig);
+    const ex5 = formatLocalPrice(5, localeConfig);
+    heading = ui.guides.title(displayCountry);
+    subtitle = ui.guides.subtitle(ex20, ex15, ex5);
+  }
   if (route.type === 'category') {
     const catName = dict.categories[route.slug] || route.slug;
     heading = `${catName} — ${displayCountry} (${localeConfig.currencyCode})`;
@@ -87,9 +110,15 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
       terms: dict.legal.termsTitle,
       about: dict.legal.aboutTitle,
       contact: dict.legal.contactTitle,
-      faq: `Preguntas Frecuentes (FAQ)`
+      faq: faqHeading
     };
-    heading = `${map[route.type]} — ${displayCountry}`;
+    heading = route.type === 'faq' ? map.faq : `${map[route.type]} — ${displayCountry}`;
+    if (route.type === 'faq') {
+      subtitle = faqMeta.description;
+    } else {
+      const legalMeta = buildRouteSeoMeta(localeConfig, { type: route.type });
+      subtitle = legalMeta.description;
+    }
   }
 
   const couponCardsHtml = coupons
@@ -105,7 +134,38 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
     )
     .join('\n');
 
-  const faqsHtml = dict.faqs
+  let dealsBlock = '';
+  if (isCatalogRoute && route.type !== 'temu' && route.storeFilter !== 'temu') {
+    const staticDeals = getCatalogDealsForMarket(localeConfig, {
+      categorySlug: route.type === 'category' ? route.slug : null,
+      limit: 16
+    });
+    if (staticDeals.length > 0) {
+      const dealsCards = staticDeals
+        .map((d) => {
+          const codeEndMs = d['Code End Time'] ? new Date(d['Code End Time']).getTime() : NaN;
+          const activeCode = d['Code Name'] && (!codeEndMs || Number.isNaN(codeEndMs) || codeEndMs >= Date.now())
+            ? d['Code Name']
+            : '';
+          return `
+        <article class="deal-static-card">
+          <img src="${escapeHtml(d['Image Url'])}" alt="${escapeHtml(d['Product Desc'])}" loading="lazy" />
+          <h3>${escapeHtml(d['Product Desc'])}</h3>
+          <p>${escapeHtml(d['Discount Price'] || '')}${d['Origin Price'] ? ` <s>${escapeHtml(d['Origin Price'])}</s>` : ''}${d.Discount ? ` (${escapeHtml(d.Discount)} OFF)` : ''}</p>
+          ${activeCode ? `<p>${escapeHtml(ui.promoCodeLabel)} <code>${escapeHtml(activeCode)}</code></p>` : ''}
+          <a href="${escapeHtml(d['Promotion Url'] || 'https://s.click.aliexpress.com/e/_c3mBZjPN')}" rel="noopener noreferrer sponsored">${escapeHtml(dict.btnGoStore)}</a>
+        </article>`;
+        })
+        .join('\n');
+      dealsBlock = `
+        <section class="catalog-deals-list">
+          <h2>${escapeHtml(heading)}</h2>
+          ${dealsCards}
+        </section>`;
+    }
+  }
+
+  const faqsHtml = (dict.faqs || [])
     .map(
       (f) => `
       <div class="faq-item">
@@ -126,15 +186,90 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
 
   const faqBlock = `
         <section class="country-faq">
-          <h2>FAQ — ${escapeHtml(displayCountry)}</h2>
+          <h2>${escapeHtml(faqHeading)}</h2>
           <div class="faqs">
             ${faqsHtml}
           </div>
         </section>`;
 
   let sectionContent = '';
-  if (['home', 'temu', 'aliexpress', 'category', 'guides', 'faq'].includes(route.type)) {
-    sectionContent = `${guideBlock}\n${faqBlock}`;
+  if (isCatalogRoute) {
+    sectionContent = `${dealsBlock}\n${guideBlock}\n${faqBlock}`;
+  } else if (route.type === 'dynamics') {
+    const dynCards = (ui.dynamics.items || [])
+      .map(
+        (item) => `
+        <article class="dynamic-static-card">
+          <span>${escapeHtml(item.store)} — ${escapeHtml(item.badge)}</span>
+          <h2>${escapeHtml(item.title)}</h2>
+          <p>${escapeHtml(item.howItWorks)}</p>
+          <p>${escapeHtml(ui.dynamics.typeInSearch)} <code>${escapeHtml(item.code)}</code></p>
+        </article>`
+      )
+      .join('\n');
+    sectionContent = `
+        <section class="dynamics-list">
+          ${dynCards}
+        </section>
+        ${faqBlock}`;
+  } else if (route.type === 'guides') {
+    const ex20 = formatLocalPrice(20, localeConfig);
+    const ex15 = formatLocalPrice(15, localeConfig);
+    const ex5 = formatLocalPrice(5, localeConfig);
+    const g = ui.guides;
+    const stepsHtml = g.steps(ex20, ex15, ex5)
+      .map(
+        (s) => `
+          <div class="guide-step">
+            <span>${escapeHtml(s.step)}</span>
+            <h3>${escapeHtml(s.title)}</h3>
+            <p>${escapeHtml(s.desc)}</p>
+          </div>`
+      )
+      .join('\n');
+    const bulletsHtml = (g.g2Bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join('\n');
+    sectionContent = `
+        <section class="guides-articles">
+          <article class="guide-article">
+            <h2>${escapeHtml(g.g1Title)}</h2>
+            <p>${escapeHtml(g.g1Sub)}</p>
+            <p>${escapeHtml(g.g1Desc(localeConfig.currencyCode))}</p>
+            ${stepsHtml}
+          </article>
+          <article class="guide-article">
+            <h2>${escapeHtml(g.g2Title)}</h2>
+            <p>${escapeHtml(g.g2Sub(displayCountry))}</p>
+            <p>${escapeHtml(g.g2Desc)}</p>
+            <ul>${bulletsHtml}</ul>
+          </article>
+          <article class="guide-article">
+            <h2>${escapeHtml(g.g3Title)}</h2>
+            <p>${escapeHtml(g.g3Sub)}</p>
+            <p>${escapeHtml(g.g3Desc(displayCountry))}</p>
+          </article>
+        </section>
+        ${guideBlock}
+        ${faqBlock}`;
+  } else if (route.type === 'faq') {
+    sectionContent = `${faqBlock}\n${guideBlock}`;
+  } else if (['privacy', 'terms', 'about', 'contact'].includes(route.type)) {
+    const bodyMap = {
+      privacy: dict.legal?.privacyBody,
+      terms: dict.legal?.termsBody,
+      about: dict.legal?.aboutBody,
+      contact: dict.legal?.contactBody
+    };
+    sectionContent = `
+        <article class="legal-content">
+          <p>${escapeHtml(bodyMap[route.type] || '')}</p>
+          <div class="legal-meta">
+            <p><strong>${escapeHtml(ui.regionLabel)}</strong> ${escapeHtml(displayCountry)} (${escapeHtml(localeConfig.code.toUpperCase())})</p>
+            <p><strong>${escapeHtml(ui.currencyLabel)}</strong> ${escapeHtml(localeConfig.currencyCode)} (${escapeHtml(localeConfig.currency)})</p>
+            <p><strong>${escapeHtml(ui.cpaComplianceLabel)}</strong> ${escapeHtml(ui.cpaComplianceText)}</p>
+            <p>${escapeHtml(dict.disclosure)}</p>
+          </div>
+        </article>
+        ${faqBlock}`;
   }
 
   const categoriesNavHtml = CATEGORY_SLUGS.map((catSlug) => {
@@ -163,10 +298,8 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
       </header>
       <main>
         <h1>${escapeHtml(heading)}</h1>
-        <p>${escapeHtml(dict.heroSubtitle)}</p>
-        <section class="coupons-list">
-          ${couponCardsHtml}
-        </section>
+        <p>${escapeHtml(subtitle)}</p>
+        ${isCatalogRoute ? `<section class="coupons-list">\n          ${couponCardsHtml}\n        </section>` : ''}
         ${sectionContent}
         <section class="regions-directory">
           <h2>${escapeHtml(ui.regionsCountLabel ? ui.regionsCountLabel(LOCALES.length) : `${LOCALES.length} regions`)}</h2>
@@ -206,7 +339,10 @@ function buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonica
   }).join('\n    ');
 
   const xDefaultSuffix = getRouteSuffixForLocale(route, defaultLocObj);
-  const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${BASE_DOMAIN}/${DEFAULT_LOCALE}${xDefaultSuffix}" data-dynamic-hreflang="true" />`;
+  const xDefaultHref = route.type === 'home' && !route.storeFilter && !route.slug
+    ? `${BASE_DOMAIN}/`
+    : `${BASE_DOMAIN}/${DEFAULT_LOCALE}${xDefaultSuffix}`;
+  const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${xDefaultHref}" data-dynamic-hreflang="true" />`;
   const canonicalTag = `<link rel="canonical" href="${canonicalUrl}" />`;
   const keywordsTag = `<meta name="keywords" content="${escapeHtml(seoMeta.keywords)}" data-dynamic-meta="true" />`;
   const robotsTag = `<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />`;
@@ -229,7 +365,19 @@ function buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonica
     .map((s) => `<script type="application/ld+json" data-dynamic-schema="true">${JSON.stringify(s)}</script>`)
     .join('\n    ');
 
-  const headInjection = [canonicalTag, robotsTag, keywordsTag, ogTags, hreflangTags, xDefaultTag, schemaScripts].join('\n    ');
+  const isCatalogRoute = ['home', 'temu', 'aliexpress', 'category'].includes(route.type);
+  const ssrStateScript = isCatalogRoute
+    ? `<script id="ssg-coupons-data">window.__SSR_COUPONS__=${JSON.stringify({
+        locale: localeConfig.code,
+        storeFilter: route.storeFilter || null,
+        categoryFilter: route.type === 'category' ? route.slug : null,
+        coupons
+      }).replace(/</g, '\\u003c')};</script>`
+    : '';
+
+  const headInjection = [canonicalTag, robotsTag, keywordsTag, ogTags, hreflangTags, xDefaultTag, schemaScripts, ssrStateScript]
+    .filter(Boolean)
+    .join('\n    ');
   const staticBody = buildStaticBodyMarkup(localeConfig, route, coupons);
 
   return templateHtml
@@ -284,11 +432,14 @@ async function runPrerenderAndSitemap() {
     for (const route of routes) {
       const storeFilter = route.storeFilter || null;
       const categoryFilter = route.type === 'category' ? route.slug : null;
-      const coupons = getCouponsForLocale(
-        localeConfig.code,
-        { storeFilter, categoryFilter },
-        { coupons: dbCoupons.length > 0 ? dbCoupons : undefined }
-      );
+      const isCatalogRoute = ['home', 'temu', 'aliexpress', 'category'].includes(route.type);
+      const coupons = isCatalogRoute
+        ? getCouponsForLocale(
+            localeConfig.code,
+            { storeFilter, categoryFilter },
+            { coupons: dbCoupons.length > 0 ? dbCoupons : undefined }
+          )
+        : [];
 
       const routeSuffix = getRouteSuffixForLocale(route, localeConfig);
       const canonicalUrl = `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`;
@@ -402,4 +553,9 @@ ${urlEntries.join('\n')}
   console.log(`[SSG + Sitemap] Generated ${generatedCount} static HTML pages across ${LOCALES.length} locales (${sitemapRecords.length} URLs in sitemap.xml + IndexNow key).`);
 }
 
-runPrerenderAndSitemap();
+runPrerenderAndSitemap()
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error('[SSG Error]', err);
+    process.exit(1);
+  });

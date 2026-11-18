@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { RootRedirect, MarketCatalogPage, DynamicsPage, GuidesPage, LegalPage } from './App.jsx';
+import { MarketCatalogPage, DynamicsPage, GuidesPage, LegalPage } from './App.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
 import { DEFAULT_LOCALE } from './config/locales.js';
 import { ROUTE_SLUGS_BY_LANG } from './data/multilingualSections.js';
@@ -23,7 +23,7 @@ const CATEGORY_WORDS = uniqueSlugs('category');
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<RootRedirect />} />
+      <Route path="/" element={<MarketCatalogPage storeFilter={null} isRoot={true} />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/:locale/admin" element={<AdminDashboard />} />
       <Route path="/:locale" element={<MarketCatalogPage storeFilter={null} />} />

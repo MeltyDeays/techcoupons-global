@@ -6,7 +6,8 @@ import {
   DEFAULT_LOCALE,
   detectBrowserLocale,
   formatLocalPrice,
-  CATEGORY_SLUGS
+  CATEGORY_SLUGS,
+  buildRouteSeoMeta
 } from './config/locales.js';
 import { getCouponsForLocale } from './data/couponsGenerator.js';
 import {
@@ -74,14 +75,15 @@ export function RootRedirect() {
   return <Navigate to={`/${suggested}`} replace />;
 }
 
-export function MarketCatalogPage({ storeFilter = null }) {
-  const { locale, slug } = useParams();
+export function MarketCatalogPage({ storeFilter = null, isRoot = false }) {
+  const { locale: paramLocale, slug } = useParams();
+  const locale = isRoot ? DEFAULT_LOCALE : paramLocale;
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyEvent1111, setOnlyEvent1111] = useState(false);
   const [userTypeFilter, setUserTypeFilter] = useState('all'); // 'all' | 'regular' | 'new'
 
-  if (!LOCALE_MAP[(locale || '').toLowerCase()]) {
+  if (!isRoot && !LOCALE_MAP[(locale || '').toLowerCase()]) {
     return <Navigate to={`/${DEFAULT_LOCALE}`} replace />;
   }
 
@@ -97,8 +99,8 @@ export function MarketCatalogPage({ storeFilter = null }) {
     return getLocalizedCategoryPath(localeConfig, storeFilter, catSlug);
   };
 
-  const canonicalCatalogPath = getCategoryPath(categoryFilter);
-  if (location.pathname.toLowerCase() !== canonicalCatalogPath.toLowerCase()) {
+  const canonicalCatalogPath = isRoot ? '/' : getCategoryPath(categoryFilter);
+  if (!isRoot && location.pathname.toLowerCase() !== canonicalCatalogPath.toLowerCase()) {
     return <Navigate to={canonicalCatalogPath} replace />;
   }
 
@@ -107,10 +109,20 @@ export function MarketCatalogPage({ storeFilter = null }) {
   const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
   const hasTemuInCountry = (localeConfig.stores || ['temu', 'aliexpress']).includes('temu');
 
-  const [liveCoupons, setLiveCoupons] = useState(null);
+  const ssrMatch =
+    typeof window !== 'undefined' &&
+    window.__SSR_COUPONS__?.locale === localeConfig.code &&
+    (window.__SSR_COUPONS__?.storeFilter || null) === (storeFilter || null) &&
+    (window.__SSR_COUPONS__?.categoryFilter || null) === (categoryFilter || null) &&
+    Array.isArray(window.__SSR_COUPONS__.coupons);
+
+  const [liveCoupons, setLiveCoupons] = useState(() => (ssrMatch ? window.__SSR_COUPONS__.coupons : null));
 
   useEffect(() => {
     let active = true;
+    if (!ssrMatch) {
+      setLiveCoupons(null);
+    }
     const params = new URLSearchParams({
       locale: localeConfig.code,
       ...(storeFilter ? { store: storeFilter } : {}),
@@ -127,7 +139,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
     return () => {
       active = false;
     };
-  }, [localeConfig.code, storeFilter, categoryFilter]);
+  }, [localeConfig.code, storeFilter, categoryFilter, ssrMatch]);
 
   const baseCoupons = liveCoupons !== null
     ? liveCoupons
@@ -156,7 +168,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
     );
   });
 
-  const routeSuffix = canonicalCatalogPath.slice(`/${localeConfig.code}`.length);
+  const routeSuffix = isRoot ? '' : canonicalCatalogPath.slice(`/${localeConfig.code}`.length);
   let customHeading = dict.heroTitle;
 
   if (storeFilter === 'temu' && categoryFilter) {
@@ -191,6 +203,7 @@ export function MarketCatalogPage({ storeFilter = null }) {
         route={{ type: categoryFilter ? 'category' : (storeFilter || 'home'), storeFilter, slug: categoryFilter }}
         routeSuffix={routeSuffix}
         coupons={coupons}
+        isRoot={isRoot}
       />
 
       {/* Automatic Event Calendar & 11.11 Live Countdown Banner */}
@@ -349,10 +362,10 @@ export function MarketCatalogPage({ storeFilter = null }) {
         {filteredCoupons.length === 0 ? (
           <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 sm:p-8 text-center">
             <p className="text-base sm:text-lg font-extrabold text-[#1F1B18] mb-2">
-              {coupons.length === 0
+              {coupons.length === 0 && !(storeFilter === 'temu' && !hasTemuInCountry)
                 ? (localeConfig.lang === 'es'
-                    ? `Ahora mismo no hay cupones verificados para ${displayCountry}. Solo publicamos códigos probados en la tienda real, con país, tipo de cuenta, compra mínima y fecha de vencimiento.`
-                    : `No verified coupons for ${displayCountry} right now. We only publish codes tested at real checkout, with country, account type, minimum spend and expiry date.`)
+                    ? `Ofertas y productos con descuento directo activos para ${displayCountry} (${localeConfig.currencyCode}) en el catálogo inferior. También puedes consultar promociones con casillero en EE. UU.`
+                    : `Active direct-discount deals and verified offers for ${displayCountry} (${localeConfig.currencyCode}) are available in the catalog below, plus regional US Locker promo options.`)
                 : ui.miamiNotice(displayCountry, localeConfig.currencyCode)}
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-3">
@@ -778,6 +791,7 @@ export function LegalPage({ type }) {
   const displayCountry = getLocalizedCountryName(localeConfig, localeConfig.lang);
 
   const isFaq = type === 'faq';
+  const faqMeta = buildRouteSeoMeta(localeConfig, { type: 'faq' });
 
   const contentMap = {
     privacy: { title: legal.privacyTitle, body: legal.privacyBody, suffix: `/${routeSlugs.privacy}` },
@@ -785,8 +799,8 @@ export function LegalPage({ type }) {
     about: { title: legal.aboutTitle, body: legal.aboutBody, suffix: `/${routeSlugs.about}` },
     contact: { title: legal.contactTitle, body: legal.contactBody, suffix: `/${routeSlugs.contact}` },
     faq: {
-      title: `Preguntas Frecuentes (FAQ) — ${displayCountry}`,
-      body: `Respuestas oficiales sobre cupones de descuento, compras en AliExpress y Temu, envíos locales y uso de casillero en Miami desde ${displayCountry}.`,
+      title: faqMeta.title.replace(/\s*\|\s*CuponesTech$/, ''),
+      body: faqMeta.description,
       suffix: `/${routeSlugs.faq || 'faq'}`
     }
   };

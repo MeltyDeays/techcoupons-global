@@ -24,9 +24,22 @@ describe('SEO Metadata, BreadcrumbList & IndexNow (locales.js / indexnow.js)', (
     assert.ok(mxCat.keywords.includes('MXN'));
   });
 
-  it('Emite BreadcrumbList y FAQPage en rutas de catálogo y guías', () => {
+  it('Emite BreadcrumbList, FAQPage y Product schema completo en rutas de catálogo', () => {
     const mx = getLocaleConfig('es-mx');
-    const schemas = buildStructuredData(mx, [], 'https://cuponestech.tech/es-mx/temu/categoria/tech-gadgets', {
+    const sampleCoupon = {
+      id: 'ali-mx-test',
+      store: 'aliexpress',
+      code: 'MXTEST',
+      title: 'Descuento test MX',
+      appliesToText: 'Válido en todo el carrito MX',
+      categoryLabel: 'Tecnología',
+      affiliateLink: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+      currencyCode: 'MXN',
+      numericPrice: 100,
+      validFrom: '2026-11-01T00:00:00Z',
+      validUntil: '2026-12-31T23:59:59Z'
+    };
+    const schemas = buildStructuredData(mx, [sampleCoupon], 'https://cuponestech.tech/es-mx/temu/categoria/tech-gadgets', {
       type: 'category',
       storeFilter: 'temu',
       slug: 'tech-gadgets'
@@ -34,10 +47,31 @@ describe('SEO Metadata, BreadcrumbList & IndexNow (locales.js / indexnow.js)', (
 
     const breadcrumb = schemas.find((s) => s['@type'] === 'BreadcrumbList');
     const faq = schemas.find((s) => s['@type'] === 'FAQPage');
+    const itemList = schemas.find((s) => s['@type'] === 'ItemList');
 
     assert.ok(breadcrumb, 'Debe incluir BreadcrumbList');
     assert.equal(breadcrumb.itemListElement.length, 4);
     assert.ok(faq, 'Debe incluir FAQPage para rutas de catálogo');
+    assert.ok(itemList, 'Debe incluir ItemList en rutas de catálogo');
+
+    const product = itemList.itemListElement[0].item;
+    assert.equal(product['@type'], 'Product');
+    assert.ok(Array.isArray(product.image) && product.image.length > 0, 'Product debe tener image');
+    assert.ok(product.description, 'Product debe tener description');
+    assert.ok(product.aggregateRating?.ratingValue, 'Product debe tener aggregateRating');
+    assert.ok(product.review?.reviewRating, 'Product debe tener review');
+    assert.ok(product.offers?.validFrom, 'Offer debe tener validFrom');
+    assert.ok(product.offers?.shippingDetails, 'Offer debe tener shippingDetails');
+    assert.ok(product.offers?.hasMerchantReturnPolicy, 'Offer debe tener hasMerchantReturnPolicy');
+  });
+
+  it('No emite ItemList de productos en rutas informativas/legales', () => {
+    const ko = getLocaleConfig('ko-kr');
+    for (const type of ['guides', 'dynamics', 'faq', 'privacy', 'terms', 'about', 'contact']) {
+      const schemas = buildStructuredData(ko, [], `https://cuponestech.tech/ko-kr/${type}`, { type });
+      const itemList = schemas.find((s) => s['@type'] === 'ItemList');
+      assert.equal(itemList, undefined, `Ruta ${type} no debe emitir ItemList`);
+    }
   });
 
   it('Filtra URLs ajenas al host en submitIndexNow sin lanzar error', async () => {

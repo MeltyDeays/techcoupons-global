@@ -20,9 +20,9 @@ function setMetaTag(attrKey, attrValue, content, dataFlag = null) {
   el.setAttribute('content', content);
 }
 
-export default function SEOHead({ localeConfig, route = null, routeSuffix = '', pageTitle, pageDescription, coupons = [] }) {
+export default function SEOHead({ localeConfig, route = null, routeSuffix = '', pageTitle, pageDescription, coupons = [], isRoot = false }) {
   const cleanSuffix = routeSuffix ? (routeSuffix.startsWith('/') ? routeSuffix : `/${routeSuffix}`) : '';
-  const currentPath = `/${localeConfig.code}${cleanSuffix}`;
+  const currentPath = isRoot ? '/' : `/${localeConfig.code}${cleanSuffix}`;
   const canonicalUrl = `${BASE_DOMAIN}${currentPath}`;
   const resolvedRoute = route || { type: cleanSuffix.replace(/^\//, '') || 'home', storeFilter: null, slug: null };
   const routeType = resolvedRoute.type || 'home';
@@ -72,10 +72,13 @@ export default function SEOHead({ localeConfig, route = null, routeSuffix = '', 
     });
 
     const xDefaultLoc = getLocaleConfig(DEFAULT_LOCALE);
+    const xDefaultHref = routeType === 'home' && !routeStore && !routeSlug
+      ? `${BASE_DOMAIN}/`
+      : `${BASE_DOMAIN}${translatePathToLocale(currentPath, xDefaultLoc)}`;
     const xDefault = document.createElement('link');
     xDefault.setAttribute('rel', 'alternate');
     xDefault.setAttribute('hreflang', 'x-default');
-    xDefault.setAttribute('href', `${BASE_DOMAIN}${translatePathToLocale(currentPath, xDefaultLoc)}`);
+    xDefault.setAttribute('href', xDefaultHref);
     xDefault.setAttribute('data-dynamic-hreflang', 'true');
     document.head.appendChild(xDefault);
 
@@ -87,7 +90,7 @@ export default function SEOHead({ localeConfig, route = null, routeSuffix = '', 
       script.textContent = JSON.stringify(schemaObj);
       document.head.appendChild(script);
     });
-  }, [localeConfig.code, routeType, routeStore, routeSlug, cleanSuffix, currentPath, title, description, seoMeta.keywords, seoMeta.ogLocale, canonicalUrl, coupons.length]);
+  }, [localeConfig.code, routeType, routeStore, routeSlug, cleanSuffix, currentPath, title, description, seoMeta.keywords, seoMeta.ogLocale, canonicalUrl, coupons.length, isRoot]);
 
   return null;
 }

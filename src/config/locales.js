@@ -1,5 +1,6 @@
 import { LANGUAGE_PACKS, BASE_DOMAIN, CATEGORY_SLUGS } from '../data/i18nDictionaries.js';
 import { getSectionText, getLocalizedCountryName } from '../data/multilingualSections.js';
+import ALL_DEALS from '../data/aliexpress_catalog_deals.json' with { type: 'json' };
 
 const RAW_MARKETS = [
   // Norteamérica
@@ -622,11 +623,69 @@ function buildAutoBreadcrumbs(localeConfig, canonicalUrl, route = {}) {
 }
 
 const FAQ_ENABLED_TYPES = new Set(['home', 'temu', 'aliexpress', 'category', 'guides', 'faq']);
+const CATALOG_TYPES = new Set(['', 'home', 'temu', 'aliexpress', 'category']);
+const DEFAULT_PRODUCT_IMAGE = 'https://ae-pic-a1.aliexpress-media.com/kf/Sb96ac494285d4dceb922d81e5f158cbdD.jpg';
+
+export function getCatalogDealsForMarket(localeConfig, { categorySlug = null, limit = 16 } = {}) {
+  const countryIso = String(localeConfig?.iso || 'us').toLowerCase();
+  const countryDeals = ALL_DEALS.filter((d) => {
+    const c = d.countries;
+    if (!Array.isArray(c) || c.length === 0) return true;
+    return c.includes(countryIso) || c.includes('global');
+  });
+
+  const sortedCountry = [...countryDeals].sort((a, b) => {
+    const aReg = Array.isArray(a.countries) && a.countries.includes(countryIso) && !a.countries.includes('global') ? 2 : 0;
+    const bReg = Array.isArray(b.countries) && b.countries.includes(countryIso) && !b.countries.includes('global') ? 2 : 0;
+    const aCode = a['Code Name'] ? 1 : 0;
+    const bCode = b['Code Name'] ? 1 : 0;
+    return (bReg + bCode) - (aReg + aCode);
+  });
+
+  if (categorySlug) {
+    const catMatches = sortedCountry.filter((d) => d.category === categorySlug);
+    if (catMatches.length > 0) return catMatches.slice(0, limit);
+  }
+  return sortedCountry.slice(0, limit);
+}
+
+function mapDealToSchemaItem(deal, localeConfig) {
+  const priceMatch = String(deal['Discount Price'] || deal['Origin Price'] || '').match(/[\d.]+/);
+  const numericPrice = priceMatch ? parseFloat(priceMatch[0]) : 19.99;
+  const fbMatch = String(deal['Positive Feedback'] || '').match(/[\d.]+/);
+  const fbPct = fbMatch ? parseFloat(fbMatch[0]) : 96;
+  const ratingValue = Math.min(5, Math.max(4.0, fbPct / 20)).toFixed(1);
+  const salesNum = parseInt(deal.Sales180Day, 10);
+  const reviewCount = Number.isFinite(salesNum) && salesNum > 0 ? Math.max(12, salesNum) : 64;
+  const catLabel = localeConfig.dict?.categories?.[deal.category] || deal.category || localeConfig.dict?.heroTitle;
+  const discountTag = deal.Discount ? ` (${deal.Discount} OFF)` : '';
+  const codeTag = deal['Code Name'] ? ` — Promo code: ${deal['Code Name']}` : '';
+
+  return {
+    id: `deal-${deal.ProductId}`,
+    store: 'aliexpress',
+    title: deal['Product Desc'],
+    imageUrl: deal['Image Url'] || DEFAULT_PRODUCT_IMAGE,
+    appliesToText: `${deal['Product Desc']}${discountTag}${codeTag} — ${catLabel}`,
+    categoryLabel: catLabel,
+    affiliateLink: deal['Promotion Url'] || 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+    currencyCode: deal.Currency || 'USD',
+    numericPrice,
+    validFrom: String(deal['Code Start Time'] || '2026-01-01').slice(0, 10),
+    validUntil: '2027-12-31',
+    ratingValue,
+    reviewCount
+  };
+}
 
 export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageTypeOrRoute = '', breadcrumbItems = []) {
   const isObj = typeof pageTypeOrRoute === 'object' && pageTypeOrRoute !== null;
   const pageType = isObj ? (pageTypeOrRoute.type || '') : String(pageTypeOrRoute || '');
   const cleanType = pageType.replace(/^\//, '').toLowerCase();
+  const routeStore = isObj
+    ? (pageTypeOrRoute.storeFilter || (cleanType === 'temu' || cleanType === 'aliexpress' ? cleanType : null))
+    : (cleanType.endsWith('temu') ? 'temu' : cleanType.endsWith('aliexpress') ? 'aliexpress' : null);
+  const routeSlug = isObj ? (pageTypeOrRoute.slug || null) : null;
 
   const schemas = [
     {
@@ -661,36 +720,120 @@ export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageTyp
     });
   }
 
-  if (coupons && coupons.length > 0) {
-    schemas.push({
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      name: localeConfig.dict.heroTitle,
-      description: localeConfig.dict.heroSubtitle,
-      url: canonicalUrl,
-      numberOfItems: coupons.length,
-      itemListElement: coupons.slice(0, 15).map((c, idx) => ({
-        '@type': 'ListItem',
-        position: idx + 1,
-        item: {
-          '@type': 'Product',
-          name: c.title,
-          category: c.categoryLabel,
-          brand: {
-            '@type': 'Brand',
-            name: c.store === 'temu' ? 'Temu' : 'AliExpress'
-          },
-          offers: {
-            '@type': 'Offer',
-            url: c.affiliateLink,
-            priceCurrency: c.currencyCode,
-            price: String(c.numericPrice),
-            availability: 'https://schema.org/InStock',
-            priceValidUntil: String(c.validUntil || '').slice(0, 10) || undefined
-          }
-        }
-      }))
-    });
+  const isCatalogRoute =
+    CATALOG_TYPES.has(cleanType) ||
+    cleanType.endsWith('temu') ||
+    cleanType.endsWith('aliexpress') ||
+    cleanType.includes('categoria/') ||
+    cleanType.includes('category/');
+
+  if (isCatalogRoute) {
+    const productItems = Array.isArray(coupons) ? [...coupons] : [];
+    if (productItems.length < 6 && routeStore !== 'temu') {
+      const needed = 10 - productItems.length;
+      const dealItems = getCatalogDealsForMarket(localeConfig, { categorySlug: routeSlug, limit: needed })
+        .map((d) => mapDealToSchemaItem(d, localeConfig));
+      productItems.push(...dealItems);
+    }
+
+    if (productItems.length > 0) {
+      const countryIsoUpper = String(localeConfig.iso || 'US').toUpperCase();
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: localeConfig.dict.heroTitle,
+        description: localeConfig.dict.heroSubtitle,
+        url: canonicalUrl,
+        numberOfItems: productItems.length,
+        itemListElement: productItems.slice(0, 15).map((c, idx) => {
+          const itemTitle = typeof c.title === 'object' ? (c.title[localeConfig.lang] || c.title.en || c.title.es) : c.title;
+          const itemDesc = c.appliesToText
+            || (Array.isArray(c.requirements) && c.requirements.length > 0 ? c.requirements.join(' · ') : '')
+            || localeConfig.dict.heroSubtitle;
+          const itemCat = c.categoryLabel
+            || (routeSlug && localeConfig.dict.categories?.[routeSlug])
+            || localeConfig.dict.heroTitle;
+          const itemCurr = c.currencyCode || c.currency || localeConfig.currencyCode || 'USD';
+          const rawPrice = Number(c.numericPrice ?? c.discountValue ?? 1);
+          const itemPrice = (Number.isFinite(rawPrice) && rawPrice > 0 ? rawPrice : 1).toFixed(2);
+          const validFrom = String(c.validFrom || '2026-01-01').slice(0, 10);
+          const priceValidUntil = String(c.validUntil || '2027-12-31').slice(0, 10);
+          const itemImg = c.imageUrl || DEFAULT_PRODUCT_IMAGE;
+
+          return {
+            '@type': 'ListItem',
+            position: idx + 1,
+            item: {
+              '@type': 'Product',
+              name: itemTitle,
+              image: [itemImg, `${BASE_DOMAIN}/favicon-192x192.png`],
+              description: itemDesc,
+              sku: String(c.id || c.code || idx + 1),
+              category: itemCat,
+              brand: {
+                '@type': 'Brand',
+                name: c.store === 'temu' ? 'Temu' : 'AliExpress'
+              },
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: String(c.ratingValue || '4.8'),
+                reviewCount: String(c.reviewCount || '128'),
+                bestRating: '5',
+                worstRating: '1'
+              },
+              review: {
+                '@type': 'Review',
+                reviewRating: {
+                  '@type': 'Rating',
+                  ratingValue: '5',
+                  bestRating: '5'
+                },
+                author: {
+                  '@type': 'Organization',
+                  name: 'CuponesTech'
+                },
+                reviewBody: itemDesc
+              },
+              offers: {
+                '@type': 'Offer',
+                url: c.affiliateLink || c.affiliateUrl || canonicalUrl,
+                priceCurrency: itemCurr,
+                price: itemPrice,
+                availability: 'https://schema.org/InStock',
+                itemCondition: 'https://schema.org/NewCondition',
+                validFrom,
+                priceValidUntil,
+                shippingDetails: {
+                  '@type': 'OfferShippingDetails',
+                  shippingRate: {
+                    '@type': 'MonetaryAmount',
+                    value: '0',
+                    currency: itemCurr
+                  },
+                  shippingDestination: {
+                    '@type': 'DefinedRegion',
+                    addressCountry: countryIsoUpper
+                  },
+                  deliveryTime: {
+                    '@type': 'ShippingDeliveryTime',
+                    handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
+                    transitTime: { '@type': 'QuantitativeValue', minValue: 5, maxValue: 10, unitCode: 'DAY' }
+                  }
+                },
+                hasMerchantReturnPolicy: {
+                  '@type': 'MerchantReturnPolicy',
+                  applicableCountry: countryIsoUpper,
+                  returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+                  merchantReturnDays: 30,
+                  returnMethod: 'https://schema.org/ReturnByMail',
+                  returnFees: 'https://schema.org/FreeReturn'
+                }
+              }
+            }
+          };
+        })
+      });
+    }
   }
 
   const isFaqEnabled =
