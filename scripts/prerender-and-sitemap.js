@@ -129,7 +129,7 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
         <p>${escapeHtml(c.discountLabel)} — ${escapeHtml(dict.minSpend)}: <strong>${escapeHtml(c.minSpendLabel)}</strong></p>
         <ul>${c.requirements.map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
         <p>${escapeHtml(ui.promoCodeLabel)} <code>${escapeHtml(c.code)}</code> (${escapeHtml(c.verifiedLabel)})</p>
-        <a href="${escapeHtml(c.affiliateLink)}" rel="noopener noreferrer sponsored">${escapeHtml(dict.btnGoStore)}</a>
+        <a href="${escapeHtml(c.affiliateLink)}" rel="noopener sponsored">${escapeHtml(dict.btnGoStore)}</a>
       </article>`
     )
     .join('\n');
@@ -153,7 +153,7 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
           <h3>${escapeHtml(d['Product Desc'])}</h3>
           <p>${escapeHtml(d['Discount Price'] || '')}${d['Origin Price'] ? ` <s>${escapeHtml(d['Origin Price'])}</s>` : ''}${d.Discount ? ` (${escapeHtml(d.Discount)} OFF)` : ''}</p>
           ${activeCode ? `<p>${escapeHtml(ui.promoCodeLabel)} <code>${escapeHtml(activeCode)}</code></p>` : ''}
-          <a href="${escapeHtml(d['Promotion Url'] || 'https://s.click.aliexpress.com/e/_c3mBZjPN')}" rel="noopener noreferrer sponsored">${escapeHtml(dict.btnGoStore)}</a>
+          <a href="${escapeHtml(d['Promotion Url'] || 'https://s.click.aliexpress.com/e/_c3mBZjPN')}" rel="noopener sponsored">${escapeHtml(dict.btnGoStore)}</a>
         </article>`;
         })
         .join('\n');
