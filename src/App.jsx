@@ -621,7 +621,7 @@ export function DynamicsPage() {
             <a
               href={selectedDynamic.storeKey === 'aliexpress' ? aliUrl : temuUrl}
               target="_blank"
-              rel="noopener noreferrer sponsored"
+              rel="noopener sponsored"
               onClick={() => setSelectedDynamic(null)}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3D6352] px-5 py-3.5 text-sm font-extrabold text-[#FCF9F4] shadow-md hover:bg-[#2E4D3F] transition"
             >

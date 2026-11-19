@@ -372,7 +372,7 @@ export default function Layout({
                     <a
                       href={AFFILIATE_CONFIG.sidebarBanners.temuBannerUrl}
                       target="_blank"
-                      rel="noopener noreferrer sponsored"
+                      rel="noopener sponsored"
                       className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#B85332] px-3 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#9E4325] transition"
                     >
                       <span>{dict.btnGoStore}</span>
@@ -387,7 +387,7 @@ export default function Layout({
                       <a
                         href={AFFILIATE_CONFIG.sidebarBanners.aliexpressBannerUrl}
                         target="_blank"
-                        rel="noopener noreferrer sponsored"
+                        rel="noopener sponsored"
                         className="block group overflow-hidden"
                         title="AliExpress 11.11 Sale - Up to 90% Off"
                       >
@@ -408,7 +408,7 @@ export default function Layout({
                         <a
                           href={AFFILIATE_CONFIG.sidebarBanners.aliexpressBannerUrl}
                           target="_blank"
-                          rel="noopener noreferrer sponsored"
+                          rel="noopener sponsored"
                           className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#7A3B24] px-3 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#5E2C1A] transition"
                         >
                           <span>{dict.btnGoStore}</span>

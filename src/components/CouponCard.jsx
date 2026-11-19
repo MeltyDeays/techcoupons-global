@@ -89,7 +89,7 @@ export default function CouponCard({ coupon, localeConfig }) {
     // Abrir inmediatamente la tienda oficial en nueva pestaña con tu tracking de afiliado (deposita la cookie de 30 días)
     if (coupon.affiliateLink) {
       try {
-        window.open(coupon.affiliateLink, '_blank', 'noopener,noreferrer');
+        window.open(coupon.affiliateLink, '_blank', 'noopener');
       } catch {
         // Fallback en caso de bloqueo estricto de popups
       }
@@ -360,7 +360,7 @@ export default function CouponCard({ coupon, localeConfig }) {
           <a
             href={coupon.affiliateLink}
             target="_blank"
-            rel="noopener noreferrer sponsored"
+            rel="noopener sponsored"
             className="inline-flex items-center justify-center gap-1 text-center text-xs font-bold text-[#6E6055] hover:text-[#1F1B18] py-0.5 transition"
           >
             <span>{dict.btnGoStore}</span>
@@ -487,7 +487,7 @@ export default function CouponCard({ coupon, localeConfig }) {
             <a
               href={coupon.affiliateLink}
               target="_blank"
-              rel="noopener noreferrer sponsored"
+              rel="noopener sponsored"
               onClick={() => setModalOpen(false)}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3D6352] px-5 py-3.5 text-sm font-extrabold text-[#FCF9F4] shadow-md hover:bg-[#2E4D3F] transition"
             >

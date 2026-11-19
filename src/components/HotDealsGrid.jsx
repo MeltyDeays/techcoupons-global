@@ -267,7 +267,7 @@ export default function HotDealsGrid({
                   <a
                     href={promoUrl}
                     target="_blank"
-                    rel="noopener noreferrer sponsored"
+                    rel="noopener sponsored"
                     className="block w-full h-full"
                   >
                     <img
@@ -321,7 +321,7 @@ export default function HotDealsGrid({
                   <a
                     href={promoUrl}
                     target="_blank"
-                    rel="noopener noreferrer sponsored"
+                    rel="noopener sponsored"
                     className="block"
                     title={desc}
                   >
@@ -393,7 +393,7 @@ export default function HotDealsGrid({
                   <a
                     href={promoUrl}
                     target="_blank"
-                    rel="noopener noreferrer sponsored"
+                    rel="noopener sponsored"
                     className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#B85332] px-3 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition shadow-sm"
                   >
                     <span>{isEs ? 'Ver Oferta' : 'View Deal'}</span>
