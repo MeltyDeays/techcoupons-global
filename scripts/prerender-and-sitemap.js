@@ -152,7 +152,7 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
           <img src="${escapeHtml(d['Image Url'])}" alt="${escapeHtml(d['Product Desc'])}" loading="lazy" />
           <h3>${escapeHtml(d['Product Desc'])}</h3>
           <p>${escapeHtml(d['Discount Price'] || '')}${d['Origin Price'] ? ` <s>${escapeHtml(d['Origin Price'])}</s>` : ''}${d.Discount ? ` (${escapeHtml(d.Discount)} OFF)` : ''}</p>
-          ${activeCode ? `<p>${escapeHtml(ui.promoCodeLabel)} <code>${escapeHtml(activeCode)}</code></p>` : ''}
+          <p class="deal-badge">${escapeHtml(localeConfig.lang === 'es' ? 'Oferta de producto, sin código' : 'Product deal, no code required')}</p>
           <a href="${escapeHtml(d['Promotion Url'] || 'https://s.click.aliexpress.com/e/_c3mBZjPN')}" rel="noopener sponsored">${escapeHtml(dict.btnGoStore)}</a>
         </article>`;
         })

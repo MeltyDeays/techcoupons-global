@@ -361,23 +361,28 @@ export function MarketCatalogPage({ storeFilter = null, isRoot = false }) {
 
         {filteredCoupons.length === 0 ? (
           <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 sm:p-8 text-center">
-            <p className="text-base sm:text-lg font-extrabold text-[#1F1B18] mb-2">
+            <p className="text-base sm:text-lg font-extrabold text-[#1F1B18] mb-1.5">
               {coupons.length === 0 && !(storeFilter === 'temu' && !hasTemuInCountry)
                 ? (localeConfig.lang === 'es'
-                    ? `Ofertas y productos con descuento directo activos para ${displayCountry} (${localeConfig.currencyCode}) en el catálogo inferior. También puedes consultar promociones con casillero en EE. UU.`
-                    : `Active direct-discount deals and verified offers for ${displayCountry} (${localeConfig.currencyCode}) are available in the catalog below, plus regional US Locker promo options.`)
+                    ? 'No hay cupones de carrito vigentes para este país en este momento'
+                    : 'No sitewide cart coupons currently active for this country at this moment')
                 : ui.miamiNotice(displayCountry, localeConfig.currencyCode)}
             </p>
-            <div className="mt-4 flex flex-wrap justify-center gap-3">
-              <Link
-                to={`/${localeConfig.code}/aliexpress`}
-                className="rounded-xl bg-[#7A3B24] px-4 py-2 text-xs font-bold text-[#FCF9F4]"
+            <p className="text-xs sm:text-sm text-[#6E6055] max-w-xl mx-auto mb-4">
+              {localeConfig.lang === 'es'
+                ? `Puedes explorar las ofertas de producto con descuento directo disponibles a continuación para ${displayCountry}.`
+                : `You can explore direct-discount product deals available below for ${displayCountry}.`}
+            </p>
+            <div className="mt-2 flex flex-wrap justify-center gap-3">
+              <a
+                href="#catalogo-ofertas"
+                className="rounded-xl bg-[#B85332] px-4 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition shadow-xs"
               >
-                AliExpress ({displayCountry})
-              </Link>
+                {localeConfig.lang === 'es' ? 'Ver ofertas de producto disponibles' : 'View available product deals'}
+              </a>
               <Link
                 to={ui.usLockerTarget || '/en-us/temu'}
-                className="rounded-xl border border-[#B85332] px-4 py-2 text-xs font-bold text-[#B85332]"
+                className="rounded-xl border border-[#B85332] px-4 py-2 text-xs font-bold text-[#B85332] hover:bg-[#B85332]/5 transition"
               >
                 {ui.miamiBtn}
               </Link>

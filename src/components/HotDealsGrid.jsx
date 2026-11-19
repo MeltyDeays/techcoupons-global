@@ -117,7 +117,7 @@ export default function HotDealsGrid({
   if (countryDeals.length === 0) return null;
 
   return (
-    <section aria-label="AliExpress Deals" className="w-full max-w-full min-w-0">
+    <section id="catalogo-ofertas" aria-label="AliExpress Deals" className="w-full max-w-full min-w-0">
       {/* Encabezado del catálogo con selector de las mismas categorías del filtro */}
       <div className="mb-4 sm:mb-6 rounded-2xl border border-[#B85332]/30 bg-gradient-to-r from-[#FCF9F4] via-[#F8F2E8] to-[#FCF9F4] p-4 sm:p-5 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -342,52 +342,15 @@ export default function HotDealsGrid({
                     )}
                   </div>
 
-                  {/* Cupón adicional del vendedor (si aplica) */}
-                  {code ? (
-                    <div className="rounded-xl border border-[#3D6352]/30 bg-[#3D6352]/5 p-2 space-y-1">
-                      <div className="flex items-center justify-between text-[10px] font-bold text-[#3D6352]">
-                        <span className="inline-flex items-center gap-1">
-                          <Tag className="h-3 w-3" />
-                          <span>{isEs ? 'Cupón tienda' : 'Store Coupon'}</span>
-                        </span>
-                        {codeVal && <span className="font-extrabold">-{codeVal}</span>}
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={(e) => handleCopyCode(e, code)}
-                        className={`flex w-full items-center justify-between rounded-lg px-2 py-1 text-xs font-mono font-bold transition ${
-                          isCopied
-                            ? 'bg-[#3D6352] text-[#FCF9F4]'
-                            : 'bg-[#FCF9F4] text-[#1F1B18] border border-[#3D6352]/40 hover:bg-[#E8F0EC]'
-                        }`}
-                      >
-                        <span className="truncate">{code}</span>
-                        <span className="inline-flex items-center gap-1 text-[10px] shrink-0 font-sans">
-                          {isCopied ? (
-                            <>
-                              <Check className="h-3 w-3" />
-                              <span>{isEs ? '¡Copiado!' : 'Copied!'}</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-3 w-3" />
-                              <span>{isEs ? 'Copiar' : 'Copy'}</span>
-                            </>
-                          )}
-                        </span>
-                      </button>
-                      {codeMin && (
-                        <p className="text-[9px] text-[#6E6055] truncate">
-                          {isEs ? `Mínimo: ${codeMin}` : `Min. spend: ${codeMin}`}
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="rounded-xl border border-[#DED4C6] bg-[#F6F2EA] px-2 py-1.5 text-[10px] text-[#6E6055] font-semibold text-center">
-                      {isEs ? 'Descuento directo en checkout' : 'Instant checkout savings'}
-                    </div>
-                  )}
+                  {/* Etiqueta de oferta de producto (descuento directo en tienda, sin código copiable) */}
+                  <div className="rounded-xl border border-[#DED4C6] bg-[#F6F2EA] px-2.5 py-2 text-center space-y-0.5">
+                    <span className="block text-[11px] font-extrabold text-[#7A3B24]">
+                      {isEs ? 'Oferta de producto, sin código' : 'Product deal, no code required'}
+                    </span>
+                    <span className="block text-[10px] text-[#6E6055]">
+                      {isEs ? 'Descuento directo aplicado en checkout' : 'Direct discount applied at checkout'}
+                    </span>
+                  </div>
 
                   {/* Botón de acción */}
                   <a
