@@ -134,6 +134,14 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
     )
     .join('\n');
 
+  const emptyCouponsHtml = `
+      <div class="no-coupons-banner">
+        <p>${escapeHtml(localeConfig.lang === 'es' ? 'No hay cupones de carrito vigentes para este país en este momento.' : 'There are no active cart coupons for this country at this moment.')}</p>
+        <div class="no-coupons-actions">
+          <a href="#catalogo-ofertas" class="btn-no-coupons-primary">${escapeHtml(localeConfig.lang === 'es' ? 'Ver ofertas de producto disponibles' : 'View available product deals')}</a>
+        </div>
+      </div>`;
+
   let dealsBlock = '';
   if (isCatalogRoute && route.type !== 'temu' && route.storeFilter !== 'temu') {
     const staticDeals = getCatalogDealsForMarket(localeConfig, {
@@ -299,7 +307,7 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
       <main>
         <h1>${escapeHtml(heading)}</h1>
         <p>${escapeHtml(subtitle)}</p>
-        ${isCatalogRoute ? `<section class="coupons-list">\n          ${couponCardsHtml}\n        </section>` : ''}
+        ${isCatalogRoute ? `<section class="coupons-list">\n          ${couponCardsHtml || emptyCouponsHtml}\n        </section>` : ''}
         ${sectionContent}
         <section class="regions-directory">
           <h2>${escapeHtml(ui.regionsCountLabel ? ui.regionsCountLabel(LOCALES.length) : `${LOCALES.length} regions`)}</h2>
