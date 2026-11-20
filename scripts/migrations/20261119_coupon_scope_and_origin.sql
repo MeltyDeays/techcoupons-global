@@ -48,12 +48,9 @@ BEGIN
   END IF;
 END $$;
 
--- 5. Índices de rendimiento para consultas multi-país de carrito (vigencia filtrada en tiempo de ejecución):
+-- 5. Índice de rendimiento para consultas multi-país de carrito (vigencia filtrada en tiempo de ejecución):
 CREATE INDEX IF NOT EXISTS idx_cuponestech_coupons_scope_valid_until
   ON public.cuponestech_coupons (coupon_scope, valid_until);
-
-CREATE INDEX IF NOT EXISTS idx_cuponestech_coupons_countries
-  ON public.cuponestech_coupons USING GIN (countries);
 
 -- Comentarios documentales de columnas en el catálogo de PostgreSQL:
 COMMENT ON COLUMN public.cuponestech_coupons.coupon_scope IS 'Alcance de aplicación: cart (carrito global), product (producto específico), campaign (evento)';
