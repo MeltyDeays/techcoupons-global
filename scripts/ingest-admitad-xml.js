@@ -58,12 +58,13 @@ async function getXmlContent() {
   throw new Error(`No se pudo obtener el feed XML (ni por URL ni en ${localPath})`);
 }
 
-function parseCouponFromXml(xmlChunk) {
+function parseCouponFromXml(xmlChunk, { sourceUrl = 'https://portals.aliexpress.com' } = {}) {
   const idMatch = xmlChunk.match(/<coupon id="(\d+)">/);
   const rawId = idMatch ? idMatch[1] : '';
   const codeMatch = xmlChunk.match(/<promocode>(.*?)<\/promocode>/);
   const code = codeMatch ? codeMatch[1].trim() : '';
-  if (!code || code === 'Not required') return null;
+  const isCartCode = /^[A-Za-z0-9]{5,12}$/.test(code) && !/^not[\s_]?required$/i.test(code);
+  const couponScope = isCartCode ? 'cart' : 'campaign';
 
   const nameMatch = xmlChunk.match(/<name>(.*?)<\/name>/);
   const name = nameMatch ? nameMatch[1].trim() : '';
@@ -177,9 +178,11 @@ function parseCouponFromXml(xmlChunk) {
   const symbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : currency === 'JPY' ? '円' : currency;
 
   return {
-    id: `ali-${code.toLowerCase()}-${rawId}`,
+    id: `ali-${(code || 'campaign').toLowerCase()}-${rawId}`,
     store: 'aliexpress',
     code,
+    couponScope,
+    sourceOrigin: 'admitad',
     countries,
     userType,
     currency,
@@ -190,7 +193,7 @@ function parseCouponFromXml(xmlChunk) {
     validFrom: new Date(dateStart).toISOString(),
     validUntil: new Date(dateEnd).toISOString(),
     channel: 'both',
-    sourceUrl: 'https://portals.aliexpress.com',
+    sourceUrl: String(sourceUrl || '').trim(),
     lastVerifiedAt: new Date().toISOString(),
     affiliateUrl: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
     category: null,
@@ -205,14 +208,19 @@ function parseCouponFromXml(xmlChunk) {
   };
 }
 
-export function parseAdmitadXml(xmlContent) {
+export function parseAdmitadXml(xmlContent, options = {}) {
   const couponMatches = xmlContent.match(/<coupon id="(\d+)">([\s\S]*?)<\/coupon>/g) || [];
   const valid = [];
   const invalid = [];
 
   for (const chunk of couponMatches) {
-    const c = parseCouponFromXml(chunk);
+    const c = parseCouponFromXml(chunk, options);
     if (!c) continue;
+    if (!c.sourceUrl) {
+      console.warn(`[Ingesta Admitad] Fila ${c.id} omitida: falta source_url.`);
+      invalid.push({ coupon: c, errors: ['sourceUrl'] });
+      continue;
+    }
     const errors = validateCoupon(c);
     if (errors.length === 0) {
       valid.push(c);

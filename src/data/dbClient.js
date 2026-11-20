@@ -76,12 +76,14 @@ export async function upsertCouponToDB(c) {
       discount_type, discount_value, max_discount, min_spend,
       valid_from, valid_until, channel, source_url, last_verified_at,
       affiliate_url, category, title_es, title_en, notes_es, notes_en,
+      coupon_scope, source_origin,
       updated_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
       $8, $9, $10, $11,
       $12, $13, $14, $15, $16,
       $17, $18, $19, $20, $21, $22,
+      $23, $24,
       NOW()
     )
     ON CONFLICT (id) DO UPDATE SET
@@ -105,6 +107,8 @@ export async function upsertCouponToDB(c) {
       title_en = EXCLUDED.title_en,
       notes_es = EXCLUDED.notes_es,
       notes_en = EXCLUDED.notes_en,
+      coupon_scope = EXCLUDED.coupon_scope,
+      source_origin = EXCLUDED.source_origin,
       updated_at = NOW()
     RETURNING id;
   `;
@@ -131,7 +135,9 @@ export async function upsertCouponToDB(c) {
     typeof c.title === 'object' ? (c.title.es || c.title.en || 'Cupón Oficial') : (c.title || 'Cupón Oficial'),
     typeof c.title === 'object' ? (c.title.en || c.title.es || 'Official Coupon') : (c.title || 'Official Coupon'),
     typeof c.notes === 'object' ? c.notes.es : (c.notes || null),
-    typeof c.notes === 'object' ? c.notes.en : (c.notes || null)
+    typeof c.notes === 'object' ? c.notes.en : (c.notes || null),
+    c.couponScope || 'cart',
+    c.sourceOrigin || 'admitad'
   ];
 
   const res = await p.query(sql, values);

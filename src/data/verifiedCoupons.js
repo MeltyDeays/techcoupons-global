@@ -51,7 +51,7 @@ export function validateCoupon(c, now = new Date()) {
   const errors = [];
   if (!isText(c.id)) errors.push('id');
   if (!STORES.includes(c.store)) errors.push('store');
-  if (!isText(c.code)) errors.push('code');
+  if (c.couponScope !== 'campaign' && !isText(c.code)) errors.push('code');
   if (!Array.isArray(c.countries) || !c.countries.length || !c.countries.every(isText)) errors.push('countries');
   if (!USER_TYPES.includes(c.userType)) errors.push('userType');
   if (!/^[A-Z]{3}$/.test(c.currency || '')) errors.push('currency');
