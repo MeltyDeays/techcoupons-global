@@ -22,6 +22,7 @@ export function getCouponsForLocale(
   return getVerifiedCouponsForLocale(localeConfig, coupons, now)
     .filter((c) => {
       if (!availableStores.includes(c.store)) return false;
+      if (c.couponScope && c.couponScope !== 'cart') return false;
       if (storeFilter && c.store !== storeFilter) return false;
       // category null = válido en todo el carrito → aparece en todas las categorías
       if (categoryFilter && c.category && c.category !== categoryFilter) return false;

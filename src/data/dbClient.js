@@ -20,14 +20,8 @@ function getPool() {
   return pool;
 }
 
-/**
- * Consulta cupones activos (valid_until > NOW()) desde la base de datos
- */
-export async function getActiveCouponsFromDB({ store = null, country = 'global', category = null, limit = 50 } = {}) {
-  const p = getPool();
-  if (!p) return [];
-
-  const conditions = ['valid_until > NOW()'];
+export function buildActiveCouponsQuery({ store = null, country = 'global', category = null, limit = 50 } = {}) {
+  const conditions = ['valid_until > NOW()', "coupon_scope = 'cart'"];
   const values = [];
   let idx = 1;
 
@@ -53,6 +47,17 @@ export async function getActiveCouponsFromDB({ store = null, country = 'global',
     ORDER BY discount_value DESC
     LIMIT $${idx}
   `;
+  return { sql, values };
+}
+
+/**
+ * Consulta cupones activos (valid_until > NOW()) desde la base de datos
+ */
+export async function getActiveCouponsFromDB({ store = null, country = 'global', category = null, limit = 50 } = {}) {
+  const p = getPool();
+  if (!p) return [];
+
+  const { sql, values } = buildActiveCouponsQuery({ store, country, category, limit });
 
   try {
     const res = await p.query(sql, values);
