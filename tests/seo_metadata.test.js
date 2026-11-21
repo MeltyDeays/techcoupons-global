@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { getLocaleConfig, buildRouteSeoMeta, buildStructuredData } from '../src/config/locales.js';
+import { getLocaleConfig, buildRouteSeoMeta, buildStructuredData, CATEGORY_SLUGS } from '../src/config/locales.js';
 import { INDEXNOW_KEY, submitIndexNow } from '../src/utils/indexnow.js';
 
 describe('SEO Metadata, BreadcrumbList & IndexNow (locales.js / indexnow.js)', () => {
@@ -63,6 +63,62 @@ describe('SEO Metadata, BreadcrumbList & IndexNow (locales.js / indexnow.js)', (
     assert.ok(product.offers?.validFrom, 'Offer debe tener validFrom');
     assert.ok(product.offers?.shippingDetails, 'Offer debe tener shippingDetails');
     assert.ok(product.offers?.hasMerchantReturnPolicy, 'Offer debe tener hasMerchantReturnPolicy');
+    assert.deepEqual(product.category, {
+      '@type': 'CategoryCode',
+      inCodeSet: 'https://www.google.com/basepages/producttype/taxonomy-with-ids.en-US.txt',
+      codeValue: '222'
+    });
+  });
+
+  it('Omite category en cupones sin categoría y emite CategoryCode oficial en deals y categorías', () => {
+    const us = getLocaleConfig('en-us');
+    const cartCoupon = {
+      id: 'ali-us-cart',
+      store: 'aliexpress',
+      code: 'CART10',
+      title: '$10 off cart',
+      appliesToText: 'Valid sitewide',
+      category: null,
+      categoryLabel: null,
+      affiliateLink: 'https://s.click.aliexpress.com/e/_c3mBZjPN',
+      currencyCode: 'USD',
+      numericPrice: 10,
+      validFrom: '2026-11-01',
+      validUntil: '2026-12-31'
+    };
+
+    const homeSchemas = buildStructuredData(us, [cartCoupon], 'https://cuponestech.tech/en-us', { type: 'home' });
+    const homeList = homeSchemas.find((s) => s['@type'] === 'ItemList');
+    assert.ok(homeList, 'Home debe emitir ItemList');
+
+    const firstProduct = homeList.itemListElement[0].item;
+    assert.equal('category' in firstProduct, false, 'Cupón sin categoría debe omitir Product.category');
+
+    const dealProducts = homeList.itemListElement.slice(1).map((el) => el.item);
+    assert.ok(dealProducts.length > 0, 'Home debe incluir deals de respaldo');
+    for (const dealProduct of dealProducts) {
+      assert.equal(dealProduct.category?.['@type'], 'CategoryCode');
+      assert.equal(
+        dealProduct.category?.inCodeSet,
+        'https://www.google.com/basepages/producttype/taxonomy-with-ids.en-US.txt'
+      );
+      assert.match(String(dealProduct.category?.codeValue || ''), /^\d+$/);
+    }
+
+    for (const slug of CATEGORY_SLUGS) {
+      const catSchemas = buildStructuredData(
+        us,
+        [],
+        `https://cuponestech.tech/en-us/aliexpress/category/${slug}`,
+        { type: 'category', storeFilter: 'aliexpress', slug }
+      );
+      const catList = catSchemas.find((s) => s['@type'] === 'ItemList');
+      assert.ok(catList?.itemListElement?.length > 0, `Categoría ${slug} debe emitir productos`);
+      for (const el of catList.itemListElement) {
+        assert.equal(el.item.category?.['@type'], 'CategoryCode', `Categoría ${slug} debe emitir CategoryCode`);
+        assert.match(String(el.item.category?.codeValue || ''), /^\d+$/);
+      }
+    }
   });
 
   it('No emite ItemList de productos en rutas informativas/legales', () => {

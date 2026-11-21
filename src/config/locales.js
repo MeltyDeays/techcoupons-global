@@ -625,6 +625,21 @@ function buildAutoBreadcrumbs(localeConfig, canonicalUrl, route = {}) {
 const FAQ_ENABLED_TYPES = new Set(['home', 'temu', 'aliexpress', 'category', 'guides', 'faq']);
 const CATALOG_TYPES = new Set(['', 'home', 'temu', 'aliexpress', 'category']);
 const DEFAULT_PRODUCT_IMAGE = 'https://ae-pic-a1.aliexpress-media.com/kf/Sb96ac494285d4dceb922d81e5f158cbdD.jpg';
+const GOOGLE_TAXONOMY_URL = 'https://www.google.com/basepages/producttype/taxonomy-with-ids.en-US.txt';
+const GOOGLE_PRODUCT_CATEGORY_IDS = {
+  'moda-ropa': '166',
+  'smart-home': '536',
+  'belleza-cuidado': '469',
+  'tech-gadgets': '222',
+  'accesorios-moviles': '264',
+  'perifericos-gaming': '1270',
+  'herramientas-autos': '632',
+  'juguetes-hobbies': '1239',
+  'deportes-outdoor': '988',
+  mascotas: '1',
+  'bebes-oficina': '922',
+  'redes-wifi': '342'
+};
 
 export function getCatalogDealsForMarket(localeConfig, { categorySlug = null, limit = 16 } = {}) {
   const countryIso = String(localeConfig?.iso || 'us').toLowerCase();
@@ -667,6 +682,7 @@ function mapDealToSchemaItem(deal, localeConfig) {
     title: deal['Product Desc'],
     imageUrl: deal['Image Url'] || DEFAULT_PRODUCT_IMAGE,
     appliesToText: `${deal['Product Desc']}${discountTag}${codeTag} — ${catLabel}`,
+    category: deal.category || null,
     categoryLabel: catLabel,
     affiliateLink: deal['Promotion Url'] || 'https://s.click.aliexpress.com/e/_c3mBZjPN',
     currencyCode: deal.Currency || 'USD',
@@ -750,9 +766,15 @@ export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageTyp
           const itemDesc = c.appliesToText
             || (Array.isArray(c.requirements) && c.requirements.length > 0 ? c.requirements.join(' · ') : '')
             || localeConfig.dict.heroSubtitle;
-          const itemCat = c.categoryLabel
-            || (routeSlug && localeConfig.dict.categories?.[routeSlug])
-            || localeConfig.dict.heroTitle;
+          const catSlug = c.category || routeSlug || null;
+          const gpcId = catSlug ? GOOGLE_PRODUCT_CATEGORY_IDS[catSlug] : null;
+          const itemCategory = gpcId
+            ? {
+                '@type': 'CategoryCode',
+                inCodeSet: GOOGLE_TAXONOMY_URL,
+                codeValue: gpcId
+              }
+            : null;
           const itemCurr = c.currencyCode || c.currency || localeConfig.currencyCode || 'USD';
           const rawPrice = Number(c.numericPrice ?? c.discountValue ?? 1);
           const itemPrice = (Number.isFinite(rawPrice) && rawPrice > 0 ? rawPrice : 1).toFixed(2);
@@ -769,7 +791,7 @@ export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageTyp
               image: [itemImg, `${BASE_DOMAIN}/favicon-192x192.png`],
               description: itemDesc,
               sku: String(c.id || c.code || idx + 1),
-              category: itemCat,
+              ...(itemCategory ? { category: itemCategory } : {}),
               brand: {
                 '@type': 'Brand',
                 name: c.store === 'temu' ? 'Temu' : 'AliExpress'
