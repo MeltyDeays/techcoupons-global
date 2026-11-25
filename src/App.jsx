@@ -171,17 +171,29 @@ export function MarketCatalogPage({ storeFilter = null, isRoot = false }) {
   const routeSuffix = isRoot ? '' : canonicalCatalogPath.slice(`/${localeConfig.code}`.length);
   let customHeading = dict.heroTitle;
 
+  const categoryHeadingLabel = categoryFilter
+    ? (
+        ui.catShort[categoryFilter] ||
+        dict.categories[categoryFilter] ||
+        categoryFilter
+          .split('-')
+          .filter(Boolean)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ') ||
+        categoryFilter
+      )
+    : '';
+
   if (storeFilter === 'temu' && categoryFilter) {
-    customHeading = `Temu • ${ui.catShort[categoryFilter] || dict.categories[categoryFilter]} (${displayCountry})`;
+    customHeading = `Temu • ${categoryHeadingLabel} (${displayCountry})`;
   } else if (storeFilter === 'aliexpress' && categoryFilter) {
-    customHeading = `AliExpress • ${ui.catShort[categoryFilter] || dict.categories[categoryFilter]} (${displayCountry})`;
+    customHeading = `AliExpress • ${categoryHeadingLabel} (${displayCountry})`;
   } else if (storeFilter === 'temu') {
     customHeading = `Temu — ${dict.heroTitle}`;
   } else if (storeFilter === 'aliexpress') {
     customHeading = `AliExpress — ${dict.heroTitle}`;
   } else if (categoryFilter) {
-    const catName = ui.catShort[categoryFilter] || dict.categories[categoryFilter];
-    customHeading = `${catName} — ${displayCountry} (${localeConfig.currencyCode})`;
+    customHeading = `${categoryHeadingLabel} — ${displayCountry} (${localeConfig.currencyCode})`;
   }
 
   return (

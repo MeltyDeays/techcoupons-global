@@ -19,8 +19,9 @@ import {
   Baby
 } from 'lucide-react';
 import ALL_DEALS from '../data/aliexpress_catalog_deals.json';
-import { CATEGORY_SLUGS } from '../config/locales.js';
 import { getSectionText } from '../data/multilingualSections.js';
+import { mergeCatalogDeals, collectCatalogCategories } from '../utils/manualCatalog.js';
+import { copyTextSafe } from '../utils/clipboard.js';
 
 const SITE_CATEGORY_ICONS = {
   'moda-ropa': Shirt,
@@ -43,7 +44,9 @@ export default function HotDealsGrid({
 }) {
   const [activeCategory, setActiveCategory] = useState(categoryFilter || 'all');
   const [visibleCount, setVisibleCount] = useState(20);
-  const [copiedCode, setCopiedCode] = useState(null);
+  const [copiedLinkId, setCopiedLinkId] = useState(null);
+  const [manualProducts, setManualProducts] = useState([]);
+  const [customCategories, setCustomCategories] = useState([]);
 
   // Sincroniza la categoría activa con el filtro de categoría global de la URL
   useEffect(() => {
@@ -51,30 +54,51 @@ export default function HotDealsGrid({
     setVisibleCount(20);
   }, [categoryFilter]);
 
-  // Si el usuario está en Temu, no mostrar productos de AliExpress
-  if (storeFilter === 'temu') return null;
+  // Carga productos manuales SiteStripe y categorías personalizadas desde PostgreSQL
+  useEffect(() => {
+    let active = true;
+    fetch('/api/products')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active || !data?.ok) return;
+        if (Array.isArray(data.products)) setManualProducts(data.products);
+        if (Array.isArray(data.categories)) setCustomCategories(data.categories);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const isEs = localeConfig.lang === 'es';
   const { dict } = localeConfig;
   const ui = getSectionText(localeConfig.lang);
   const countryIso = String(localeConfig.iso || '').toLowerCase();
 
+  // Combinar productos manuales delante del catálogo estático sin duplicados
+  const allDeals = useMemo(
+    () => mergeCatalogDeals(manualProducts, ALL_DEALS),
+    [manualProducts]
+  );
+
   // Filtrar ofertas aplicables al país actual (locales + campañas globales)
   const countryDeals = useMemo(() => {
-    const matching = ALL_DEALS.filter((d) => {
+    const matching = allDeals.filter((d) => {
       const c = d.countries;
       if (!Array.isArray(c) || c.length === 0) return true;
       return c.includes(countryIso) || c.includes('global');
     });
 
     return [...matching].sort((a, b) => {
+      const aManual = a.dealType === 'manual-sitestripe' ? 4 : 0;
+      const bManual = b.dealType === 'manual-sitestripe' ? 4 : 0;
       const aReg = Array.isArray(a.countries) && a.countries.includes(countryIso) && !a.countries.includes('global') ? 2 : 0;
       const bReg = Array.isArray(b.countries) && b.countries.includes(countryIso) && !b.countries.includes('global') ? 2 : 0;
       const aCode = a['Code Name'] ? 1 : 0;
       const bCode = b['Code Name'] ? 1 : 0;
-      return (bReg + bCode) - (aReg + aCode);
+      return (bManual + bReg + bCode) - (aManual + aReg + aCode);
     });
-  }, [countryIso]);
+  }, [allDeals, countryIso]);
 
   const regionalCount = useMemo(
     () => countryDeals.filter((d) => Array.isArray(d.countries) && d.countries.includes(countryIso) && !d.countries.includes('global')).length,
@@ -89,23 +113,29 @@ export default function HotDealsGrid({
 
   const displayedDeals = filteredDeals.slice(0, visibleCount);
 
-  // Conteo de productos por categoría canónica del sitio
-  const categoryCounts = useMemo(() => {
-    const counts = {};
-    countryDeals.forEach((d) => {
-      counts[d.category] = (counts[d.category] || 0) + 1;
-    });
-    return counts;
-  }, [countryDeals]);
+  // Categorías canónicas + categorías personalizadas presentes en BD/productos
+  const catalogCategories = useMemo(
+    () => collectCatalogCategories(countryDeals, customCategories),
+    [countryDeals, customCategories]
+  );
 
-  const handleCopyCode = (e, code) => {
+  const customCatLabelMap = useMemo(() => {
+    const map = {};
+    for (const c of catalogCategories) {
+      if (c.isCustom && c.label) map[c.slug] = c.label;
+    }
+    return map;
+  }, [catalogCategories]);
+
+  const handleCopyTrackingLink = async (e, pid, promoUrl) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!code) return;
-    navigator.clipboard?.writeText(code);
-    setCopiedCode(code);
+    if (!promoUrl) return;
+    const ok = await copyTextSafe(promoUrl);
+    if (!ok) return;
+    setCopiedLinkId(pid);
     setTimeout(() => {
-      setCopiedCode((curr) => (curr === code ? null : curr));
+      setCopiedLinkId((curr) => (curr === pid ? null : curr));
     }, 2000);
   };
 
@@ -114,6 +144,8 @@ export default function HotDealsGrid({
     setVisibleCount(20);
   };
 
+  // Si el usuario está en Temu, no mostrar productos de AliExpress (evaluado después de todos los hooks)
+  if (storeFilter === 'temu') return null;
   if (countryDeals.length === 0) return null;
 
   return (
@@ -145,13 +177,13 @@ export default function HotDealsGrid({
             </h3>
             <p className="text-xs sm:text-sm text-[#574B40]">
               {isEs
-                ? `Explora ${countryDeals.length} productos sincronizados (${regionalCount > 0 ? 'campañas locales + respaldo global' : 'ofertas globales válidas en tu país'}) en las 11 categorías oficiales.`
-                : `Browse ${countryDeals.length} live deals (${regionalCount > 0 ? 'regional + global campaigns' : 'global offers valid in your country'}) across our 11 official categories.`}
+                ? `Explora ${countryDeals.length} productos sincronizados (${regionalCount > 0 ? 'campañas locales + respaldo global' : 'ofertas globales válidas en tu país'}) en las categorías del catálogo.`
+                : `Browse ${countryDeals.length} live deals (${regionalCount > 0 ? 'regional + global campaigns' : 'global offers valid in your country'}) across catalog categories.`}
             </p>
           </div>
         </div>
 
-        {/* Selector de las 11 Categorías Oficiales de la Página */}
+        {/* Selector de Categorías del Catálogo */}
         <div className="space-y-2 pt-2 border-t border-[#DED4C6]">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#574B40]">
@@ -184,13 +216,14 @@ export default function HotDealsGrid({
               </span>
             </button>
 
-            {CATEGORY_SLUGS.map((slug) => {
+            {catalogCategories.map((cat) => {
+              const slug = cat.slug;
               const Icon = SITE_CATEGORY_ICONS[slug] || Tag;
-              const label = ui.catShort?.[slug] || dict.categories?.[slug] || slug;
-              const count = categoryCounts[slug] || 0;
+              const label = ui.catShort?.[slug] || dict.categories?.[slug] || cat.label || slug;
+              const count = cat.count || 0;
               const isActive = activeCategory === slug;
 
-              if (count === 0 && !isActive) return null;
+              if (count === 0 && !isActive && !cat.isCustom) return null;
 
               return (
                 <button
@@ -251,11 +284,11 @@ export default function HotDealsGrid({
             const feedback = deal['Positive Feedback'];
             const catSlug = deal.category;
             const CatIcon = SITE_CATEGORY_ICONS[catSlug] || Tag;
-            const catLabel = ui.catShort?.[catSlug] || dict.categories?.[catSlug] || catSlug;
+            const catLabel = ui.catShort?.[catSlug] || dict.categories?.[catSlug] || deal.categoryLabel || customCatLabelMap[catSlug] || catSlug;
             const isRegional = Array.isArray(deal.countries) && deal.countries.includes(countryIso) && !deal.countries.includes('global');
             const isMiamiLockerProxy = isRegional && deal.countries.includes('us') && countryIso !== 'us';
 
-            const isCopied = copiedCode === code;
+            const isLinkCopied = copiedLinkId === pid;
 
             return (
               <div
@@ -352,16 +385,35 @@ export default function HotDealsGrid({
                     </span>
                   </div>
 
-                  {/* Botón de acción */}
-                  <a
-                    href={promoUrl}
-                    target="_blank"
-                    rel="noopener sponsored"
-                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#B85332] px-3 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition shadow-sm"
-                  >
-                    <span>{isEs ? 'Ver Oferta' : 'View Deal'}</span>
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
+                  {/* Botones de acción: abrir enlace y copiar tracking link */}
+                  <div className="flex flex-col gap-1.5">
+                    <a
+                      href={promoUrl}
+                      target="_blank"
+                      rel="noopener sponsored"
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#B85332] px-3 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition shadow-sm"
+                    >
+                      <span>{isEs ? 'Ver Oferta' : 'View Deal'}</span>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopyTrackingLink(e, pid, promoUrl)}
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#DED4C6] bg-white px-3 py-1.5 text-[11px] font-bold text-[#574B40] hover:border-[#B85332] hover:text-[#1F1B18] transition"
+                    >
+                      {isLinkCopied ? (
+                        <>
+                          <Check className="h-3.5 w-3.5 text-[#3D6352]" />
+                          <span className="text-[#3D6352]">{isEs ? 'Enlace copiado' : 'Link copied'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          <span>{isEs ? 'Copiar enlace' : 'Copy link'}</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             );
