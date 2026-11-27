@@ -9,7 +9,9 @@ import {
   buildStructuredData,
   buildRouteSeoMeta,
   formatLocalPrice,
-  getCatalogDealsForMarket
+  getCatalogDealsForMarket,
+  resolveRouteSeoPolicy,
+  getRouteSuffixForLocale
 } from '../src/config/locales.js';
 import { INDEXNOW_KEY } from '../src/utils/indexnow.js';
 import { getCouponsForLocale } from '../src/data/couponsGenerator.js';
@@ -55,25 +57,6 @@ function getAllRouteDescriptors() {
   });
 
   return routes;
-}
-
-function getRouteSuffixForLocale(route, localeConfig) {
-  const slugs = getRouteSlugsForLang(localeConfig.lang);
-  if (route.type === 'home') return '';
-  if (route.type === 'temu') return '/temu';
-  if (route.type === 'aliexpress') return '/aliexpress';
-  if (route.type === 'dynamics') return `/${slugs.dynamics}`;
-  if (route.type === 'guides') return `/${slugs.guides}`;
-  if (route.type === 'privacy') return `/${slugs.privacy}`;
-  if (route.type === 'terms') return `/${slugs.terms}`;
-  if (route.type === 'about') return `/${slugs.about}`;
-  if (route.type === 'contact') return `/${slugs.contact}`;
-  if (route.type === 'faq') return `/${slugs.faq || 'faq'}`;
-  if (route.type === 'category') {
-    const fullPath = getLocalizedCategoryPath(localeConfig, route.storeFilter, route.slug);
-    return fullPath.slice(`/${localeConfig.code}`.length);
-  }
-  return '';
 }
 
 function buildStaticBodyMarkup(localeConfig, route, coupons) {
@@ -136,9 +119,10 @@ function buildStaticBodyMarkup(localeConfig, route, coupons) {
 
   const emptyCouponsHtml = `
       <div class="no-coupons-banner">
-        <p>${escapeHtml(localeConfig.lang === 'es' ? 'No hay cupones de carrito vigentes para este país en este momento.' : 'There are no active cart coupons for this country at this moment.')}</p>
+        <p>${escapeHtml(ui.noActiveCartCoupons)}</p>
+        <p>${escapeHtml(ui.exploreProductDeals(displayCountry))}</p>
         <div class="no-coupons-actions">
-          <a href="#catalogo-ofertas" class="btn-no-coupons-primary">${escapeHtml(localeConfig.lang === 'es' ? 'Ver ofertas de producto disponibles' : 'View available product deals')}</a>
+          <a href="#catalogo-ofertas" class="btn-no-coupons-primary">${escapeHtml(ui.viewProductDealsBtn)}</a>
         </div>
       </div>`;
 
@@ -336,24 +320,47 @@ function getRouteSeoMeta(routeType) {
   return { rank: 5, priority: '0.3', changefreq: 'monthly' };
 }
 
-function buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonicalUrl, defaultLocObj) {
+function buildLocalizedHtml(
+  templateHtml,
+  localeConfig,
+  route,
+  coupons,
+  policyOrCanonicalUrl,
+  defaultLocObj = LOCALES.find((l) => l.code === DEFAULT_LOCALE) || LOCALES[0],
+  options = {}
+) {
+  const isPolicyObj = Boolean(
+    policyOrCanonicalUrl && typeof policyOrCanonicalUrl === 'object' && 'robotsContent' in policyOrCanonicalUrl
+  );
+  const policy = isPolicyObj
+    ? policyOrCanonicalUrl
+    : resolveRouteSeoPolicy(localeConfig, route, {
+        coupons,
+        offersCount: options.offersCount || 0,
+        isRoot: Boolean(options.isRoot) || policyOrCanonicalUrl === `${BASE_DOMAIN}/`,
+        indexableLocales: options.indexableLocales || null
+      });
+
+  const canonicalUrl = policy.canonicalUrl;
   const seoMeta = buildRouteSeoMeta(localeConfig, route);
   const pageTitle = seoMeta.title;
   const pageDesc = seoMeta.description;
 
-  const hreflangTags = LOCALES.map((loc) => {
-    const altSuffix = getRouteSuffixForLocale(route, loc);
-    return `<link rel="alternate" hreflang="${loc.code}" href="${BASE_DOMAIN}/${loc.code}${altSuffix}" data-dynamic-hreflang="true" />`;
-  }).join('\n    ');
+  const hreflangTags = policy.emitHreflang
+    ? policy.hreflangLocales
+        .map((loc) => {
+          const altSuffix = getRouteSuffixForLocale(route, loc);
+          return `<link rel="alternate" hreflang="${loc.code}" href="${BASE_DOMAIN}/${loc.code}${altSuffix}" data-dynamic-hreflang="true" />`;
+        })
+        .join('\n    ')
+    : '';
 
-  const xDefaultSuffix = getRouteSuffixForLocale(route, defaultLocObj);
-  const xDefaultHref = route.type === 'home' && !route.storeFilter && !route.slug
-    ? `${BASE_DOMAIN}/`
-    : `${BASE_DOMAIN}/${DEFAULT_LOCALE}${xDefaultSuffix}`;
-  const xDefaultTag = `<link rel="alternate" hreflang="x-default" href="${xDefaultHref}" data-dynamic-hreflang="true" />`;
+  const xDefaultTag = policy.emitHreflang && policy.xDefaultHref
+    ? `<link rel="alternate" hreflang="x-default" href="${policy.xDefaultHref}" data-dynamic-hreflang="true" />`
+    : '';
   const canonicalTag = `<link rel="canonical" href="${canonicalUrl}" />`;
   const keywordsTag = `<meta name="keywords" content="${escapeHtml(seoMeta.keywords)}" data-dynamic-meta="true" />`;
-  const robotsTag = `<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />`;
+  const robotsTag = `<meta name="robots" content="${policy.robotsContent}" />`;
 
   const ogTags = [
     `<meta property="og:type" content="website" data-dynamic-og="true" />`,
@@ -379,7 +386,8 @@ function buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonica
         locale: localeConfig.code,
         storeFilter: route.storeFilter || null,
         categoryFilter: route.type === 'category' ? route.slug : null,
-        coupons
+        coupons,
+        ...(policy.emitHreflang ? { indexableLocales: policy.hreflangLocales.map((l) => l.code) } : {})
       }).replace(/</g, '\\u003c')};</script>`
     : '';
 
@@ -397,6 +405,104 @@ function buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonica
     )
     .replace('<!--SEO_HEAD_INJECT-->', headInjection)
     .replace('<!--SSG_CONTENT_INJECT-->', staticBody);
+}
+
+function buildSitemapXml(sitemapRecords, todayIso = new Date().toISOString().split('T')[0]) {
+  const sorted = [...sitemapRecords].sort((a, b) => a.rank - b.rank);
+  const urlEntries = sorted.map(
+    (entry) => `  <url>
+    <loc>${entry.loc}</loc>
+    <lastmod>${todayIso}</lastmod>
+    <changefreq>${entry.changefreq}</changefreq>
+    <priority>${entry.priority}</priority>
+  </url>`
+  );
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urlEntries.join('\n')}
+</urlset>
+`;
+}
+
+function buildSitemapIndexXml(todayIso = new Date().toISOString().split('T')[0]) {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>${BASE_DOMAIN}/sitemap.xml</loc>
+    <lastmod>${todayIso}</lastmod>
+  </sitemap>
+</sitemapindex>
+`;
+}
+
+function buildRobotsTxt() {
+  return [
+    'User-agent: Googlebot',
+    'Allow: /',
+    '',
+    'User-agent: Yandex',
+    'Allow: /',
+    '',
+    'User-agent: bingbot',
+    'Allow: /',
+    '',
+    'User-agent: DuckDuckBot',
+    'Allow: /',
+    '',
+    'User-agent: Slurp',
+    'Allow: /',
+    '',
+    'User-agent: Baiduspider',
+    'Allow: /',
+    '',
+    'User-agent: Applebot',
+    'Allow: /',
+    '',
+    'User-agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: ${BASE_DOMAIN}/sitemap-index.xml`,
+    ''
+  ].join('\n');
+}
+
+function evaluateRoutesWithPolicies(routes, { dbCoupons = [], offersCountForRoute = () => 0 } = {}) {
+  return routes.map((route) => {
+    const storeFilter = route.storeFilter || null;
+    const categoryFilter = route.type === 'category' ? route.slug : null;
+    const isCatalogRoute = ['home', 'temu', 'aliexpress', 'category'].includes(route.type);
+
+    const preliminary = LOCALES.map((localeConfig) => {
+      const coupons = isCatalogRoute
+        ? getCouponsForLocale(
+            localeConfig.code,
+            { storeFilter, categoryFilter },
+            { coupons: dbCoupons.length > 0 ? dbCoupons : undefined }
+          )
+        : [];
+      const offersCount = Number(offersCountForRoute(localeConfig, route)) || 0;
+      const policy = resolveRouteSeoPolicy(localeConfig, route, { coupons, offersCount });
+      return { localeConfig, coupons, offersCount, isIndexable: policy.isIndexable };
+    });
+
+    const indexableLocales = preliminary
+      .filter((item) => item.isIndexable)
+      .map((item) => item.localeConfig.code);
+
+    const entries = preliminary.map(({ localeConfig, coupons, offersCount }) => ({
+      localeConfig,
+      coupons,
+      offersCount,
+      policy: resolveRouteSeoPolicy(localeConfig, route, {
+        coupons,
+        offersCount,
+        indexableLocales
+      })
+    }));
+
+    return { route, indexableLocales, entries };
+  });
 }
 
 async function runPrerenderAndSitemap() {
@@ -434,51 +540,7 @@ async function runPrerenderAndSitemap() {
   const todayIso = new Date().toISOString().split('T')[0];
   const defaultLocObj = LOCALES.find((l) => l.code === DEFAULT_LOCALE) || LOCALES[0];
 
-  let generatedCount = 0;
-
-  for (const localeConfig of LOCALES) {
-    for (const route of routes) {
-      const storeFilter = route.storeFilter || null;
-      const categoryFilter = route.type === 'category' ? route.slug : null;
-      const isCatalogRoute = ['home', 'temu', 'aliexpress', 'category'].includes(route.type);
-      const coupons = isCatalogRoute
-        ? getCouponsForLocale(
-            localeConfig.code,
-            { storeFilter, categoryFilter },
-            { coupons: dbCoupons.length > 0 ? dbCoupons : undefined }
-          )
-        : [];
-
-      const routeSuffix = getRouteSuffixForLocale(route, localeConfig);
-      const canonicalUrl = `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`;
-      const localizedHtml = buildLocalizedHtml(templateHtml, localeConfig, route, coupons, canonicalUrl, defaultLocObj);
-
-      const relativeFolder = path.join(localeConfig.code, routeSuffix.replace(/^\//, ''));
-      const targetFolder = path.join(DIST_DIR, relativeFolder);
-      fs.mkdirSync(targetFolder, { recursive: true });
-      fs.writeFileSync(path.join(targetFolder, 'index.html'), localizedHtml, 'utf-8');
-      generatedCount++;
-    }
-  }
-
-  // Prerender root index.html so https://cuponestech.tech/ serves full static SEO links & schema
-  const rootCoupons = getCouponsForLocale(
-    defaultLocObj.code,
-    { storeFilter: null, categoryFilter: null },
-    { coupons: dbCoupons.length > 0 ? dbCoupons : undefined }
-  );
-  const rootHtml = buildLocalizedHtml(
-    templateHtml,
-    defaultLocObj,
-    { type: 'home', storeFilter: null },
-    rootCoupons,
-    `${BASE_DOMAIN}/`,
-    defaultLocObj
-  );
-  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), rootHtml, 'utf-8');
-  generatedCount++;
-
-  // Generate compact, priority-ordered Sitemap XML (hreflang links live in HTML <head>)
+  const evaluatedRoutes = evaluateRoutesWithPolicies(routes, { dbCoupons });
   const sitemapRecords = [
     {
       loc: `${BASE_DOMAIN}/`,
@@ -488,69 +550,60 @@ async function runPrerenderAndSitemap() {
     }
   ];
 
-  for (const route of routes) {
-    const seoMeta = getRouteSeoMeta(route.type);
-    for (const localeConfig of LOCALES) {
+  let generatedCount = 0;
+
+  for (const { route, entries } of evaluatedRoutes) {
+    const routeMeta = getRouteSeoMeta(route.type);
+    for (const { localeConfig, coupons, policy } of entries) {
       const routeSuffix = getRouteSuffixForLocale(route, localeConfig);
-      sitemapRecords.push({
-        loc: `${BASE_DOMAIN}/${localeConfig.code}${routeSuffix}`,
-        ...seoMeta
-      });
+      const localizedHtml = buildLocalizedHtml(templateHtml, localeConfig, route, coupons, policy, defaultLocObj);
+
+      const relativeFolder = path.join(localeConfig.code, routeSuffix.replace(/^\//, ''));
+      const targetFolder = path.join(DIST_DIR, relativeFolder);
+      fs.mkdirSync(targetFolder, { recursive: true });
+      fs.writeFileSync(path.join(targetFolder, 'index.html'), localizedHtml, 'utf-8');
+      generatedCount++;
+
+      if (policy.includeInSitemap) {
+        sitemapRecords.push({
+          loc: policy.canonicalUrl,
+          ...routeMeta
+        });
+      }
     }
   }
 
-  sitemapRecords.sort((a, b) => a.rank - b.rank);
-
-  const urlEntries = sitemapRecords.map(
-    (entry) => `  <url>
-    <loc>${entry.loc}</loc>
-    <lastmod>${todayIso}</lastmod>
-    <changefreq>${entry.changefreq}</changefreq>
-    <priority>${entry.priority}</priority>
-  </url>`
+  // Prerender root index.html so https://cuponestech.tech/ serves full static SEO links & schema
+  const rootCoupons = getCouponsForLocale(
+    defaultLocObj.code,
+    { storeFilter: null, categoryFilter: null },
+    { coupons: dbCoupons.length > 0 ? dbCoupons : undefined }
   );
+  const rootPolicy = resolveRouteSeoPolicy(
+    defaultLocObj,
+    { type: 'home', storeFilter: null },
+    { coupons: rootCoupons, offersCount: 0, isRoot: true, indexableLocales: LOCALES.map((l) => l.code) }
+  );
+  const rootHtml = buildLocalizedHtml(
+    templateHtml,
+    defaultLocObj,
+    { type: 'home', storeFilter: null },
+    rootCoupons,
+    rootPolicy,
+    defaultLocObj
+  );
+  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), rootHtml, 'utf-8');
+  generatedCount++;
 
-  const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urlEntries.join('\n')}
-</urlset>
-`;
+  const sitemapXml = buildSitemapXml(sitemapRecords, todayIso);
+  const sitemapIndexXml = buildSitemapIndexXml(todayIso);
+  const robotsTxt = buildRobotsTxt();
 
   fs.mkdirSync(PUBLIC_DIR, { recursive: true });
   fs.writeFileSync(path.join(PUBLIC_DIR, 'sitemap.xml'), sitemapXml, 'utf-8');
   fs.writeFileSync(path.join(DIST_DIR, 'sitemap.xml'), sitemapXml, 'utf-8');
-  fs.writeFileSync(path.join(PUBLIC_DIR, 'sitemap-index.xml'), sitemapXml, 'utf-8');
-  fs.writeFileSync(path.join(DIST_DIR, 'sitemap-index.xml'), sitemapXml, 'utf-8');
-
-  const robotsTxt = [
-    'User-agent: Googlebot',
-    'Allow: /',
-    '',
-    'User-agent: Yandex',
-    'Allow: /',
-    '',
-    'User-agent: bingbot',
-    'Allow: /',
-    '',
-    'User-agent: DuckDuckBot',
-    'Allow: /',
-    '',
-    'User-agent: Slurp',
-    'Allow: /',
-    '',
-    'User-agent: Baiduspider',
-    'Allow: /',
-    '',
-    'User-agent: Applebot',
-    'Allow: /',
-    '',
-    'User-agent: *',
-    'Allow: /',
-    '',
-    `Sitemap: ${BASE_DOMAIN}/sitemap.xml`,
-    `Sitemap: ${BASE_DOMAIN}/sitemap-index.xml`,
-    ''
-  ].join('\n');
+  fs.writeFileSync(path.join(PUBLIC_DIR, 'sitemap-index.xml'), sitemapIndexXml, 'utf-8');
+  fs.writeFileSync(path.join(DIST_DIR, 'sitemap-index.xml'), sitemapIndexXml, 'utf-8');
 
   fs.writeFileSync(path.join(PUBLIC_DIR, 'robots.txt'), robotsTxt, 'utf-8');
   fs.writeFileSync(path.join(DIST_DIR, 'robots.txt'), robotsTxt, 'utf-8');
@@ -561,9 +614,27 @@ ${urlEntries.join('\n')}
   console.log(`[SSG + Sitemap] Generated ${generatedCount} static HTML pages across ${LOCALES.length} locales (${sitemapRecords.length} URLs in sitemap.xml + IndexNow key).`);
 }
 
-runPrerenderAndSitemap()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error('[SSG Error]', err);
-    process.exit(1);
-  });
+export {
+  getAllRouteDescriptors,
+  getRouteSuffixForLocale,
+  buildStaticBodyMarkup,
+  buildLocalizedHtml,
+  buildSitemapXml,
+  buildSitemapIndexXml,
+  buildRobotsTxt,
+  evaluateRoutesWithPolicies,
+  runPrerenderAndSitemap
+};
+
+const isMainModule = Boolean(
+  process.argv[1] && path.resolve(process.argv[1]).toLowerCase() === __filename.toLowerCase()
+);
+
+if (isMainModule) {
+  runPrerenderAndSitemap()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('[SSG Error]', err);
+      process.exit(1);
+    });
+}

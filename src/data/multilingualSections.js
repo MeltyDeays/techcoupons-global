@@ -217,6 +217,10 @@ export const SECTION_I18N = {
     currencyLabel: 'Moneda:',
     cpaComplianceLabel: 'Cumplimiento CPA:',
     cpaComplianceText: 'Sin incentivos por clic, sin cookie-stuffing y sin redirecciones forzadas.',
+    noActiveCartCoupons: 'No hay cupones de carrito vigentes para este país en este momento.',
+    exploreProductDeals: (country) =>
+      `Puedes explorar las ofertas de producto con descuento directo disponibles a continuación para ${country}.`,
+    viewProductDealsBtn: 'Ver ofertas de producto disponibles',
     catShort: {
       'moda-ropa': 'Ropa y Calzado',
       'smart-home': 'Hogar y Cocina',
@@ -388,6 +392,10 @@ export const SECTION_I18N = {
     currencyLabel: 'Currency:',
     cpaComplianceLabel: 'CPA Compliance:',
     cpaComplianceText: 'No incentivized clicks, no cookie-stuffing, no forced redirects.',
+    noActiveCartCoupons: 'There are no active cart coupons for this country at this moment.',
+    exploreProductDeals: (country) =>
+      `You can explore direct-discount product deals available below for ${country}.`,
+    viewProductDealsBtn: 'View available product deals',
     catShort: {
       'moda-ropa': 'Fashion & Shoes',
       'smart-home': 'Home & Kitchen',

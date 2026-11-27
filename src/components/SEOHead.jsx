@@ -1,13 +1,11 @@
 import { useEffect } from 'react';
 import {
-  LOCALES,
   BASE_DOMAIN,
-  DEFAULT_LOCALE,
-  getLocaleConfig,
   buildStructuredData,
-  buildRouteSeoMeta
+  buildRouteSeoMeta,
+  resolveRouteSeoPolicy,
+  getRouteSuffixForLocale
 } from '../config/locales.js';
-import { translatePathToLocale } from '../data/multilingualSections.js';
 
 function setMetaTag(attrKey, attrValue, content, dataFlag = null) {
   let el = document.head.querySelector(`meta[${attrKey}="${attrValue}"]`);
@@ -20,14 +18,44 @@ function setMetaTag(attrKey, attrValue, content, dataFlag = null) {
   el.setAttribute('content', content);
 }
 
-export default function SEOHead({ localeConfig, route = null, routeSuffix = '', pageTitle, pageDescription, coupons = [], isRoot = false }) {
+export default function SEOHead({
+  localeConfig,
+  route = null,
+  routeSuffix = '',
+  pageTitle,
+  pageDescription,
+  coupons = [],
+  offersCount = 0,
+  indexableLocales = null,
+  isRoot = false
+}) {
   const cleanSuffix = routeSuffix ? (routeSuffix.startsWith('/') ? routeSuffix : `/${routeSuffix}`) : '';
-  const currentPath = isRoot ? '/' : `/${localeConfig.code}${cleanSuffix}`;
-  const canonicalUrl = `${BASE_DOMAIN}${currentPath}`;
   const resolvedRoute = route || { type: cleanSuffix.replace(/^\//, '') || 'home', storeFilter: null, slug: null };
   const routeType = resolvedRoute.type || 'home';
   const routeStore = resolvedRoute.storeFilter || null;
   const routeSlug = resolvedRoute.slug || null;
+
+  const ssrData = typeof window !== 'undefined' ? window.__SSR_COUPONS__ : null;
+  const ssrMatchesRoute = Boolean(
+    ssrData &&
+    ssrData.locale === localeConfig.code &&
+    (ssrData.storeFilter || null) === routeStore &&
+    (ssrData.categoryFilter || null) === (routeType === 'category' ? routeSlug : null)
+  );
+  const resolvedIndexableLocales = indexableLocales ?? (
+    ssrMatchesRoute && Array.isArray(ssrData.indexableLocales) ? ssrData.indexableLocales : null
+  );
+
+  const policy = resolveRouteSeoPolicy(
+    localeConfig,
+    { type: routeType, storeFilter: routeStore, slug: routeSlug },
+    { coupons, offersCount, isRoot, indexableLocales: resolvedIndexableLocales }
+  );
+  const canonicalUrl = policy.canonicalUrl;
+  const hreflangCodesKey = policy.emitHreflang
+    ? policy.hreflangLocales.map((l) => l.code).join(',')
+    : '';
+
   const seoMeta = buildRouteSeoMeta(localeConfig, { type: routeType, storeFilter: routeStore, slug: routeSlug });
   const title = pageTitle || seoMeta.title;
   const description = pageDescription || seoMeta.description;
@@ -39,7 +67,7 @@ export default function SEOHead({ localeConfig, route = null, routeSuffix = '', 
 
     setMetaTag('name', 'description', description);
     setMetaTag('name', 'keywords', seoMeta.keywords, 'data-dynamic-meta');
-    setMetaTag('name', 'robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+    setMetaTag('name', 'robots', policy.robotsContent);
 
     setMetaTag('property', 'og:type', 'website', 'data-dynamic-og');
     setMetaTag('property', 'og:site_name', 'CuponesTech', 'data-dynamic-og');
@@ -60,27 +88,30 @@ export default function SEOHead({ localeConfig, route = null, routeSuffix = '', 
     }
     canonical.setAttribute('href', canonicalUrl);
 
-    document.querySelectorAll('link[data-dynamic-hreflang="true"], script[data-dynamic-schema="true"]').forEach((el) => el.remove());
+    document
+      .querySelectorAll('link[rel="alternate"][hreflang], link[data-dynamic-hreflang="true"], script[data-dynamic-schema="true"]')
+      .forEach((el) => el.remove());
 
-    LOCALES.forEach((loc) => {
-      const link = document.createElement('link');
-      link.setAttribute('rel', 'alternate');
-      link.setAttribute('hreflang', loc.code);
-      link.setAttribute('href', `${BASE_DOMAIN}${translatePathToLocale(currentPath, loc)}`);
-      link.setAttribute('data-dynamic-hreflang', 'true');
-      document.head.appendChild(link);
-    });
+    if (policy.emitHreflang) {
+      policy.hreflangLocales.forEach((loc) => {
+        const altSuffix = getRouteSuffixForLocale({ type: routeType, storeFilter: routeStore, slug: routeSlug }, loc);
+        const link = document.createElement('link');
+        link.setAttribute('rel', 'alternate');
+        link.setAttribute('hreflang', loc.code);
+        link.setAttribute('href', `${BASE_DOMAIN}/${loc.code}${altSuffix}`);
+        link.setAttribute('data-dynamic-hreflang', 'true');
+        document.head.appendChild(link);
+      });
 
-    const xDefaultLoc = getLocaleConfig(DEFAULT_LOCALE);
-    const xDefaultHref = routeType === 'home' && !routeStore && !routeSlug
-      ? `${BASE_DOMAIN}/`
-      : `${BASE_DOMAIN}${translatePathToLocale(currentPath, xDefaultLoc)}`;
-    const xDefault = document.createElement('link');
-    xDefault.setAttribute('rel', 'alternate');
-    xDefault.setAttribute('hreflang', 'x-default');
-    xDefault.setAttribute('href', xDefaultHref);
-    xDefault.setAttribute('data-dynamic-hreflang', 'true');
-    document.head.appendChild(xDefault);
+      if (policy.xDefaultHref) {
+        const xDefault = document.createElement('link');
+        xDefault.setAttribute('rel', 'alternate');
+        xDefault.setAttribute('hreflang', 'x-default');
+        xDefault.setAttribute('href', policy.xDefaultHref);
+        xDefault.setAttribute('data-dynamic-hreflang', 'true');
+        document.head.appendChild(xDefault);
+      }
+    }
 
     const schemas = buildStructuredData(localeConfig, coupons, canonicalUrl, { type: routeType, storeFilter: routeStore, slug: routeSlug });
     schemas.forEach((schemaObj) => {
@@ -90,7 +121,25 @@ export default function SEOHead({ localeConfig, route = null, routeSuffix = '', 
       script.textContent = JSON.stringify(schemaObj);
       document.head.appendChild(script);
     });
-  }, [localeConfig.code, routeType, routeStore, routeSlug, cleanSuffix, currentPath, title, description, seoMeta.keywords, seoMeta.ogLocale, canonicalUrl, coupons.length, isRoot]);
+  }, [
+    localeConfig.code,
+    routeType,
+    routeStore,
+    routeSlug,
+    cleanSuffix,
+    title,
+    description,
+    seoMeta.keywords,
+    seoMeta.ogLocale,
+    canonicalUrl,
+    policy.robotsContent,
+    policy.emitHreflang,
+    policy.xDefaultHref,
+    hreflangCodesKey,
+    coupons.length,
+    offersCount,
+    isRoot
+  ]);
 
   return null;
 }

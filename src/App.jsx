@@ -215,6 +215,8 @@ export function MarketCatalogPage({ storeFilter = null, isRoot = false }) {
         route={{ type: categoryFilter ? 'category' : (storeFilter || 'home'), storeFilter, slug: categoryFilter }}
         routeSuffix={routeSuffix}
         coupons={coupons}
+        offersCount={0}
+        indexableLocales={ssrMatch && Array.isArray(window.__SSR_COUPONS__?.indexableLocales) ? window.__SSR_COUPONS__.indexableLocales : null}
         isRoot={isRoot}
       />
 
@@ -375,22 +377,18 @@ export function MarketCatalogPage({ storeFilter = null, isRoot = false }) {
           <div className="rounded-2xl border border-[#DED4C6] bg-[#FCF9F4] p-6 sm:p-8 text-center">
             <p className="text-base sm:text-lg font-extrabold text-[#1F1B18] mb-1.5">
               {coupons.length === 0 && !(storeFilter === 'temu' && !hasTemuInCountry)
-                ? (localeConfig.lang === 'es'
-                    ? 'No hay cupones de carrito vigentes para este país en este momento'
-                    : 'No sitewide cart coupons currently active for this country at this moment')
+                ? ui.noActiveCartCoupons
                 : ui.miamiNotice(displayCountry, localeConfig.currencyCode)}
             </p>
             <p className="text-xs sm:text-sm text-[#6E6055] max-w-xl mx-auto mb-4">
-              {localeConfig.lang === 'es'
-                ? `Puedes explorar las ofertas de producto con descuento directo disponibles a continuación para ${displayCountry}.`
-                : `You can explore direct-discount product deals available below for ${displayCountry}.`}
+              {ui.exploreProductDeals(displayCountry)}
             </p>
             <div className="mt-2 flex flex-wrap justify-center gap-3">
               <a
                 href="#catalogo-ofertas"
                 className="rounded-xl bg-[#B85332] px-4 py-2 text-xs font-bold text-[#FCF9F4] hover:bg-[#9E4224] transition shadow-xs"
               >
-                {localeConfig.lang === 'es' ? 'Ver ofertas de producto disponibles' : 'View available product deals'}
+                {ui.viewProductDealsBtn}
               </a>
               <Link
                 to={ui.usLockerTarget || '/en-us/temu'}

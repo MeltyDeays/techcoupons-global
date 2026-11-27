@@ -22,5 +22,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://cuponestech.tech/sitemap.xml
 Sitemap: https://cuponestech.tech/sitemap-index.xml

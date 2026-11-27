@@ -1,5 +1,10 @@
 import { LANGUAGE_PACKS, BASE_DOMAIN, CATEGORY_SLUGS } from '../data/i18nDictionaries.js';
-import { getSectionText, getLocalizedCountryName } from '../data/multilingualSections.js';
+import {
+  getSectionText,
+  getLocalizedCountryName,
+  getLocalizedCategoryPath,
+  getRouteSlugsForLang
+} from '../data/multilingualSections.js';
 import ALL_DEALS from '../data/aliexpress_catalog_deals.json' with { type: 'json' };
 
 const RAW_MARKETS = [
@@ -885,6 +890,149 @@ export function buildStructuredData(localeConfig, coupons, canonicalUrl, pageTyp
   }
 
   return schemas;
+}
+
+const INDEX_ROBOTS_CONTENT = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+const NOINDEX_ROBOTS_CONTENT = 'noindex, follow';
+const PRUNED_LEGAL_TYPES = new Set(['privacy', 'terms', 'about', 'contact', 'faq']);
+
+export function getRouteSuffixForLocale(route = { type: 'home', storeFilter: null, slug: null }, localeConfig = LOCALE_MAP[DEFAULT_LOCALE]) {
+  const normRoute = typeof route === 'string'
+    ? { type: route || 'home', storeFilter: null, slug: null }
+    : (route || { type: 'home', storeFilter: null, slug: null });
+  const slugs = getRouteSlugsForLang(localeConfig.lang);
+  if (normRoute.type === 'home') return '';
+  if (normRoute.type === 'temu') return '/temu';
+  if (normRoute.type === 'aliexpress') return '/aliexpress';
+  if (normRoute.type === 'dynamics') return `/${slugs.dynamics}`;
+  if (normRoute.type === 'guides') return `/${slugs.guides}`;
+  if (normRoute.type === 'privacy') return `/${slugs.privacy}`;
+  if (normRoute.type === 'terms') return `/${slugs.terms}`;
+  if (normRoute.type === 'about') return `/${slugs.about}`;
+  if (normRoute.type === 'contact') return `/${slugs.contact}`;
+  if (normRoute.type === 'faq') return `/${slugs.faq || 'faq'}`;
+  if (normRoute.type === 'category' && normRoute.slug) {
+    const fullPath = getLocalizedCategoryPath(localeConfig, normRoute.storeFilter, normRoute.slug);
+    return fullPath.slice(`/${localeConfig.code}`.length);
+  }
+  return '';
+}
+
+/**
+ * Resuelve de forma determinista la política SEO (robots, canonical, hreflang, sitemap)
+ * compartida entre SSG (`scripts/prerender-and-sitemap.js`) y cliente (`SEOHead.jsx`).
+ */
+export function resolveRouteSeoPolicy(
+  localeConfig,
+  route = { type: 'home', storeFilter: null, slug: null },
+  { coupons = [], offersCount = 0, isRoot = false, indexableLocales = null } = {}
+) {
+  const loc = localeConfig || LOCALE_MAP[DEFAULT_LOCALE];
+  const normRoute = typeof route === 'string'
+    ? { type: route || 'home', storeFilter: null, slug: null }
+    : (route || { type: 'home', storeFilter: null, slug: null });
+  const type = normRoute.type || 'home';
+  const storeFilter = normRoute.storeFilter || null;
+  const slug = normRoute.slug || null;
+
+  const routeSuffix = isRoot ? '' : getRouteSuffixForLocale(normRoute, loc);
+  const selfUrl = isRoot ? `${BASE_DOMAIN}/` : `${BASE_DOMAIN}/${loc.code}${routeSuffix}`;
+  const defaultLocObj = LOCALE_MAP[DEFAULT_LOCALE] || LOCALES[0];
+
+  const allowedSet = indexableLocales instanceof Set
+    ? indexableLocales
+    : Array.isArray(indexableLocales)
+      ? new Set(indexableLocales)
+      : null;
+
+  // R1: Rutas duplicadas de AliExpress -> noindex, canonical hacia ruta sin filtro de tienda, sin hreflang, fuera de sitemap
+  if (type === 'aliexpress' || (type === 'category' && storeFilter === 'aliexpress')) {
+    const canonicalUrl = type === 'category' && slug
+      ? `${BASE_DOMAIN}${getLocalizedCategoryPath(loc, null, slug)}`
+      : `${BASE_DOMAIN}/${loc.code}`;
+    return {
+      isIndexable: false,
+      robotsContent: NOINDEX_ROBOTS_CONTENT,
+      canonicalUrl,
+      emitHreflang: false,
+      includeInSitemap: false,
+      hreflangLocales: [],
+      xDefaultHref: null
+    };
+  }
+
+  // R2: Rutas de Temu -> indexables solo con soporte en país + inventario activo (cupones u ofertas)
+  if (type === 'temu' || (type === 'category' && storeFilter === 'temu')) {
+    const hasTemuInCountry = (loc.stores || []).includes('temu');
+    const activeCoupons = Array.isArray(coupons) ? coupons.length : 0;
+    const activeOffers = Number(offersCount) || 0;
+    const hasInventory = hasTemuInCountry && (activeCoupons > 0 || activeOffers > 0);
+
+    if (!hasInventory) {
+      return {
+        isIndexable: false,
+        robotsContent: NOINDEX_ROBOTS_CONTENT,
+        canonicalUrl: selfUrl,
+        emitHreflang: false,
+        includeInSitemap: false,
+        hreflangLocales: [],
+        xDefaultHref: null
+      };
+    }
+
+    const hreflangLocales = allowedSet
+      ? LOCALES.filter((l) => allowedSet.has(l.code))
+      : LOCALES.filter((l) => (l.stores || []).includes('temu'));
+    const hasDefaultInHreflang = hreflangLocales.some((l) => l.code === DEFAULT_LOCALE);
+    const xDefaultHref = hasDefaultInHreflang
+      ? `${BASE_DOMAIN}/${DEFAULT_LOCALE}${getRouteSuffixForLocale(normRoute, defaultLocObj)}`
+      : null;
+
+    return {
+      isIndexable: true,
+      robotsContent: INDEX_ROBOTS_CONTENT,
+      canonicalUrl: selfUrl,
+      emitHreflang: true,
+      includeInSitemap: true,
+      hreflangLocales,
+      xDefaultHref
+    };
+  }
+
+  // R3: Rutas legales y FAQ -> noindex, self-canonical, sin hreflang, fuera de sitemap
+  if (PRUNED_LEGAL_TYPES.has(type)) {
+    return {
+      isIndexable: false,
+      robotsContent: NOINDEX_ROBOTS_CONTENT,
+      canonicalUrl: selfUrl,
+      emitHreflang: false,
+      includeInSitemap: false,
+      hreflangLocales: [],
+      xDefaultHref: null
+    };
+  }
+
+  // Rutas indexables: home, category (storeFilter === null), dynamics, guides, root /
+  const hreflangLocales = allowedSet
+    ? LOCALES.filter((l) => allowedSet.has(l.code))
+    : LOCALES;
+  const hasDefaultInHreflang = hreflangLocales.some((l) => l.code === DEFAULT_LOCALE);
+  const isHomeRoute = type === 'home' && !storeFilter && !slug;
+  const xDefaultHref = isHomeRoute
+    ? `${BASE_DOMAIN}/`
+    : (hasDefaultInHreflang
+        ? `${BASE_DOMAIN}/${DEFAULT_LOCALE}${getRouteSuffixForLocale(normRoute, defaultLocObj)}`
+        : null);
+
+  return {
+    isIndexable: true,
+    robotsContent: INDEX_ROBOTS_CONTENT,
+    canonicalUrl: selfUrl,
+    emitHreflang: true,
+    includeInSitemap: true,
+    hreflangLocales,
+    xDefaultHref
+  };
 }
 
 export { BASE_DOMAIN, CATEGORY_SLUGS };
